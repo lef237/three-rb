@@ -14,6 +14,7 @@ The current browser examples use root-relative URLs. The deployed output must pr
 - `/vendor/@ruby/wasm-wasi/` for the browser Ruby VM JavaScript package.
 - `/vendor/@bjorn3/browser_wasi_shim/` for WASI browser support.
 - `/vendor/three/` for three.js and its addons.
+- `/` for the public demo entrypoint generated from the Ruby example page.
 
 Do not set `examples/browser/ruby` itself as the Cloudflare Pages output directory. That directory alone does not contain `/lib`, `/examples/browser/shared`, or the required browser packages.
 
@@ -40,7 +41,7 @@ Create a deployment directory that contains only the static files required by th
 pnpm run build:pages:ruby
 ```
 
-This script rebuilds `dist/` from scratch, copies the Ruby example, shared browser boot runtime, local Ruby source, and required browser packages. It uses `cp -RL` for packages copied from local `node_modules` so pnpm symlinks are resolved into real files, then deploys those package files under `/vendor/`. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
+This script rebuilds `dist/` from scratch, copies the Ruby example, shared browser boot runtime, local Ruby source, and required browser packages. It also generates `dist/index.html` and `dist/boot.mjs` so the public Pages root URL runs the Ruby example directly. It uses `cp -RL` for packages copied from local `node_modules` so pnpm symlinks are resolved into real files, then deploys those package files under `/vendor/`. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
 
 By default, the script writes a Pages-specific wasm URL into `dist/examples/browser/shared/config.mjs`:
 
@@ -59,7 +60,7 @@ ruby -run -e httpd dist -p 8000
 Open:
 
 ```text
-http://localhost:8000/examples/browser/ruby/
+http://localhost:8000/
 ```
 
 If you rebuild `dist/` locally, start from an empty output directory so stale files do not hide missing copy steps.
@@ -104,7 +105,7 @@ Cloudflare Pages installs dependencies from `package.json` before the build comm
 After deployment, open:
 
 ```text
-https://<project>.pages.dev/examples/browser/ruby/
+https://<project>.pages.dev/
 ```
 
 ## Direct Upload With Wrangler
@@ -117,7 +118,7 @@ pnpm run build:pages:ruby
 pnpm exec wrangler pages deploy dist --project-name <project>
 ```
 
-Open the deployed `/examples/browser/ruby/` path after Wrangler prints the Pages URL.
+Open the deployed Pages root URL after Wrangler prints it.
 
 ## Deploying A Different Example
 
