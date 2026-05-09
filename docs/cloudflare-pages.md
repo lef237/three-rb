@@ -11,13 +11,15 @@ The current browser examples use root-relative URLs. The deployed output must pr
 - `/examples/browser/ruby/` for the Ruby gemstone example page, boot file, Ruby entrypoint, and local assets.
 - `/examples/browser/shared/` for the shared JavaScript boot runtime.
 - `/lib/` for the three-rb Ruby source files loaded by `require_relative`.
-- `/node_modules/@ruby/wasm-wasi/` for the browser Ruby VM JavaScript package.
-- `/node_modules/@bjorn3/browser_wasi_shim/` for WASI browser support.
-- `/node_modules/three/` for three.js and its addons.
+- `/vendor/@ruby/wasm-wasi/` for the browser Ruby VM JavaScript package.
+- `/vendor/@bjorn3/browser_wasi_shim/` for WASI browser support.
+- `/vendor/three/` for three.js and its addons.
 
 Do not set `examples/browser/ruby` itself as the Cloudflare Pages output directory. That directory alone does not contain `/lib`, `/examples/browser/shared`, or the required browser packages.
 
 Cloudflare Pages has a 25 MiB maximum size for each static asset. The current `ruby+stdlib.wasm` file is larger than that limit, so the Pages build script does not upload it as a Pages asset. Instead, the generated `dist/examples/browser/shared/config.mjs` points at a CDN URL for the pinned `@ruby/3.4-wasm-wasi` package by default. If you prefer to own that asset, upload `node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm` to Cloudflare R2 or another static host that supports large files and set `RUBY_WASM_URL` to that public URL in the Pages environment.
+
+The Pages build script copies browser packages under `/vendor/` instead of `/node_modules/`. This avoids Pages deployments that omit or fail to serve `node_modules` paths, and keeps the deployed URLs separate from package-manager internals.
 
 ## Local Verification
 
@@ -38,7 +40,7 @@ Create a deployment directory that contains only the static files required by th
 pnpm run build:pages:ruby
 ```
 
-This script rebuilds `dist/` from scratch, copies the Ruby example, shared browser boot runtime, local Ruby source, and required browser packages. It uses `cp -RL` for packages copied from `node_modules` so pnpm symlinks are resolved into real files. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
+This script rebuilds `dist/` from scratch, copies the Ruby example, shared browser boot runtime, local Ruby source, and required browser packages. It uses `cp -RL` for packages copied from local `node_modules` so pnpm symlinks are resolved into real files, then deploys those package files under `/vendor/`. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
 
 By default, the script writes a Pages-specific wasm URL into `dist/examples/browser/shared/config.mjs`:
 
@@ -145,10 +147,10 @@ The import map in the example page points at `/node_modules/...`, but the matchi
 
 `/node_modules/three/examples/jsm/... not found`
 
-The output directory probably contains pnpm symlinks instead of package files. Rebuild `dist/` from an empty directory and copy packages with `cp -RL`, then confirm the expected addon exists:
+The deployed site is using an older output layout or the output directory contains pnpm symlinks instead of package files. Rebuild `dist/` from an empty directory with `pnpm run build:pages:ruby`, then confirm the expected addon exists under `/vendor/`:
 
 ```sh
-test -f dist/node_modules/three/examples/jsm/postprocessing/UnrealBloomPass.js
+test -f dist/vendor/three/examples/jsm/postprocessing/UnrealBloomPass.js
 ```
 
 Ruby `require_relative` errors

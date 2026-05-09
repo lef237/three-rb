@@ -4,16 +4,17 @@ set -eu
 rm -rf dist
 
 mkdir -p dist/examples/browser
-mkdir -p dist/node_modules/@ruby
-mkdir -p dist/node_modules/@bjorn3
-mkdir -p dist/node_modules
+mkdir -p dist/vendor/@ruby
+mkdir -p dist/vendor/@bjorn3
+mkdir -p dist/vendor
 
 cp -R examples/browser/ruby dist/examples/browser/ruby
 cp -R examples/browser/shared dist/examples/browser/shared
 cp -R lib dist/lib
 
-cp -RL node_modules/@ruby/wasm-wasi dist/node_modules/@ruby/wasm-wasi
-cp -RL node_modules/@bjorn3/browser_wasi_shim dist/node_modules/@bjorn3/browser_wasi_shim
-cp -RL node_modules/three dist/node_modules/three
+cp -RL node_modules/@ruby/wasm-wasi dist/vendor/@ruby/wasm-wasi
+cp -RL node_modules/@bjorn3/browser_wasi_shim dist/vendor/@bjorn3/browser_wasi_shim
+cp -RL node_modules/three dist/vendor/three
 
 node -e 'const fs = require("fs"); const url = process.env.RUBY_WASM_URL || "https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a/dist/ruby+stdlib.wasm"; fs.writeFileSync("dist/examples/browser/shared/config.mjs", `export const rubyWasmUrl = ${JSON.stringify(url)};\n`);'
+node -e 'const fs = require("fs"); for (const path of ["dist/examples/browser/ruby/index.html", "dist/examples/browser/ruby/main.rb"]) { const text = fs.readFileSync(path, "utf8"); fs.writeFileSync(path, text.replaceAll("/node_modules/", "/vendor/")); }'
