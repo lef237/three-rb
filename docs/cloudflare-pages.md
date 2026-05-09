@@ -34,22 +34,10 @@ The smoke test starts a local static HTTP server and verifies that the Ruby VM b
 Create a deployment directory that contains only the static files required by the example:
 
 ```sh
-rm -rf dist
-mkdir -p dist/examples/browser
-mkdir -p dist/node_modules/@ruby
-mkdir -p dist/node_modules/@bjorn3
-mkdir -p dist/node_modules
-
-cp -R examples/browser/ruby dist/examples/browser/ruby
-cp -R examples/browser/shared dist/examples/browser/shared
-cp -R lib dist/lib
-cp -RL node_modules/@ruby/3.4-wasm-wasi dist/node_modules/@ruby/3.4-wasm-wasi
-cp -RL node_modules/@ruby/wasm-wasi dist/node_modules/@ruby/wasm-wasi
-cp -RL node_modules/@bjorn3/browser_wasi_shim dist/node_modules/@bjorn3/browser_wasi_shim
-cp -RL node_modules/three dist/node_modules/three
+pnpm run build:pages:ruby
 ```
 
-Use `cp -RL` for packages copied from `node_modules` so pnpm symlinks are resolved into real files. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
+This script rebuilds `dist/` from scratch, copies the Ruby example, shared browser boot runtime, local Ruby source, and required browser packages. It uses `cp -RL` for packages copied from `node_modules` so pnpm symlinks are resolved into real files. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
 
 Run the same shape locally before deploying:
 
@@ -84,7 +72,7 @@ Create a Pages project from the repository and use these settings:
 
 ```text
 Framework preset: None
-Build command: <copy files into dist>
+Build command: pnpm run build:pages:ruby
 Build output directory: dist
 ```
 
@@ -94,7 +82,7 @@ Set this environment variable to match the package manager version declared in `
 PNPM_VERSION=11.1.1
 ```
 
-Cloudflare Pages installs dependencies from `package.json` before the build command unless dependency installation is disabled. The build command may be the copy commands above, but it is usually cleaner to wrap them in a package script such as `pnpm run build:pages:ruby`. Cloudflare's Ruby support is only needed for build-time commands; the deployed Pages runtime still serves static files.
+Cloudflare Pages installs dependencies from `package.json` before the build command unless dependency installation is disabled. The build command creates `dist/` on Cloudflare during each deployment, so `dist/` should not be committed to the repository. Cloudflare's Ruby support is only needed for build-time commands; the deployed Pages runtime still serves static files.
 
 After deployment, open:
 
@@ -108,18 +96,7 @@ For a manual deployment, build the output directory locally and upload it:
 
 ```sh
 pnpm install
-rm -rf dist
-mkdir -p dist/examples/browser
-mkdir -p dist/node_modules/@ruby
-mkdir -p dist/node_modules/@bjorn3
-mkdir -p dist/node_modules
-cp -R examples/browser/ruby dist/examples/browser/ruby
-cp -R examples/browser/shared dist/examples/browser/shared
-cp -R lib dist/lib
-cp -RL node_modules/@ruby/3.4-wasm-wasi dist/node_modules/@ruby/3.4-wasm-wasi
-cp -RL node_modules/@ruby/wasm-wasi dist/node_modules/@ruby/wasm-wasi
-cp -RL node_modules/@bjorn3/browser_wasi_shim dist/node_modules/@bjorn3/browser_wasi_shim
-cp -RL node_modules/three dist/node_modules/three
+pnpm run build:pages:ruby
 pnpm exec wrangler pages deploy dist --project-name <project>
 ```
 
