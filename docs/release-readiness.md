@@ -21,7 +21,7 @@ The `0.1.0` target is complete when all of these are true:
 - JavaScript-loaded assets remain opaque `ExternalObject3D` roots for `0.1.0`; transform-level use, renderer traversal helpers, animation mixer usage, and explicit subtree disposal are in scope, while Ruby child mutation inside loaded external roots is out of scope.
 - Every browser example advertised in `README.md` and `examples/browser/README.md` has a matching deterministic Playwright smoke command, and `pnpm test:browser` runs them all.
 - The required gate below passes locally before tagging, and the CI workflow passes on the release commit.
-- Release metadata is final: `lib/three/version.rb` contains `0.1.0`, `CHANGELOG.md` has either the unreleased heading during development or the final release date before publishing, and `docs/publishing.md` has the manual publish steps.
+- Release metadata is final: `lib/three/version.rb` contains the exact target version, `CHANGELOG.md` has either the unreleased heading during development or the final release date before publishing, and `docs/publishing.md` has the manual publish steps.
 
 ## Public Scope
 
@@ -77,7 +77,7 @@ Before expanding feature scope, prefer:
 
 1. Keep release checks fast and deterministic.
 2. Keep fixture-based JSON export/load regression tests current.
-3. Keep `CHANGELOG.md` accurate while it remains under the `0.1.0 - Unreleased` heading.
+3. Keep `CHANGELOG.md` accurate while the next release remains under an unreleased heading.
 4. Improve public docs around browser examples, browser boot, and unsupported APIs; see `docs/next-work.md`.
 5. Add new material classes, postprocessing passes, render targets, or loaders only when a dedicated example and smoke test need them.
 6. Treat KTX2, WebGPU, WebXR, and native rendering as post-0.1 planning items.
