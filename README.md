@@ -1,5 +1,8 @@
-# three.rb
+# three-rb
+
 Ruby 3D Library.
+
+Published to RubyGems as `three-rb`; require it in Ruby as `three`.
 
 ## Status
 
@@ -24,13 +27,13 @@ Out of scope for the first public release:
 After a release is published:
 
 ```sh
-gem install three.rb
+gem install three-rb
 ```
 
 Or add it to a Gemfile:
 
 ```ruby
-gem "three.rb", "~> 0.1"
+gem "three-rb", "~> 0.1"
 ```
 
 ## Quick Start

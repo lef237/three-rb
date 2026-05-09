@@ -380,7 +380,7 @@ bundle exec rake test
 pnpm test:browser
 pnpm audit --audit-level moderate
 pnpm audit signatures
-gem build three.rb.gemspec --output /private/tmp/three.rb-check.gem
+gem build three-rb.gemspec --output /private/tmp/three-rb-check.gem
 git diff --check
 ```
 

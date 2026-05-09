@@ -1,4 +1,4 @@
-# three.rb Implementation Plan
+# three-rb Implementation Plan
 
 This document describes an implementation plan for building a Ruby 3D library inspired by three.js. The local reference repositories are:
 
@@ -13,7 +13,7 @@ The reason is practical. The value of three.js is not only classes like `Vector3
 
 The recommended initial direction is:
 
-- Build `three.rb` as a Ruby gem.
+- Build `three-rb` as a Ruby gem.
 - Implement core Ruby APIs such as `Three::Vector3`, `Three::Object3D`, `Three::Scene`, `Three::Mesh`, `Three::BufferGeometry`, and `Three::Material`.
 - In browser environments, use ruby.wasm's `js` bridge and delegate actual rendering to JavaScript three.js.
 - Keep the renderer abstract so future backends such as `Three::Renderers::NativeOpenGLRenderer` or `Three::Renderers::ExportRenderer` can be added.
@@ -77,7 +77,7 @@ The main module boundaries are:
 - `src/renderers`: `WebGLRenderer`, WebGPU support, WebXR, shaders, textures, and render state.
 - `examples/jsm`: addons such as `OrbitControls`, loaders, exporters, and postprocessing.
 
-The key architectural observation is that the renderer is much more complex than the math, object, and material layers. `WebGLRenderer` owns canvas/context handling, render lists, material programs, textures, render state, shadow maps, XR integration, and the animation loop. In three.rb, the renderer should initially be treated as a backend rather than as a direct porting target.
+The key architectural observation is that the renderer is much more complex than the math, object, and material layers. `WebGLRenderer` owns canvas/context handling, render lists, material programs, textures, render state, shadow maps, XR integration, and the animation loop. In three-rb, the renderer should initially be treated as a backend rather than as a direct porting target.
 
 ### ruby.wasm
 
@@ -85,7 +85,7 @@ ruby.wasm provides CRuby builds for WebAssembly/WASI. It includes npm packages s
 
 Ruby can access JavaScript through `require "js"`. This enables Ruby code to use the DOM, call JavaScript constructors, pass callbacks, and await JavaScript promises.
 
-For three.rb, ruby.wasm is useful for:
+For three-rb, ruby.wasm is useful for:
 
 - Running the Ruby API in the browser.
 - Bridging Ruby `Three::Scene` objects to JavaScript `THREE.Scene` objects.
@@ -100,7 +100,7 @@ Important constraints:
 
 ## Architecture
 
-three.rb should be split into layers:
+three-rb should be split into layers:
 
 ```text
 Ruby user code
@@ -191,12 +191,13 @@ Geometry attributes are large. They should not be recreated on every render. On 
 ## Recommended Directory Structure
 
 ```text
-three.rb/
-  three.rb.gemspec
+three-rb/
+  three-rb.gemspec
   Gemfile
   Rakefile
   README.md
   lib/
+    three-rb.rb
     three.rb
     three/
       version.rb
@@ -334,8 +335,8 @@ The goal is to create a Ruby project structure that can support continued develo
 
 Tasks:
 
-- Add `three.rb.gemspec`.
-- Add `lib/three.rb` and `lib/three/version.rb`.
+- Add `three-rb.gemspec`.
+- Add `lib/three-rb.rb`, `lib/three.rb`, and `lib/three/version.rb`.
 - Choose a test runner. `minitest` is sufficient initially.
 - Make `bundle exec rake test` work.
 - Avoid making `rubocop` too strict at the start; use minimal linting if needed.
@@ -573,7 +574,7 @@ Completion criteria:
 
 ### Phase 5: Serialization and Export
 
-The goal is to make three.rb scenes useful beyond immediate rendering.
+The goal is to make three-rb scenes useful beyond immediate rendering.
 
 Current implementation status:
 
@@ -733,7 +734,7 @@ Poor uses:
 - Implementing network- or thread-heavy loaders entirely in Ruby.
 - Pages where the startup size of a Ruby VM is unacceptable.
 
-Therefore, three.rb should adopt ruby.wasm as the browser runtime while keeping hot paths in JavaScript three.js.
+Therefore, three-rb should adopt ruby.wasm as the browser runtime while keeping hot paths in JavaScript three.js.
 
 ## Performance Strategy
 
@@ -840,7 +841,7 @@ The MVP is complete when:
 
 ## First 10 Tasks
 
-- [x] Add `three.rb.gemspec`, `Gemfile`, `Rakefile`, and `lib/three.rb`.
+- [x] Add `three-rb.gemspec`, `Gemfile`, `Rakefile`, `lib/three-rb.rb`, and `lib/three.rb`.
 - [x] Add `Three::Version` and the module skeleton.
 - [x] Implement `Vector3`, `Matrix4`, `Quaternion`, `Euler`, and `Color`.
 - [x] Add math unit tests.
@@ -868,6 +869,6 @@ The original MVP decisions are now resolved:
 - Use pnpm-managed local browser dependencies for ruby.wasm and three.js, avoiding CDN runtime drift and browser ORB failures.
 - Defer broad camelCase three.js compatibility aliases until after the first public release; snake-case Ruby methods are the documented API style.
 - Start geometry and attribute data with standard Ruby `Array` values instead of requiring `numo-narray`.
-- Publish the gem as `three.rb`.
+- Publish the gem as `three-rb`.
 
 The first public target is `0.1.0` browser-first alpha. Its completion definition and release gate are tracked in `docs/release-readiness.md`.

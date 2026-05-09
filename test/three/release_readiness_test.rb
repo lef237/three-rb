@@ -9,7 +9,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
     readme = File.read(File.join(ROOT, "README.md"))
 
     assert_includes readme, "Browser-first alpha scope"
-    assert_includes readme, "gem install three.rb"
+    assert_includes readme, "gem install three-rb"
     assert_includes readme, "bundle exec rake release:gem_smoke"
     assert_includes readme, "bundle exec rake release:preflight"
     assert_includes readme, "docs/release-readiness.md"
@@ -20,7 +20,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
   end
 
   def test_changelog_and_release_docs_are_packaged
-    spec = Gem::Specification.load(File.join(ROOT, "three.rb.gemspec"))
+    spec = Gem::Specification.load(File.join(ROOT, "three-rb.gemspec"))
 
     assert_path_exists File.join(ROOT, "CHANGELOG.md")
     assert_path_exists File.join(ROOT, "docs/browser-runtime.md")
@@ -39,7 +39,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
   def test_changelog_tracks_current_alpha_surface
     changelog = File.read(File.join(ROOT, "CHANGELOG.md"))
 
-    assert_includes changelog, "## 0.1.0 - Unreleased"
+    assert_includes changelog, "## 0.1.0 - 2026-05-15"
     assert_includes changelog, "physical, matcap, toon, normal, shadow, line, points, and sprite materials"
     assert_includes changelog, "glTF/DRACO"
     assert_includes changelog, "loaded-asset traversal/disposal helpers"
@@ -78,8 +78,9 @@ class ThreeReleaseReadinessTest < Minitest::Test
   end
 
   def test_gemspec_has_public_metadata
-    spec = Gem::Specification.load(File.join(ROOT, "three.rb.gemspec"))
+    spec = Gem::Specification.load(File.join(ROOT, "three-rb.gemspec"))
 
+    assert_equal "three-rb", spec.name
     assert_equal spec.homepage, spec.metadata.fetch("homepage_uri")
     assert_match(%r{/tree/main\z}, spec.metadata.fetch("source_code_uri"))
     assert_match(%r{/CHANGELOG\.md\z}, spec.metadata.fetch("changelog_uri"))

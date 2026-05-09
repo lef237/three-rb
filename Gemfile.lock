@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    three.rb (0.1.0)
+    three-rb (0.1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -20,7 +20,7 @@ PLATFORMS
 DEPENDENCIES
   minitest (~> 6.0)
   rake (~> 13.0)
-  three.rb!
+  three-rb!
 
 BUNDLED WITH
    2.6.9

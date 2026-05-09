@@ -1,14 +1,14 @@
 require_relative "lib/three/version"
 
 Gem::Specification.new do |spec|
-  spec.name = "three.rb"
+  spec.name = "three-rb"
   spec.version = Three::VERSION
   spec.authors = ["LEF"]
   spec.email = []
 
   spec.summary = "Ruby 3D library inspired by three.js."
-  spec.description = "three.rb provides Ruby APIs for building 3D scenes, with browser rendering through ruby.wasm and three.js."
-  spec.homepage = "https://github.com/lef237/three.rb"
+  spec.description = "three-rb provides Ruby APIs for building 3D scenes, with browser rendering through ruby.wasm and three.js."
+  spec.homepage = "https://github.com/lef237/three-rb"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.2"
 

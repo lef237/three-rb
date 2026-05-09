@@ -19,7 +19,7 @@ class ThreeThreeJSONExporterTest < Minitest::Test
 
     exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
 
-    assert_equal({ version: 1, generator: "three.rb", type: "Object" }, exported[:metadata])
+    assert_equal({ version: 1, generator: "three-rb", type: "Object" }, exported[:metadata])
     assert_equal "Scene", exported[:object][:type]
     assert_equal "root", exported[:object][:name]
     assert_equal 2, exported[:object][:children].length
@@ -246,7 +246,7 @@ class ThreeThreeJSONExporterTest < Minitest::Test
 
     parsed = JSON.parse(scene.to_json)
 
-    assert_equal "three.rb", parsed.fetch("metadata").fetch("generator")
+    assert_equal "three-rb", parsed.fetch("metadata").fetch("generator")
     assert_equal "Scene", parsed.fetch("object").fetch("type")
     assert_equal 1, parsed.fetch("geometries").length
     assert_equal 1, parsed.fetch("materials").length

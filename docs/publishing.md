@@ -1,6 +1,6 @@
 # Publishing
 
-This document records the manual steps for publishing `three.rb`. Do not run the publish step until the release owner has confirmed the version, changelog date, and RubyGems credentials.
+This document records the manual steps for publishing `three-rb`. Do not run the publish step until the release owner has confirmed the version, changelog date, and RubyGems credentials.
 
 ## Preflight
 
@@ -38,8 +38,8 @@ Skip `lib/three/version.rb` in the commit if the version was already correct.
 Publishing requires RubyGems credentials with MFA enabled.
 
 ```sh
-gem build three.rb.gemspec
-gem push three.rb-0.1.0.gem
+gem build three-rb.gemspec
+gem push three-rb-0.1.0.gem
 ```
 
 After RubyGems accepts the gem, create and push the git tag:
@@ -57,7 +57,7 @@ If `gem push` fails, do not create the tag until the published artifact is confi
 Verify the public install path from a clean temporary directory:
 
 ```sh
-gem install three.rb -v 0.1.0
+gem install three-rb -v 0.1.0
 ruby -e 'require "three"; puts Three::VERSION'
 ```
 

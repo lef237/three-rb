@@ -18,7 +18,7 @@ module Three
         {
           metadata: {
             version: FORMAT_VERSION,
-            generator: "three.rb",
+            generator: "three-rb",
             type: "Object"
           },
           object: serialize_object(object),

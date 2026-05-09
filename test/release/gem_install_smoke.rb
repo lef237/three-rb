@@ -30,7 +30,7 @@ json = JSON.generate(exported)
 loaded = Three::Loaders::ThreeJSONLoader.new.parse(json)
 
 assert(Three::VERSION.match?(/\A\d+\.\d+\.\d+\z/), "expected a semantic gem version")
-assert(exported.fetch(:metadata).fetch(:generator) == "three.rb", "expected three.rb export metadata")
+assert(exported.fetch(:metadata).fetch(:generator) == "three-rb", "expected three-rb export metadata")
 assert(loaded.is_a?(Three::Scene), "expected JSON loader to reconstruct a scene")
 assert(loaded.children.any? { |child| child.is_a?(Three::PerspectiveCamera) }, "expected camera to round-trip")
 assert(loaded.children.any? { |child| child.is_a?(Three::Mesh) }, "expected mesh to round-trip")
@@ -45,4 +45,4 @@ assert(defined?(Three::Postprocessing::EffectComposer), "expected postprocessing
 assert(defined?(Three::Postprocessing::OutputPass), "expected output pass API to load")
 assert(defined?(Three::Postprocessing::DotScreenPass), "expected dot screen pass API to load")
 
-puts "gem install smoke passed for three.rb #{Three::VERSION}"
+puts "gem install smoke passed for three-rb #{Three::VERSION}"

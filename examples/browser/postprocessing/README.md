@@ -1,4 +1,4 @@
-# three.rb postprocessing browser example
+# three-rb postprocessing browser example
 
 This example renders a Ruby-authored scene through ruby.wasm, the JavaScript three.js renderer, and an explicit postprocessing pipeline. It focuses on `Three::Postprocessing::EffectComposer`, `RenderPass`, `UnrealBloomPass`, `DotScreenPass`, `OutputPass`, composer sizing, pass property and uniform updates, and rendering through `composer.render(scene, camera)`.
 

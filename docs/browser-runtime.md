@@ -1,12 +1,12 @@
 # Browser Runtime
 
-This guide describes the current browser runtime shape for embedding three.rb outside the repository examples. The browser runtime is still browser-first alpha: Ruby builds the scene graph, ruby.wasm runs the Ruby code, and pnpm-managed three.js modules do the actual WebGL rendering.
+This guide describes the current browser runtime shape for embedding three-rb outside the repository examples. The browser runtime is still browser-first alpha: Ruby builds the scene graph, ruby.wasm runs the Ruby code, and pnpm-managed three.js modules do the actual WebGL rendering.
 
 For the example coverage map and per-example smoke commands, see `examples/browser/README.md`.
 
 ## Runtime Shape
 
-A browser page using three.rb needs four pieces:
+A browser page using three-rb needs four pieces:
 
 1. An HTTP-served page with a canvas element.
 2. An import map or bundler setup that resolves ruby.wasm, three.js, and three.js addon modules.

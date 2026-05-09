@@ -1,6 +1,6 @@
 # Release Readiness
 
-This document defines the quality gate for publishing the first public `three.rb` release.
+This document defines the quality gate for publishing the first public `three-rb` release.
 
 ## Current Position
 

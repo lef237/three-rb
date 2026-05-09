@@ -10,12 +10,12 @@ end
 namespace :release do
   desc "Build the gem, install it into a temporary GEM_HOME, and run the install smoke test"
   task :gem_smoke do
-    spec = Gem::Specification.load("three.rb.gemspec")
+    spec = Gem::Specification.load("three-rb.gemspec")
     gem_file = "#{spec.name}-#{spec.version}.gem"
     smoke_path = File.expand_path("test/release/gem_install_smoke.rb", __dir__)
 
     FileUtils.rm_f(gem_file)
-    run_release_command!(Gem.ruby, "-S", "gem", "build", "three.rb.gemspec")
+    run_release_command!(Gem.ruby, "-S", "gem", "build", "three-rb.gemspec")
 
     Dir.mktmpdir("three-rb-gem-smoke") do |dir|
       gem_home = File.join(dir, "gems")
@@ -40,7 +40,7 @@ namespace :release do
   desc "Run non-publishing release preflight checks after browser dependencies are installed"
   task preflight: [:check] do
     run_release_command!("pnpm", "test:browser")
-    run_release_command!(Gem.ruby, "-S", "gem", "build", "three.rb.gemspec")
+    run_release_command!(Gem.ruby, "-S", "gem", "build", "three-rb.gemspec")
   end
 end
 

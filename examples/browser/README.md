@@ -1,6 +1,6 @@
 # Browser Examples
 
-These examples are the browser-facing coverage map for three.rb's browser-first alpha. They run Ruby through ruby.wasm, load pnpm-managed three.js packages, and render through `Three::Renderers::ThreeJSRenderer`.
+These examples are the browser-facing coverage map for three-rb's browser-first alpha. They run Ruby through ruby.wasm, load pnpm-managed three.js packages, and render through `Three::Renderers::ThreeJSRenderer`.
 
 ## Run Examples
 
