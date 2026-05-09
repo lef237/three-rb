@@ -1,5 +1,24 @@
 # Changelog
 
+## 0.2.0 - 2026-05-17
+
+### Added
+
+- Expanded `Three::Browser` helpers so browser examples can stay in Ruby without direct application-level `require "js"` or `JS.global` usage.
+- Added the `three-rb browser` generator for creating standalone browser apps with Ruby-only entrypoints.
+- Added a Ruby gemstone browser example with deterministic smoke coverage.
+- Added scene fog and override material support.
+- Added manual `Object3D` matrix support.
+- Added text geometry and font loader APIs.
+- Added JSON resource metadata preservation for exported and loaded scenes.
+
+### Changed
+
+- Converted browser examples to the Ruby browser helper API and shared browser boot path.
+- Improved browser addon error messages with more actionable guidance.
+- Strengthened release checks for installed gem behavior, the installed executable, and generated browser apps.
+- Expanded browser runtime and standalone app documentation.
+
 ## 0.1.0 - 2026-05-15
 
 ### Added
