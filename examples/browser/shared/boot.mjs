@@ -11,6 +11,7 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { DotScreenPass } from "three/addons/postprocessing/DotScreenPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { rubyWasmUrl } from "./config.mjs";
 
 export async function bootRubyExample({ main, clearColor }) {
   const setStatus = globalThis.__threeRbSetStatus || (() => {});
@@ -49,7 +50,7 @@ export async function bootRubyExample({ main, clearColor }) {
       composer.render();
     };
 
-    const rubyModule = await compileWasm("/node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm");
+    const rubyModule = await compileWasm(rubyWasmUrl);
     const { vm } = await DefaultRubyVM(rubyModule);
     globalThis.rubyVM = vm;
 
