@@ -34,6 +34,7 @@ The smoke test starts a local static HTTP server and verifies that the Ruby VM b
 Create a deployment directory that contains only the static files required by the example:
 
 ```sh
+rm -rf dist
 mkdir -p dist/examples/browser
 mkdir -p dist/node_modules/@ruby
 mkdir -p dist/node_modules/@bjorn3
@@ -42,11 +43,13 @@ mkdir -p dist/node_modules
 cp -R examples/browser/ruby dist/examples/browser/ruby
 cp -R examples/browser/shared dist/examples/browser/shared
 cp -R lib dist/lib
-cp -R node_modules/@ruby/3.4-wasm-wasi dist/node_modules/@ruby/3.4-wasm-wasi
-cp -R node_modules/@ruby/wasm-wasi dist/node_modules/@ruby/wasm-wasi
-cp -R node_modules/@bjorn3/browser_wasi_shim dist/node_modules/@bjorn3/browser_wasi_shim
-cp -R node_modules/three dist/node_modules/three
+cp -RL node_modules/@ruby/3.4-wasm-wasi dist/node_modules/@ruby/3.4-wasm-wasi
+cp -RL node_modules/@ruby/wasm-wasi dist/node_modules/@ruby/wasm-wasi
+cp -RL node_modules/@bjorn3/browser_wasi_shim dist/node_modules/@bjorn3/browser_wasi_shim
+cp -RL node_modules/three dist/node_modules/three
 ```
+
+Use `cp -RL` for packages copied from `node_modules` so pnpm symlinks are resolved into real files. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
 
 Run the same shape locally before deploying:
 
@@ -105,6 +108,7 @@ For a manual deployment, build the output directory locally and upload it:
 
 ```sh
 pnpm install
+rm -rf dist
 mkdir -p dist/examples/browser
 mkdir -p dist/node_modules/@ruby
 mkdir -p dist/node_modules/@bjorn3
@@ -112,10 +116,10 @@ mkdir -p dist/node_modules
 cp -R examples/browser/ruby dist/examples/browser/ruby
 cp -R examples/browser/shared dist/examples/browser/shared
 cp -R lib dist/lib
-cp -R node_modules/@ruby/3.4-wasm-wasi dist/node_modules/@ruby/3.4-wasm-wasi
-cp -R node_modules/@ruby/wasm-wasi dist/node_modules/@ruby/wasm-wasi
-cp -R node_modules/@bjorn3/browser_wasi_shim dist/node_modules/@bjorn3/browser_wasi_shim
-cp -R node_modules/three dist/node_modules/three
+cp -RL node_modules/@ruby/3.4-wasm-wasi dist/node_modules/@ruby/3.4-wasm-wasi
+cp -RL node_modules/@ruby/wasm-wasi dist/node_modules/@ruby/wasm-wasi
+cp -RL node_modules/@bjorn3/browser_wasi_shim dist/node_modules/@bjorn3/browser_wasi_shim
+cp -RL node_modules/three dist/node_modules/three
 pnpm exec wrangler pages deploy dist --project-name <project>
 ```
 
@@ -146,6 +150,14 @@ The output directory is missing `/node_modules/@ruby/3.4-wasm-wasi/dist/ruby+std
 `Failed to resolve module specifier`
 
 The import map in the example page points at `/node_modules/...`, but the matching package was not copied to the output directory.
+
+`/node_modules/three/examples/jsm/... not found`
+
+The output directory probably contains pnpm symlinks instead of package files. Rebuild `dist/` from an empty directory and copy packages with `cp -RL`, then confirm the expected addon exists:
+
+```sh
+test -f dist/node_modules/three/examples/jsm/postprocessing/UnrealBloomPass.js
+```
 
 Ruby `require_relative` errors
 
