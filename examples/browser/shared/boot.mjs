@@ -18,7 +18,7 @@ export async function bootRubyExample({ main, clearColor }) {
   const bootFailed = globalThis.__threeRbBootFailed || ((message) => console.error(message));
 
   try {
-    setStatus("Loading ruby.wasm", "loading");
+    setStatus("Preparing browser runtime", "loading", 4);
     globalThis.THREE = THREE;
     globalThis.THREE_GLTF_LOADER = GLTFLoader;
     globalThis.THREE_DRACO_LOADER = DRACOLoader;
@@ -50,11 +50,14 @@ export async function bootRubyExample({ main, clearColor }) {
       composer.render();
     };
 
-    const rubyModule = await compileWasm(rubyWasmUrl);
+    const rubyModule = await compileWasm(rubyWasmUrl, (percent) => {
+      setStatus(`Loading ruby.wasm ${percent}%`, "loading", percent);
+    });
+    setStatus("Compiling ruby.wasm", "loading", 82);
     const { vm } = await DefaultRubyVM(rubyModule);
     globalThis.rubyVM = vm;
 
-    setStatus("Starting Ruby VM", "loading");
+    setStatus("Starting Ruby VM", "loading", 88);
     await withNoStoreRubySourceFetch(async () => {
       await vm.evalAsync(`
         require "js/require_remote/relative_shim"
@@ -94,11 +97,15 @@ function shouldBypassCache(input) {
   return !pathname.includes("/assets/");
 }
 
-async function compileWasm(url) {
-  const response = fetch(url);
+async function compileWasm(url, onProgress = () => {}) {
   if (WebAssembly.compileStreaming) {
     try {
-      return await WebAssembly.compileStreaming(response);
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Failed to load ruby.wasm: ${response.status} ${response.statusText}`);
+      }
+
+      return await WebAssembly.compileStreaming(trackDownload(response, onProgress));
     } catch (_error) {
       // Fall back when a static server does not provide application/wasm.
     }
@@ -108,5 +115,36 @@ async function compileWasm(url) {
   if (!fallbackResponse.ok) {
     throw new Error(`Failed to load ruby.wasm: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
   }
-  return WebAssembly.compile(await fallbackResponse.arrayBuffer());
+  return WebAssembly.compile(await trackDownload(fallbackResponse, onProgress).arrayBuffer());
+}
+
+function trackDownload(response, onProgress) {
+  const total = Number(response.headers.get("content-length"));
+  if (!response.body || !Number.isFinite(total) || total <= 0) return response;
+
+  let loaded = 0;
+  const stream = new ReadableStream({
+    async start(controller) {
+      const reader = response.body.getReader();
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          loaded += value.byteLength;
+          onProgress(Math.min(80, Math.round((loaded / total) * 80)));
+          controller.enqueue(value);
+        }
+        controller.close();
+      } catch (error) {
+        controller.error(error);
+      }
+    }
+  });
+
+  return new Response(stream, {
+    headers: response.headers,
+    status: response.status,
+    statusText: response.statusText
+  });
 }
