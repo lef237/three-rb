@@ -109,6 +109,8 @@ pnpm install
 ruby -run -e httpd . -p 8000
 ```
 
+If Ruby reports that `webrick` is not found, install it once with `gem install webrick`. Ruby 3.0 and later no longer include WEBrick as a standard library.
+
 ```text
 http://localhost:8000/examples/browser/quickstart/
 ```

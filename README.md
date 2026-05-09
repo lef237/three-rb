@@ -52,6 +52,8 @@ pnpm install
 ruby -run -e httpd . -p 8000
 ```
 
+If Ruby reports that `webrick` is not found, install it once with `gem install webrick`. Ruby 3.0 and later no longer include WEBrick as a standard library.
+
 ```text
 http://localhost:8000/examples/browser/ruby/
 ```
@@ -107,6 +109,8 @@ When developing this repository, install browser dependencies, serve the reposit
 pnpm install
 ruby -run -e httpd . -p 8000
 ```
+
+If `ruby -run -e httpd` reports that `webrick` is not found, run `gem install webrick` and retry. Ruby 3.0 and later require WEBrick to be installed separately.
 
 ```text
 http://localhost:8000/examples/browser/ruby/
