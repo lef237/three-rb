@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.2.1 - 2026-05-17
+
+### Added
+
+- Added a generated Ruby browser example template that copies the full gemstone example, including its local HDR asset.
+- Added generator coverage for Ruby example asset copying and Ruby-only browser entrypoints.
+
+### Changed
+
+- Moved browser example assets into example-local asset directories so generated examples and smoke tests use self-contained paths.
+- Strengthened release readiness checks for the browser generator template and installed executable.
+
 ## 0.2.0 - 2026-05-17
 
 ### Added
