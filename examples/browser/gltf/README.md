@@ -1,6 +1,6 @@
 # Browser glTF Example
 
-This example renders a small glTF asset through ruby.wasm and the JavaScript three.js renderer. It focuses on `GLTFLoader` and adding a loaded external scene to the Ruby-authored scene graph.
+This example renders a small animated glTF asset through ruby.wasm and the JavaScript three.js renderer. It focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, playing loaded clips through `AnimationMixer`, and disposing the loaded subtree.
 
 ## Run
 

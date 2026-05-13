@@ -108,6 +108,65 @@ module Three
           gltf_loader_constructor.new.call(:loadAsync, source)
         end
 
+        def gltf_animations(gltf)
+          animations = gltf[:animations]
+          js_present?(animations) ? animations.to_a : []
+        end
+
+        def animation_clip_name(clip)
+          value = clip[:name]
+          js_present?(value) ? value.to_s : ""
+        end
+
+        def animation_clip_duration(clip)
+          value = clip[:duration]
+          js_present?(value) ? value.to_f : 0.0
+        end
+
+        def new_animation_mixer(root)
+          @three[:AnimationMixer].new(root)
+        end
+
+        def animation_mixer_clip_action(mixer, clip, root = nil)
+          root ? mixer.call(:clipAction, clip, root) : mixer.call(:clipAction, clip)
+        end
+
+        def update_animation_mixer(mixer, delta)
+          mixer.call(:update, delta)
+        end
+
+        def stop_all_animation_actions(mixer)
+          mixer.call(:stopAllAction)
+        end
+
+        def uncache_animation_root(mixer, root)
+          mixer.call(:uncacheRoot, root)
+        end
+
+        def set_animation_action_property(action, name, value)
+          action[name] = value
+        end
+
+        def play_animation_action(action)
+          action.call(:play)
+        end
+
+        def stop_animation_action(action)
+          action.call(:stop)
+        end
+
+        def reset_animation_action(action)
+          action.call(:reset)
+        end
+
+        def fade_in_animation_action(action, duration)
+          action.call(:fadeIn, duration)
+        end
+
+        def fade_out_animation_action(action, duration)
+          action.call(:fadeOut, duration)
+        end
+
         def update_texture(texture, parameters)
           texture[:flipY] = parameters[:flip_y] unless parameters[:flip_y].nil?
           texture[:wrapS] = parameters[:wrap_s] unless parameters[:wrap_s].nil?

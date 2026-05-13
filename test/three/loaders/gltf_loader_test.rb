@@ -13,6 +13,10 @@ class ThreeGLTFLoaderTest < Minitest::Test
     assert_instance_of Three::ExternalObject3D, gltf.scene
     assert_equal "GLTFScene", gltf.scene.type
     assert_same gltf.handle[:scene], gltf.scene.handle
+    assert_equal 1, gltf.animations.length
+    assert_instance_of Three::AnimationClip, gltf.animations.first
+    assert_equal "Spin", gltf.animations.first.name
+    assert_equal 1.5, gltf.animations.first.duration
   end
 
   def test_load_yields_gltf

@@ -501,7 +501,7 @@ Current implementation status:
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, directional shadow mapping, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshPhongMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
 - `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial` base/PBR texture maps on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
-- `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, and disposing the loaded subtree through the renderer API.
+- `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, playing loaded animation clips through `AnimationMixer`, and disposing the loaded subtree through the renderer API.
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
 - `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
 - `examples/browser/primitives` focuses on `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
@@ -510,6 +510,7 @@ Current implementation status:
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
 - `Three::Clock` and `Three::Layers` are implemented; `Object3D#layers` is serialized and synchronized to Three.js `layers.mask`.
+- glTF animation is prioritized ahead of broader postprocessing or additional loader expansion because it builds directly on the existing `GLTFLoader`, `ExternalObject3D`, and browser smoke infrastructure while providing a visible user-facing capability with bounded backend API surface.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
 - `Three::Renderers::ThreeJSRenderer#traverse_handles` and `#dispose_subtree` expose loaded-asset traversal and cleanup without changing Ruby `Object3D#traverse`.
 - Loaded asset traversal/disposal design and implementation status are documented in `docs/loaded-assets-design.md`.
@@ -831,10 +832,11 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add the next material class or addon loader only when a concrete example or API target needs it.
-2. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable.
-3. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
-4. Keep reviewing low-risk dependency updates after checking their CI results.
+1. Prefer feature work that has visible user value, reuses the current Three.js backend boundary, and can be verified by deterministic browser smoke tests.
+2. Add the next material class or addon loader only when a concrete example or API target needs it.
+3. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable.
+4. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
+5. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open
 

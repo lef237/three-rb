@@ -38,6 +38,50 @@ module Three
       def intersect_objects(_raycaster_handle, _objects, recursive: false)
         raise NotImplementedError
       end
+
+      def create_animation_mixer(_root_handle)
+        raise NotImplementedError
+      end
+
+      def animation_mixer_clip_action(_mixer_handle, _clip_handle, _root_handle = nil)
+        raise NotImplementedError
+      end
+
+      def update_animation_mixer(_mixer_handle, _delta)
+        raise NotImplementedError
+      end
+
+      def stop_all_animation_actions(_mixer_handle)
+        raise NotImplementedError
+      end
+
+      def uncache_animation_root(_mixer_handle, _root_handle)
+        raise NotImplementedError
+      end
+
+      def set_animation_action_property(_action_handle, _name, _value)
+        raise NotImplementedError
+      end
+
+      def play_animation_action(_action_handle)
+        raise NotImplementedError
+      end
+
+      def stop_animation_action(_action_handle)
+        raise NotImplementedError
+      end
+
+      def reset_animation_action(_action_handle)
+        raise NotImplementedError
+      end
+
+      def fade_in_animation_action(_action_handle, _duration)
+        raise NotImplementedError
+      end
+
+      def fade_out_animation_action(_action_handle, _duration)
+        raise NotImplementedError
+      end
     end
   end
 end

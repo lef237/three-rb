@@ -48,6 +48,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_path_exists File.join(GLTF_EXAMPLE_DIR, "README.md")
     assert_path_exists File.join(GLTF_EXAMPLE_DIR, "smoke_test.mjs")
     assert_path_exists File.join(ROOT, "examples/browser/assets/triangle.gltf")
+    assert_path_exists File.join(ROOT, "examples/browser/assets/animated_triangle.gltf")
   end
 
   def test_browser_serialization_example_files_exist
@@ -147,6 +148,9 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     ruby = File.read(File.join(GLTF_EXAMPLE_DIR, "main.rb"))
 
     assert_includes ruby, "Three::Loaders::GLTFLoader"
+    assert_includes ruby, "Three::AnimationMixer"
+    assert_includes ruby, "Three::Clock"
+    assert_includes ruby, "mixer.update"
     assert_includes ruby, "scene.add(model)"
     assert_includes ruby, "renderer.backend.materialize(model)"
     assert_includes ruby, "renderer.animation_loop"

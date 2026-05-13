@@ -95,7 +95,81 @@ class FakeThreeJSAdapter
   end
 
   def load_gltf(source)
-    handle(:gltf, source: source, scene: handle(:gltf_scene, children: []))
+    handle(
+      :gltf,
+      source: source,
+      scene: handle(:gltf_scene, children: []),
+      animations: [
+        handle(:animation_clip, name: "Spin", duration: 1.5)
+      ]
+    )
+  end
+
+  def gltf_animations(gltf)
+    gltf[:animations] || []
+  end
+
+  def animation_clip_name(clip)
+    clip[:name].to_s
+  end
+
+  def animation_clip_duration(clip)
+    clip[:duration].to_f
+  end
+
+  def new_animation_mixer(root)
+    handle(:animation_mixer, root: root, actions: [])
+  end
+
+  def animation_mixer_clip_action(mixer, clip, root = nil)
+    action = handle(:animation_action, mixer: mixer, clip: clip, root: root)
+    mixer[:actions] << action
+    action
+  end
+
+  def update_animation_mixer(mixer, delta)
+    @calls << [:update_animation_mixer, mixer, delta]
+    mixer[:time] = mixer.fetch(:time, 0) + delta
+  end
+
+  def stop_all_animation_actions(mixer)
+    @calls << [:stop_all_animation_actions, mixer]
+    mixer[:actions].each { |action| action[:playing] = false }
+  end
+
+  def uncache_animation_root(mixer, root)
+    @calls << [:uncache_animation_root, mixer, root]
+    mixer[:uncached_root] = root
+  end
+
+  def set_animation_action_property(action, name, value)
+    @calls << [:set_animation_action_property, action, name, value]
+    action[name] = value
+  end
+
+  def play_animation_action(action)
+    @calls << [:play_animation_action, action]
+    action[:playing] = true
+  end
+
+  def stop_animation_action(action)
+    @calls << [:stop_animation_action, action]
+    action[:playing] = false
+  end
+
+  def reset_animation_action(action)
+    @calls << [:reset_animation_action, action]
+    action[:time] = 0
+  end
+
+  def fade_in_animation_action(action, duration)
+    @calls << [:fade_in_animation_action, action, duration]
+    action[:fade_in] = duration
+  end
+
+  def fade_out_animation_action(action, duration)
+    @calls << [:fade_out_animation_action, action, duration]
+    action[:fade_out] = duration
   end
 
   def update_texture(texture, parameters)

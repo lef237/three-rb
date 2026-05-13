@@ -31,6 +31,12 @@ async function main() {
 
     const scene = await page.evaluate(() => ({
       frame: globalThis.__threeRbGltfFrame,
+      animationTime: globalThis.__threeRbGltfAnimationTime,
+      animationCount: globalThis.__threeRbGltfAnimations,
+      animationName: globalThis.__threeRbGltfAnimationName,
+      animationDuration: globalThis.__threeRbGltfAnimationDuration,
+      actionTime: globalThis.__threeRbGltfAction?.time,
+      animatedNodeQuaternion: globalThis.__threeRbGltfScene?.children?.[0]?.quaternion?.toArray?.(),
       renderInfo: globalThis.__threeRbRenderer?.info?.render,
       cameraType: globalThis.__threeRbCamera?.type,
       rootChildren: globalThis.__threeRbGltfRootScene?.children?.length,
@@ -50,6 +56,15 @@ async function main() {
     }
     if (!scene.frame) {
       throw new Error(`glTF example animation did not advance: ${JSON.stringify(scene)}`);
+    }
+    if (scene.animationCount !== 1 || scene.animationName !== "TriangleSpin" || scene.animationDuration !== 2) {
+      throw new Error(`glTF animation metadata was not exposed: ${JSON.stringify(scene)}`);
+    }
+    if (!(scene.animationTime > 0) || !(scene.actionTime > 0)) {
+      throw new Error(`AnimationMixer did not advance the glTF action: ${JSON.stringify(scene)}`);
+    }
+    if (!scene.animatedNodeQuaternion || Math.abs(scene.animatedNodeQuaternion[1]) < 0.05) {
+      throw new Error(`glTF animated node quaternion did not change: ${JSON.stringify(scene)}`);
     }
 
     const disposal = await page.evaluate(() => {

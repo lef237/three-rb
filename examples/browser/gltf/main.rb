@@ -24,11 +24,6 @@ begin
   key_light.position.set(2.5, 3.0, 4.0)
   scene.add(key_light)
 
-  gltf = Three::Loaders::GLTFLoader.new.load("/examples/browser/assets/triangle.gltf")
-  model = gltf.scene
-  model.scale.set(1.2, 1.2, 1.2)
-  scene.add(model)
-
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
     antialias: true,
@@ -36,6 +31,16 @@ begin
     preserveDrawingBuffer: true
   )
   renderer.set_clear_color(0x11151a, 1)
+
+  gltf = Three::Loaders::GLTFLoader.new(backend: renderer.backend).load("/examples/browser/assets/animated_triangle.gltf")
+  model = gltf.scene
+  model.scale.set(1.2, 1.2, 1.2)
+  scene.add(model)
+
+  clock = Three::Clock.new
+  mixer = Three::AnimationMixer.new(model, backend: renderer.backend)
+  action = mixer.clip_action(gltf.animations.first)
+  action.play
 
   resize = proc do
     width = [viewport[:clientWidth].to_i, 1].max
@@ -54,8 +59,16 @@ begin
   JS.global[:__threeRbGltfRootScene] = renderer.backend.materialize(scene)
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
   JS.global[:__threeRbGltfScene] = renderer.backend.materialize(model)
+  JS.global[:__threeRbGltfAnimations] = gltf.animations.length
+  JS.global[:__threeRbGltfAnimationName] = gltf.animations.first&.name
+  JS.global[:__threeRbGltfAnimationDuration] = gltf.animations.first&.duration
+  JS.global[:__threeRbGltfMixer] = mixer.handle
+  JS.global[:__threeRbGltfAction] = action.handle
   JS.global[:__threeRbGltfFrame] = 0
+  JS.global[:__threeRbGltfAnimationTime] = 0
   JS.global[:__threeRbDisposeGltf] = proc do
+    mixer.stop_all_action
+    mixer.uncache_root
     renderer.dispose_subtree(model, remove: true, dispose_textures: true)
     JS.global[:__threeRbGltfDisposed] = true
   end
@@ -63,7 +76,9 @@ begin
   frame = 0
   renderer.animation_loop do
     frame += 1
-    model.rotation.y += 0.012
+    delta = clock.get_delta
+    mixer.update(delta)
+    JS.global[:__threeRbGltfAnimationTime] = JS.global[:__threeRbGltfAnimationTime].to_f + delta
     JS.global[:__threeRbGltfFrame] = frame
     renderer.render(scene, camera)
   end

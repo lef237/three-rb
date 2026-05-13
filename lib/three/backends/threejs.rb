@@ -131,6 +131,50 @@ module Three
         end
       end
 
+      def create_animation_mixer(root_handle)
+        @adapter.new_animation_mixer(root_handle)
+      end
+
+      def animation_mixer_clip_action(mixer_handle, clip_handle, root_handle = nil)
+        @adapter.animation_mixer_clip_action(mixer_handle, clip_handle, root_handle)
+      end
+
+      def update_animation_mixer(mixer_handle, delta)
+        @adapter.update_animation_mixer(mixer_handle, delta)
+      end
+
+      def stop_all_animation_actions(mixer_handle)
+        @adapter.stop_all_animation_actions(mixer_handle)
+      end
+
+      def uncache_animation_root(mixer_handle, root_handle)
+        @adapter.uncache_animation_root(mixer_handle, root_handle)
+      end
+
+      def set_animation_action_property(action_handle, name, value)
+        @adapter.set_animation_action_property(action_handle, name, value)
+      end
+
+      def play_animation_action(action_handle)
+        @adapter.play_animation_action(action_handle)
+      end
+
+      def stop_animation_action(action_handle)
+        @adapter.stop_animation_action(action_handle)
+      end
+
+      def reset_animation_action(action_handle)
+        @adapter.reset_animation_action(action_handle)
+      end
+
+      def fade_in_animation_action(action_handle, duration)
+        @adapter.fade_in_animation_action(action_handle, duration)
+      end
+
+      def fade_out_animation_action(action_handle, duration)
+        @adapter.fade_out_animation_action(action_handle, duration)
+      end
+
       def materialize(object)
         key = cache_key(object)
         return @handles[key] if key && @handles.key?(key)
