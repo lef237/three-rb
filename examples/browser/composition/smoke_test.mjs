@@ -51,6 +51,9 @@ async function main() {
       pointLightType: globalThis.__threeRbPointLight?.type,
       pointLightDistance: globalThis.__threeRbPointLight?.distance,
       pointLightDecay: globalThis.__threeRbPointLight?.decay,
+      hemisphereLightType: globalThis.__threeRbHemisphereLight?.type,
+      hemisphereLightGroundColor: globalThis.__threeRbHemisphereLight?.groundColor?.getHex?.(),
+      hemisphereLightIntensity: globalThis.__threeRbHemisphereLight?.intensity,
       planeGeometryType: globalThis.__threeRbPlane?.geometry?.type,
       rigType: globalThis.__threeRbRig?.type,
       primaryParentType: globalThis.__threeRbPrimaryMesh?.parent?.type,
@@ -85,11 +88,14 @@ async function main() {
     if (!Array.isArray(scene.materialTextureRepeat) || scene.materialTextureRepeat[0] !== 2 || scene.materialTextureRepeat[1] !== 2) {
       throw new Error(`expected configured texture repeat: ${JSON.stringify(scene)}`);
     }
-    if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight" || scene.pointLightType !== "PointLight") {
-      throw new Error(`expected ambient, directional, and point lights: ${JSON.stringify(scene)}`);
+    if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight" || scene.pointLightType !== "PointLight" || scene.hemisphereLightType !== "HemisphereLight") {
+      throw new Error(`expected ambient, directional, point, and hemisphere lights: ${JSON.stringify(scene)}`);
     }
     if (scene.pointLightDistance !== 7 || scene.pointLightDecay !== 2) {
       throw new Error(`expected configured PointLight falloff: ${JSON.stringify(scene)}`);
+    }
+    if (scene.hemisphereLightGroundColor !== 0x1d2a20 || scene.hemisphereLightIntensity !== 0.28) {
+      throw new Error(`expected configured HemisphereLight: ${JSON.stringify(scene)}`);
     }
     if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group" || scene.sphereParentType !== "Group") {
       throw new Error(`expected grouped child meshes: ${JSON.stringify(scene)}`);

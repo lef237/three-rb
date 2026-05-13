@@ -8,6 +8,7 @@ require_relative "../geometries/plane_geometry"
 require_relative "../geometries/sphere_geometry"
 require_relative "../lights/ambient_light"
 require_relative "../lights/directional_light"
+require_relative "../lights/hemisphere_light"
 require_relative "../lights/point_light"
 require_relative "../materials/mesh_basic_material"
 require_relative "../materials/mesh_lambert_material"
@@ -143,6 +144,8 @@ module Three
           @adapter.new_directional_light(object.color.hex, object.intensity)
         when PointLight
           @adapter.new_point_light(object.color.hex, object.intensity, object.distance, object.decay)
+        when HemisphereLight
+          @adapter.new_hemisphere_light(object.color.hex, object.ground_color.hex, object.intensity)
         when BoxGeometry
           parameters = object.parameters
           @adapter.new_box_geometry(
@@ -262,6 +265,8 @@ module Three
         case object
         when PointLight
           @adapter.update_point_light(handle, object.color.hex, object.intensity, object.distance, object.decay)
+        when HemisphereLight
+          @adapter.update_hemisphere_light(handle, object.color.hex, object.ground_color.hex, object.intensity)
         else
           @adapter.update_light(handle, object.color.hex, object.intensity)
         end
@@ -492,6 +497,10 @@ module Three
           @three[:PointLight].new(color, intensity, distance, decay)
         end
 
+        def new_hemisphere_light(sky_color, ground_color, intensity)
+          @three[:HemisphereLight].new(sky_color, ground_color, intensity)
+        end
+
         def new_mesh(geometry, material)
           @three[:Mesh].new(geometry, material)
         end
@@ -608,6 +617,11 @@ module Three
           update_light(light, color, intensity)
           light[:distance] = distance
           light[:decay] = decay
+        end
+
+        def update_hemisphere_light(light, sky_color, ground_color, intensity)
+          update_light(light, sky_color, intensity)
+          light[:groundColor].call(:setHex, ground_color)
         end
 
         def update_material(material, parameters)

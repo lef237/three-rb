@@ -37,6 +37,15 @@ class ThreeLightTest < Minitest::Test
     assert_equal 1.8, light.decay
   end
 
+  def test_hemisphere_light_accepts_sky_ground_and_intensity
+    light = Three::HemisphereLight.new(0xddeeff, 0x223344, 0.6)
+
+    assert_equal "HemisphereLight", light.type
+    assert_equal 0xddeeff, light.color.hex
+    assert_equal 0x223344, light.ground_color.hex
+    assert_equal 0.6, light.intensity
+  end
+
   def test_marks_dirty_when_color_changes
     light = Three::AmbientLight.new(0xffffff)
     light.mark_clean!
@@ -67,11 +76,28 @@ class ThreeLightTest < Minitest::Test
     assert_equal 1.5, light.decay
   end
 
+  def test_marks_dirty_when_hemisphere_ground_color_changes
+    light = Three::HemisphereLight.new
+    light.mark_clean!
+
+    light.ground_color.set_hex(0x445566)
+
+    assert light.dirty_field?(:light)
+    assert_equal 0x445566, light.ground_color.hex
+  end
+
   def test_point_light_to_h
     light = Three::PointLight.new(0xffffff, 2, 8, 2)
 
     assert_equal "PointLight", light.to_h[:type]
     assert_equal 8, light.to_h[:distance]
     assert_equal 2, light.to_h[:decay]
+  end
+
+  def test_hemisphere_light_to_h
+    light = Three::HemisphereLight.new(0xffffff, 0x223344, 0.5)
+
+    assert_equal "HemisphereLight", light.to_h[:type]
+    assert_equal 0x223344, light.to_h[:ground_color]
   end
 end

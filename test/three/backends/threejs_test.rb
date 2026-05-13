@@ -184,6 +184,7 @@ class ThreeThreeJSBackendTest < Minitest::Test
     ambient = backend.materialize(Three::AmbientLight.new(0x112233, 0.5))
     directional = backend.materialize(Three::DirectionalLight.new(0xffffff, 1.25))
     point = backend.materialize(Three::PointLight.new(0xffddaa, 1.5, 10, 2))
+    hemisphere = backend.materialize(Three::HemisphereLight.new(0xddeeff, 0x223344, 0.75))
 
     assert_equal :ambient_light, ambient[:type]
     assert_equal 0x112233, ambient[:color]
@@ -196,6 +197,10 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 1.5, point[:intensity]
     assert_equal 10, point[:distance]
     assert_equal 2, point[:decay]
+    assert_equal :hemisphere_light, hemisphere[:type]
+    assert_equal 0xddeeff, hemisphere[:sky_color]
+    assert_equal 0x223344, hemisphere[:ground_color]
+    assert_equal 0.75, hemisphere[:intensity]
   end
 
   def test_sync_updates_object_transform
@@ -368,6 +373,25 @@ class ThreeThreeJSBackendTest < Minitest::Test
     backend.sync(light)
 
     assert_equal [:update_point_light, handle, 0x336699, 0.8, 12, 1.6], adapter.calls.last
+  end
+
+  def test_sync_updates_dirty_hemisphere_light_only_after_change
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    light = Three::HemisphereLight.new(0xffffff, 0x111111, 1)
+
+    handle = backend.sync(light)
+    adapter.calls.clear
+    backend.sync(light)
+
+    assert_empty adapter.calls
+
+    light.color.set_hex(0xddeeff)
+    light.ground_color.set_hex(0x223344)
+    light.intensity = 0.4
+    backend.sync(light)
+
+    assert_equal [:update_hemisphere_light, handle, 0xddeeff, 0x223344, 0.4], adapter.calls.last
   end
 
   def test_sync_updates_dirty_buffer_attribute_only_after_change

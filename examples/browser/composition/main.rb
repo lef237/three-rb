@@ -29,6 +29,9 @@ begin
   point_light.position.set(-1.6, 1.7, 2.4)
   scene.add(point_light)
 
+  hemisphere_light = Three::HemisphereLight.new(0xdceeff, 0x1d2a20, 0.28)
+  scene.add(hemisphere_light)
+
   backdrop_material = Three::MeshBasicMaterial.new(color: 0x243141)
   backdrop = Three::Mesh.new(Three::PlaneGeometry.new(5.8, 3.4, width_segments: 2, height_segments: 2), backdrop_material)
   backdrop.position.z = -1.25
@@ -106,6 +109,7 @@ begin
   JS.global[:__threeRbAmbientLight] = renderer.backend.materialize(ambient_light)
   JS.global[:__threeRbDirectionalLight] = renderer.backend.materialize(key_light)
   JS.global[:__threeRbPointLight] = renderer.backend.materialize(point_light)
+  JS.global[:__threeRbHemisphereLight] = renderer.backend.materialize(hemisphere_light)
   JS.global[:__threeRbPlane] = renderer.backend.materialize(backdrop)
   JS.global[:__threeRbRig] = renderer.backend.materialize(rig)
   JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)

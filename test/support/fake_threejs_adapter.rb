@@ -102,6 +102,10 @@ class FakeThreeJSAdapter
     handle(:point_light, color: color, intensity: intensity, distance: distance, decay: decay, children: [])
   end
 
+  def new_hemisphere_light(sky_color, ground_color, intensity)
+    handle(:hemisphere_light, sky_color: sky_color, ground_color: ground_color, intensity: intensity, children: [])
+  end
+
   def new_mesh(geometry, material)
     handle(:mesh, geometry: geometry, material: material, children: [])
   end
@@ -254,6 +258,13 @@ class FakeThreeJSAdapter
     light[:intensity] = intensity
     light[:distance] = distance
     light[:decay] = decay
+  end
+
+  def update_hemisphere_light(light, sky_color, ground_color, intensity)
+    @calls << [:update_hemisphere_light, light, sky_color, ground_color, intensity]
+    light[:sky_color] = sky_color
+    light[:ground_color] = ground_color
+    light[:intensity] = intensity
   end
 
   def update_material(material, parameters)
