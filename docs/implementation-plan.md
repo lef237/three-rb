@@ -529,6 +529,7 @@ Current implementation status:
 - `DRACOLoader` was prioritized before postprocessing because a compressed glTF fixture can verify it through the existing GLTFLoader, ExternalObject3D, loaded-asset disposal, and browser-smoke paths with a small API addition.
 - Postprocessing was prioritized after `DRACOLoader` because the core render, material, texture, glTF, and interaction paths now have enough coverage to justify a dedicated render-pipeline example. The first wrapper set intentionally stays small: `EffectComposer`, `RenderPass`, and `UnrealBloomPass`.
 - The next implementation step is adding more material classes, postprocessing passes, render targets, or addon loaders only when an example or API target needs them; KTX2 should wait until texture-compression fixture coverage is needed.
+- Public release readiness is tracked in `docs/release-readiness.md`; before adding broad new feature scope, prioritize install smoke coverage, CI gates, and public-scope documentation.
 
 Recommended structure:
 
@@ -846,10 +847,11 @@ The MVP is complete when:
 ## Next Tasks
 
 1. Prefer feature work that has visible user value, reuses the current Three.js backend boundary, and can be verified by deterministic browser smoke tests.
-2. Expand postprocessing beyond `RenderPass`/`UnrealBloomPass` only when a dedicated example requires a new pass or render-target API; add KTX2 or other decoder loaders only with fixtures that require them.
-3. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable.
-4. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
-5. Keep reviewing low-risk dependency updates after checking their CI results.
+2. Keep the public release gate passing: Ruby tests, gem install smoke, browser smoke tests, and gem build.
+3. Expand postprocessing beyond `RenderPass`/`UnrealBloomPass` only when a dedicated example requires a new pass or render-target API; add KTX2 or other decoder loaders only with fixtures that require them.
+4. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable.
+5. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
+6. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open
 

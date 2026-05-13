@@ -51,5 +51,8 @@ jobs:
       - name: Run Ruby tests
         run: bundle exec rake test
 
+      - name: Run gem install smoke test
+        run: bundle exec rake release:gem_smoke
+
       - name: Run browser smoke test
         run: pnpm test:browser

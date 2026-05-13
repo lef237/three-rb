@@ -3,7 +3,21 @@ Ruby 3D Library.
 
 ## Status
 
-This project is in the initial implementation phase. The current code covers the gem foundation, math primitives, scene graph basics, initial geometry/material objects, dirty-tracked backend sync, browser examples, and the first three.js backend/renderer bridge.
+This project is in browser-first alpha. The current code covers the gem foundation, math primitives, scene graph basics, geometry/material objects, dirty-tracked backend sync, JSON export/load, browser examples, and a three.js backend/renderer bridge through ruby.wasm.
+
+## Browser-first alpha scope
+
+Supported scope for the first public release:
+
+- Pure Ruby scene construction, math, cameras, lights, geometry, materials, textures, layers, raycasting helpers, and JSON export/load.
+- Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and pnpm-managed `three@0.184.0`.
+- JavaScript-delegated browser features for texture loading, cube/RGBE textures, glTF/DRACO loading, OrbitControls, animation mixers, instancing, picking, shadows, and an initial postprocessing pipeline.
+
+Out of scope for the first public release:
+
+- A Ruby-native OpenGL/Vulkan/software renderer.
+- Full three.js API compatibility.
+- Stable APIs for every addon loader, render target, postprocessing pass, WebGPU, or XR workflow.
 
 ## Quick Start
 
@@ -76,6 +90,12 @@ Run tests:
 bundle exec rake test
 ```
 
+Build and install the gem into a temporary `GEM_HOME`, then run the install smoke test:
+
+```sh
+bundle exec rake release:gem_smoke
+```
+
 Export a Ruby-authored scene to a deterministic JSON-friendly hash:
 
 ```ruby
@@ -89,14 +109,17 @@ Run the full local CI-equivalent check:
 
 ```sh
 bundle exec rake test
+bundle exec rake release:gem_smoke
 pnpm install --frozen-lockfile --ignore-scripts
 pnpm audit --audit-level moderate
 pnpm audit signatures
 pnpm exec playwright install chromium
 pnpm test:browser
+gem build three.rb.gemspec
 ```
 
 ## Documents
 
 - [Implementation Plan](docs/implementation-plan.md)
 - [Loaded Asset Traversal and Disposal Design](docs/loaded-assets-design.md)
+- [Release Readiness](docs/release-readiness.md)
