@@ -271,6 +271,7 @@ class ThreeThreeJSBackendTest < Minitest::Test
       wrap_t: Three::MirroredRepeatWrapping,
       mag_filter: Three::NearestFilter,
       min_filter: Three::NearestMipmapNearestFilter,
+      offset: [0.25, 0.5],
       repeat: [2, 3]
     )
 
@@ -283,7 +284,12 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal Three::MirroredRepeatWrapping, handle[:wrap_t]
     assert_equal Three::NearestFilter, handle[:mag_filter]
     assert_equal Three::NearestMipmapNearestFilter, handle[:min_filter]
+    assert_equal [0.25, 0.5], handle[:offset]
     assert_equal [2, 3], handle[:repeat]
+    assert_equal [0, 0], handle[:center]
+    assert_equal 0, handle[:rotation]
+    assert_equal true, handle[:matrix_auto_update]
+    assert_equal Three::Matrix3.new.elements, handle[:matrix]
     refute texture.dirty?
   end
 
@@ -323,10 +329,12 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_empty adapter.calls
 
     texture.repeat.set(4, 5)
+    texture.offset.set(0.25, 0.5)
     backend.sync(texture)
 
     assert_equal :update_texture, adapter.calls.last[0]
     assert_same handle, adapter.calls.last[1]
+    assert_equal [0.25, 0.5], adapter.calls.last[2][:offset]
     assert_equal [4, 5], adapter.calls.last[2][:repeat]
     refute texture.dirty?
   end
@@ -816,7 +824,12 @@ class ThreeThreeJSBackendTest < Minitest::Test
       wrap_t: Three::ClampToEdgeWrapping,
       mag_filter: Three::LinearFilter,
       min_filter: Three::LinearMipmapLinearFilter,
-      repeat: [2, 2]
+      offset: [0, 0],
+      repeat: [2, 2],
+      center: [0, 0],
+      rotation: 0,
+      matrix_auto_update: true,
+      matrix: Three::Matrix3.new.elements
     }]
   end
 

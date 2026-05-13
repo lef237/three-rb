@@ -57,7 +57,12 @@ module Three
             wrap_t: texture.wrap_t,
             mag_filter: texture.mag_filter,
             min_filter: texture.min_filter,
-            repeat: texture.repeat.to_a
+            offset: texture.offset.to_a,
+            repeat: texture.repeat.to_a,
+            center: texture.center.to_a,
+            rotation: texture.rotation,
+            matrix_auto_update: texture.matrix_auto_update,
+            matrix: texture.matrix.to_a
           }
         end
       end

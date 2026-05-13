@@ -6,7 +6,20 @@ module Three
   class CubeTexture < Texture
     FACE_COUNT = 6
 
-    def initialize(sources, flip_y: false, wrap_s: Three::ClampToEdgeWrapping, wrap_t: Three::ClampToEdgeWrapping, mag_filter: Three::LinearFilter, min_filter: Three::LinearMipmapLinearFilter, repeat: nil)
+    def initialize(
+      sources,
+      flip_y: false,
+      wrap_s: Three::ClampToEdgeWrapping,
+      wrap_t: Three::ClampToEdgeWrapping,
+      mag_filter: Three::LinearFilter,
+      min_filter: Three::LinearMipmapLinearFilter,
+      offset: nil,
+      repeat: nil,
+      center: nil,
+      rotation: 0,
+      matrix_auto_update: true,
+      matrix: nil
+    )
       super(
         validate_sources(sources),
         flip_y: flip_y,
@@ -14,7 +27,12 @@ module Three
         wrap_t: wrap_t,
         mag_filter: mag_filter,
         min_filter: min_filter,
-        repeat: repeat
+        offset: offset,
+        repeat: repeat,
+        center: center,
+        rotation: rotation,
+        matrix_auto_update: matrix_auto_update,
+        matrix: matrix
       )
     end
 

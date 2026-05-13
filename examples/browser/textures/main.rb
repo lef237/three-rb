@@ -29,7 +29,10 @@ begin
   texture.wrap_t = Three::RepeatWrapping
   texture.mag_filter = Three::NearestFilter
   texture.min_filter = Three::NearestMipmapNearestFilter
+  texture.offset.set(0.125, 0.25)
   texture.repeat.set(4, 3)
+  texture.center.set(0.5, 0.5)
+  texture.rotation = 0.35
 
   material = Three::MeshStandardMaterial.new(
     color: 0xffffff,

@@ -5,7 +5,7 @@ require "test_helper"
 class ThreeThreeJSONLoaderTest < Minitest::Test
   def test_parse_reconstructs_exported_scene_with_shared_resources
     scene = Three::Scene.new
-    texture = Three::Texture.new("/texture.png", repeat: [2, 3])
+    texture = Three::Texture.new("/texture.png", offset: [0.25, 0.5], repeat: [2, 3], center: [0.5, 0.5], rotation: 0.35)
     geometry = Three::BoxGeometry.new(1, 2, 3)
     material = Three::MeshBasicMaterial.new(color: 0x00ff00, map: texture)
     first = Three::Mesh.new(geometry, material)
@@ -25,7 +25,10 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert_instance_of Three::MeshBasicMaterial, loaded.children[0].material
     assert_equal 0x00ff00, loaded.children[0].material.color.hex
     assert_equal "/texture.png", loaded.children[0].material.map.source
+    assert_equal [0.25, 0.5], loaded.children[0].material.map.offset.to_a
     assert_equal [2, 3], loaded.children[0].material.map.repeat.to_a
+    assert_equal [0.5, 0.5], loaded.children[0].material.map.center.to_a
+    assert_equal 0.35, loaded.children[0].material.map.rotation
     assert_equal [1, 2, 3], loaded.children[0].position.to_a
     assert_equal [2, 2, 2], loaded.children[1].scale.to_a
     assert_equal 1 << 2, loaded.children[1].layers.mask

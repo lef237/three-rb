@@ -173,7 +173,13 @@ module Three
           texture[:wrapT] = parameters[:wrap_t] unless parameters[:wrap_t].nil?
           texture[:magFilter] = parameters[:mag_filter] unless parameters[:mag_filter].nil?
           texture[:minFilter] = parameters[:min_filter] unless parameters[:min_filter].nil?
+          texture[:offset].call(:set, *parameters[:offset]) if parameters[:offset]
           texture[:repeat].call(:set, *parameters[:repeat]) if parameters[:repeat]
+          texture[:center].call(:set, *parameters[:center]) if parameters[:center]
+          texture[:rotation] = parameters[:rotation] unless parameters[:rotation].nil?
+          texture[:matrixAutoUpdate] = parameters[:matrix_auto_update] unless parameters[:matrix_auto_update].nil?
+          texture[:matrix].call(:fromArray, js_array(parameters[:matrix])) if parameters[:matrix]
+          texture.call(:updateMatrix) if parameters[:matrix_auto_update]
           texture[:needsUpdate] = true
           texture
         end

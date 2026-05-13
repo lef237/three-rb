@@ -499,7 +499,7 @@ Current implementation status:
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, directional shadow mapping, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshPhongMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
-- `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial` base/PBR texture maps on a textured cube.
+- `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter/UV-transform settings, and `MeshStandardMaterial` base/PBR texture maps on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, playing loaded animation clips through `AnimationMixer`, and disposing the loaded subtree through the renderer API.
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
@@ -510,6 +510,7 @@ Current implementation status:
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
 - `Three::Matrix3` is implemented with inverse/transpose, normal-matrix, and UV-transform helpers; `Vector3` can apply `Matrix3` values.
+- `Texture` exposes `offset`, `repeat`, `center`, `rotation`, `matrix_auto_update`, and `matrix`, and the Three.js backend synchronizes these UV-transform settings.
 - `Three::Clock` and `Three::Layers` are implemented; `Object3D#layers` is serialized and synchronized to Three.js `layers.mask`.
 - glTF animation is prioritized ahead of broader postprocessing or additional loader expansion because it builds directly on the existing `GLTFLoader`, `ExternalObject3D`, and browser smoke infrastructure while providing a visible user-facing capability with bounded backend API surface.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.

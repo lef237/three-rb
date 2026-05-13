@@ -48,7 +48,11 @@ async function main() {
       textureWrapT: globalThis.__threeRbTextureExampleTexture?.wrapT,
       textureMagFilter: globalThis.__threeRbTextureExampleTexture?.magFilter,
       textureMinFilter: globalThis.__threeRbTextureExampleTexture?.minFilter,
-      textureRepeat: globalThis.__threeRbTextureExampleTexture?.repeat?.toArray?.()
+      textureOffset: globalThis.__threeRbTextureExampleTexture?.offset?.toArray?.(),
+      textureRepeat: globalThis.__threeRbTextureExampleTexture?.repeat?.toArray?.(),
+      textureCenter: globalThis.__threeRbTextureExampleTexture?.center?.toArray?.(),
+      textureRotation: globalThis.__threeRbTextureExampleTexture?.rotation,
+      textureMatrixAutoUpdate: globalThis.__threeRbTextureExampleTexture?.matrixAutoUpdate
     }));
 
     if (scene.cameraType !== "OrthographicCamera") {
@@ -74,6 +78,15 @@ async function main() {
     }
     if (!Array.isArray(scene.textureRepeat) || scene.textureRepeat[0] !== 4 || scene.textureRepeat[1] !== 3) {
       throw new Error(`expected configured texture repeat: ${JSON.stringify(scene)}`);
+    }
+    if (!Array.isArray(scene.textureOffset) || scene.textureOffset[0] !== 0.125 || scene.textureOffset[1] !== 0.25) {
+      throw new Error(`expected configured texture offset: ${JSON.stringify(scene)}`);
+    }
+    if (!Array.isArray(scene.textureCenter) || scene.textureCenter[0] !== 0.5 || scene.textureCenter[1] !== 0.5) {
+      throw new Error(`expected configured texture center: ${JSON.stringify(scene)}`);
+    }
+    if (Math.abs(scene.textureRotation - 0.35) > 1e-12 || scene.textureMatrixAutoUpdate !== true) {
+      throw new Error(`expected configured texture transform state: ${JSON.stringify(scene)}`);
     }
     if (!scene.renderInfo || scene.renderInfo.triangles < 12) {
       throw new Error(`renderer did not draw the textured cube triangles: ${JSON.stringify(scene)}`);

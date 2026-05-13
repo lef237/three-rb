@@ -40,7 +40,12 @@ module Three
           wrap_t: value(entry, :wrap_t),
           mag_filter: value(entry, :mag_filter),
           min_filter: value(entry, :min_filter),
-          repeat: value(entry, :repeat)
+          offset: value(entry, :offset),
+          repeat: value(entry, :repeat),
+          center: value(entry, :center),
+          rotation: value(entry, :rotation),
+          matrix_auto_update: value(entry, :matrix_auto_update),
+          matrix: value(entry, :matrix)
         }.compact
       end
 

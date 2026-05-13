@@ -7,7 +7,7 @@ class ThreeThreeJSONExporterTest < Minitest::Test
   def test_exports_scene_graph_with_deduplicated_resources
     scene = Three::Scene.new
     scene.name = "root"
-    texture = Three::Texture.new("/texture.png", repeat: [2, 3])
+    texture = Three::Texture.new("/texture.png", offset: [0.25, 0.5], repeat: [2, 3], center: [0.5, 0.5], rotation: 0.35)
     geometry = Three::BoxGeometry.new(1, 2, 3)
     material = Three::MeshBasicMaterial.new(color: 0x00ff00, map: texture)
     first = Three::Mesh.new(geometry, material)
@@ -34,7 +34,10 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal material.uuid, exported[:object][:children][0][:material]
     assert_equal texture.uuid, exported[:materials][0][:map]
     assert_equal "/texture.png", exported[:textures][0][:source]
+    assert_equal [0.25, 0.5], exported[:textures][0][:offset]
     assert_equal [2, 3], exported[:textures][0][:repeat]
+    assert_equal [0.5, 0.5], exported[:textures][0][:center]
+    assert_equal 0.35, exported[:textures][0][:rotation]
   end
 
   def test_exports_cameras_lights_scene_textures_and_instanced_mesh_data

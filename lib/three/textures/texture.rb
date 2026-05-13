@@ -4,6 +4,7 @@ require_relative "../core/event_dispatcher"
 require_relative "../constants"
 require_relative "../dirty"
 require_relative "../math/math_utils"
+require_relative "../math/matrix3"
 require_relative "../math/vector2"
 
 module Three
@@ -16,10 +17,24 @@ module Three
       attr_accessor :next_id
     end
 
-    attr_reader :id, :uuid, :source, :flip_y, :wrap_s, :wrap_t, :mag_filter, :min_filter, :repeat
+    attr_reader :id, :uuid, :source, :flip_y, :wrap_s, :wrap_t, :mag_filter, :min_filter
+    attr_reader :offset, :repeat, :center, :rotation, :matrix_auto_update, :matrix
     attr_accessor :user_data
 
-    def initialize(source = nil, flip_y: true, wrap_s: Three::ClampToEdgeWrapping, wrap_t: Three::ClampToEdgeWrapping, mag_filter: Three::LinearFilter, min_filter: Three::LinearMipmapLinearFilter, repeat: nil)
+    def initialize(
+      source = nil,
+      flip_y: true,
+      wrap_s: Three::ClampToEdgeWrapping,
+      wrap_t: Three::ClampToEdgeWrapping,
+      mag_filter: Three::LinearFilter,
+      min_filter: Three::LinearMipmapLinearFilter,
+      offset: nil,
+      repeat: nil,
+      center: nil,
+      rotation: 0,
+      matrix_auto_update: true,
+      matrix: nil
+    )
       super()
       @id = self.class.allocate_id
       @uuid = MathUtils.generate_uuid
@@ -29,9 +44,14 @@ module Three
       @wrap_t = wrap_t
       @mag_filter = mag_filter
       @min_filter = min_filter
-      @repeat = coerce_vector2(repeat || [1, 1])
+      @offset = coerce_vector2(offset || [0, 0], field: :offset)
+      @repeat = coerce_vector2(repeat || [1, 1], field: :repeat)
+      @center = coerce_vector2(center || [0, 0], field: :center)
+      @rotation = rotation
+      @matrix_auto_update = matrix_auto_update
+      @matrix = coerce_matrix3(matrix || Matrix3.new)
       @user_data = {}
-      bind_repeat_changes
+      bind_vector_changes
       mark_dirty!
     end
 
@@ -66,9 +86,42 @@ module Three
     end
 
     def repeat=(value)
-      @repeat = coerce_vector2(value)
-      bind_repeat_changes
+      @repeat = coerce_vector2(value, field: :repeat)
+      bind_vector_changes
       mark_dirty!(:parameters)
+    end
+
+    def offset=(value)
+      @offset = coerce_vector2(value, field: :offset)
+      bind_vector_changes
+      mark_dirty!(:parameters)
+    end
+
+    def center=(value)
+      @center = coerce_vector2(value, field: :center)
+      bind_vector_changes
+      mark_dirty!(:parameters)
+    end
+
+    def rotation=(value)
+      @rotation = value
+      mark_dirty!(:parameters)
+    end
+
+    def matrix_auto_update=(value)
+      @matrix_auto_update = value
+      mark_dirty!(:parameters)
+    end
+
+    def matrix=(value)
+      @matrix = coerce_matrix3(value)
+      mark_dirty!(:parameters)
+    end
+
+    def update_matrix
+      @matrix.set_uv_transform(@offset.x, @offset.y, @repeat.x, @repeat.y, @rotation, @center.x, @center.y)
+      mark_dirty!(:parameters)
+      self
     end
 
     def dispose
@@ -85,7 +138,12 @@ module Three
         wrap_t: @wrap_t,
         mag_filter: @mag_filter,
         min_filter: @min_filter,
-        repeat: @repeat.to_a
+        offset: @offset.to_a,
+        repeat: @repeat.to_a,
+        center: @center.to_a,
+        rotation: @rotation,
+        matrix_auto_update: @matrix_auto_update,
+        matrix: @matrix.to_a
       }
     end
 
@@ -97,18 +155,30 @@ module Three
 
     private
 
-    def coerce_vector2(value)
+    def coerce_vector2(value, field:)
       return value if value.is_a?(Vector2)
 
       array = value.to_ary if value.respond_to?(:to_ary)
       array ||= value.to_a if value.respond_to?(:to_a)
       return Vector2.new(array[0], array[1]) if array && array.length >= 2
 
-      raise TypeError, "repeat must be a Three::Vector2 or an array-like [x, y]"
+      raise TypeError, "#{field} must be a Three::Vector2 or an array-like [x, y]"
     end
 
-    def bind_repeat_changes
+    def coerce_matrix3(value)
+      return value if value.is_a?(Matrix3)
+
+      array = value.to_ary if value.respond_to?(:to_ary)
+      array ||= value.to_a if value.respond_to?(:to_a)
+      return Matrix3.new.from_array(array) if array && array.length >= 9
+
+      raise TypeError, "matrix must be a Three::Matrix3 or an array-like with 9 elements"
+    end
+
+    def bind_vector_changes
+      @offset.on_change { mark_dirty!(:parameters) }
       @repeat.on_change { mark_dirty!(:parameters) }
+      @center.on_change { mark_dirty!(:parameters) }
     end
   end
 end
