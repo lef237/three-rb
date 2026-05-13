@@ -66,6 +66,10 @@ async function main() {
       normalMaterialFlatShading: globalThis.__threeRbNormalMaterial?.flatShading,
       standardMaterialRoughness: globalThis.__threeRbStandardMaterial?.roughness,
       standardMaterialMetalness: globalThis.__threeRbStandardMaterial?.metalness,
+      materialDisposeEvent: globalThis.__threeRbMaterialDisposeEvent,
+      textureDisposeEvent: globalThis.__threeRbTextureDisposeEvent,
+      materialHandleCachedAfterDispose: globalThis.__threeRbMaterialHandleCachedAfterDispose,
+      textureHandleCachedAfterDispose: globalThis.__threeRbTextureHandleCachedAfterDispose,
       currentMaterialColor: globalThis.__threeRbChangingMaterial?.color?.getHex?.(),
       initialMaterialColor: globalThis.__threeRbInitialMaterialColor
     }));
@@ -111,6 +115,12 @@ async function main() {
     }
     if (scene.satelliteMaterialType !== "MeshNormalMaterial" || scene.normalMaterialFlatShading !== true) {
       throw new Error(`expected a flat-shaded MeshNormalMaterial satellite: ${JSON.stringify(scene)}`);
+    }
+    if (scene.materialDisposeEvent !== true || scene.textureDisposeEvent !== true) {
+      throw new Error(`expected material and texture dispose events: ${JSON.stringify(scene)}`);
+    }
+    if (scene.materialHandleCachedAfterDispose !== false || scene.textureHandleCachedAfterDispose !== false) {
+      throw new Error(`expected disposed material and texture handles to leave the backend cache: ${JSON.stringify(scene)}`);
     }
     if (!scene.renderInfo || scene.renderInfo.triangles < 200) {
       throw new Error(`renderer did not draw the composition triangles: ${JSON.stringify(scene)}`);

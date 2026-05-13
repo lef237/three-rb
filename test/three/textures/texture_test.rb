@@ -59,6 +59,16 @@ class ThreeTextureTest < Minitest::Test
     assert_match(/repeat must be/, error.message)
   end
 
+  def test_dispose_event
+    texture = Three::Texture.new("/texture.png")
+    called = false
+    texture.on(:dispose) { called = true }
+
+    texture.dispose
+
+    assert called
+  end
+
   def test_to_h
     texture = Three::Texture.new(
       "/texture.png",

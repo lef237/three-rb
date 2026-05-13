@@ -120,6 +120,19 @@ begin
   JS.global[:__threeRbLambertMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)
   JS.global[:__threeRbStandardMaterial] = renderer.backend.materialize(orb_material)
+  JS.global[:__threeRbMaterialDisposeEvent] = false
+  JS.global[:__threeRbTextureDisposeEvent] = false
+
+  disposable_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  disposable_material = Three::MeshBasicMaterial.new(map: disposable_texture)
+  disposable_texture_handle = renderer.backend.materialize(disposable_texture)
+  disposable_material_handle = renderer.backend.materialize(disposable_material)
+  disposable_texture_handle.call(:addEventListener, "dispose", proc { JS.global[:__threeRbTextureDisposeEvent] = true })
+  disposable_material_handle.call(:addEventListener, "dispose", proc { JS.global[:__threeRbMaterialDisposeEvent] = true })
+  renderer.backend.dispose(disposable_material)
+  renderer.backend.dispose(disposable_texture)
+  JS.global[:__threeRbMaterialHandleCachedAfterDispose] = renderer.backend.handles.key?(disposable_material.uuid)
+  JS.global[:__threeRbTextureHandleCachedAfterDispose] = renderer.backend.handles.key?(disposable_texture.uuid)
   JS.global[:__threeRbInitialMaterialColor] = primary_material.color.hex
   JS.global[:__threeRbCompositionFrame] = 0
 
