@@ -218,6 +218,61 @@ module Three
       self
     end
 
+    def invert
+      n11 = @elements[0]
+      n21 = @elements[1]
+      n31 = @elements[2]
+      n41 = @elements[3]
+      n12 = @elements[4]
+      n22 = @elements[5]
+      n32 = @elements[6]
+      n42 = @elements[7]
+      n13 = @elements[8]
+      n23 = @elements[9]
+      n33 = @elements[10]
+      n43 = @elements[11]
+      n14 = @elements[12]
+      n24 = @elements[13]
+      n34 = @elements[14]
+      n44 = @elements[15]
+
+      t1 = n11 * n22 - n21 * n12
+      t2 = n11 * n32 - n31 * n12
+      t3 = n11 * n42 - n41 * n12
+      t4 = n21 * n32 - n31 * n22
+      t5 = n21 * n42 - n41 * n22
+      t6 = n31 * n42 - n41 * n32
+      t7 = n13 * n24 - n23 * n14
+      t8 = n13 * n34 - n33 * n14
+      t9 = n13 * n44 - n43 * n14
+      t10 = n23 * n34 - n33 * n24
+      t11 = n23 * n44 - n43 * n24
+      t12 = n33 * n44 - n43 * n34
+
+      det = t1 * t12 - t2 * t11 + t3 * t10 + t4 * t9 - t5 * t8 + t6 * t7
+      return set(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) if det.zero?
+
+      det_inv = 1.0 / det
+
+      @elements[0] = (n22 * t12 - n32 * t11 + n42 * t10) * det_inv
+      @elements[1] = (n31 * t11 - n21 * t12 - n41 * t10) * det_inv
+      @elements[2] = (n24 * t6 - n34 * t5 + n44 * t4) * det_inv
+      @elements[3] = (n33 * t5 - n23 * t6 - n43 * t4) * det_inv
+      @elements[4] = (n32 * t9 - n12 * t12 - n42 * t8) * det_inv
+      @elements[5] = (n11 * t12 - n31 * t9 + n41 * t8) * det_inv
+      @elements[6] = (n34 * t3 - n14 * t6 - n44 * t2) * det_inv
+      @elements[7] = (n13 * t6 - n33 * t3 + n43 * t2) * det_inv
+      @elements[8] = (n12 * t11 - n22 * t9 + n42 * t7) * det_inv
+      @elements[9] = (n21 * t9 - n11 * t11 - n41 * t7) * det_inv
+      @elements[10] = (n14 * t5 - n24 * t3 + n44 * t1) * det_inv
+      @elements[11] = (n23 * t3 - n13 * t5 - n43 * t1) * det_inv
+      @elements[12] = (n22 * t8 - n12 * t10 - n32 * t7) * det_inv
+      @elements[13] = (n11 * t10 - n21 * t8 + n31 * t7) * det_inv
+      @elements[14] = (n24 * t2 - n14 * t4 - n34 * t1) * det_inv
+      @elements[15] = (n13 * t4 - n23 * t2 + n33 * t1) * det_inv
+      self
+    end
+
     def scale(vector)
       @elements[0] *= vector.x
       @elements[4] *= vector.y
@@ -231,6 +286,33 @@ module Three
       @elements[3] *= vector.x
       @elements[7] *= vector.y
       @elements[11] *= vector.z
+      self
+    end
+
+    def make_perspective(left, right, top, bottom, near, far)
+      x = 2.0 * near / (right - left)
+      y = 2.0 * near / (top - bottom)
+      a = (right + left).to_f / (right - left)
+      b = (top + bottom).to_f / (top - bottom)
+      c = -(far + near).to_f / (far - near)
+      d = (-2.0 * far * near) / (far - near)
+
+      @elements[0] = x
+      @elements[4] = 0
+      @elements[8] = a
+      @elements[12] = 0
+      @elements[1] = 0
+      @elements[5] = y
+      @elements[9] = b
+      @elements[13] = 0
+      @elements[2] = 0
+      @elements[6] = 0
+      @elements[10] = c
+      @elements[14] = d
+      @elements[3] = 0
+      @elements[7] = 0
+      @elements[11] = -1
+      @elements[15] = 0
       self
     end
 

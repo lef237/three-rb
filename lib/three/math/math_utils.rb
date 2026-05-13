@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "securerandom"
+
 module Three
   module MathUtils
     DEG2RAD = Math::PI / 180.0
@@ -25,6 +27,10 @@ module Three
 
     def rad_to_deg(radians)
       radians * RAD2DEG
+    end
+
+    def generate_uuid
+      SecureRandom.uuid
     end
   end
 end

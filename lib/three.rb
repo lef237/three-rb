@@ -6,6 +6,12 @@ require_relative "three/math/vector3"
 require_relative "three/math/quaternion"
 require_relative "three/math/matrix4"
 require_relative "three/math/euler"
+require_relative "three/core/event_dispatcher"
+require_relative "three/core/object3d"
+require_relative "three/objects/group"
+require_relative "three/scenes/scene"
+require_relative "three/cameras/camera"
+require_relative "three/cameras/perspective_camera"
 
 module Three
 end

@@ -68,4 +68,21 @@ class ThreeMatrix4Test < Minitest::Test
     assert_equal 1, Three::Matrix4.new.determinant
     assert_equal 24, Three::Matrix4.new.make_scale(2, 3, 4).determinant
   end
+
+  def test_invert
+    matrix = Three::Matrix4.new.make_translation(1, 2, 3)
+    inverse = matrix.clone.invert
+    vector = Three::Vector3.new(1, 2, 3).apply_matrix4(inverse)
+
+    assert_vector3_in_delta [0, 0, 0], vector
+  end
+
+  def test_make_perspective
+    matrix = Three::Matrix4.new.make_perspective(-1, 1, 1, -1, 1, 100)
+
+    assert_in_delta 1, matrix.elements[0], 1e-12
+    assert_in_delta 1, matrix.elements[5], 1e-12
+    assert_in_delta(-1.02020202020202, matrix.elements[10], 1e-12)
+    assert_equal(-1, matrix.elements[11])
+  end
 end

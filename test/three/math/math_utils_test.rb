@@ -17,4 +17,8 @@ class ThreeMathUtilsTest < Minitest::Test
   def test_lerp
     assert_equal 15, Three::MathUtils.lerp(10, 20, 0.5)
   end
+
+  def test_generate_uuid
+    assert_match(/\A[0-9a-f-]{36}\z/, Three::MathUtils.generate_uuid)
+  end
 end
