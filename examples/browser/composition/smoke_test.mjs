@@ -48,6 +48,9 @@ async function main() {
       sceneChildren: globalThis.__threeRbScene?.children?.length,
       ambientLightType: globalThis.__threeRbAmbientLight?.type,
       directionalLightType: globalThis.__threeRbDirectionalLight?.type,
+      pointLightType: globalThis.__threeRbPointLight?.type,
+      pointLightDistance: globalThis.__threeRbPointLight?.distance,
+      pointLightDecay: globalThis.__threeRbPointLight?.decay,
       planeGeometryType: globalThis.__threeRbPlane?.geometry?.type,
       rigType: globalThis.__threeRbRig?.type,
       primaryParentType: globalThis.__threeRbPrimaryMesh?.parent?.type,
@@ -82,8 +85,11 @@ async function main() {
     if (!Array.isArray(scene.materialTextureRepeat) || scene.materialTextureRepeat[0] !== 2 || scene.materialTextureRepeat[1] !== 2) {
       throw new Error(`expected configured texture repeat: ${JSON.stringify(scene)}`);
     }
-    if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight") {
-      throw new Error(`expected ambient and directional lights: ${JSON.stringify(scene)}`);
+    if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight" || scene.pointLightType !== "PointLight") {
+      throw new Error(`expected ambient, directional, and point lights: ${JSON.stringify(scene)}`);
+    }
+    if (scene.pointLightDistance !== 7 || scene.pointLightDecay !== 2) {
+      throw new Error(`expected configured PointLight falloff: ${JSON.stringify(scene)}`);
     }
     if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group" || scene.sphereParentType !== "Group") {
       throw new Error(`expected grouped child meshes: ${JSON.stringify(scene)}`);

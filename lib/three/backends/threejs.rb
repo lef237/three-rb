@@ -8,6 +8,7 @@ require_relative "../geometries/plane_geometry"
 require_relative "../geometries/sphere_geometry"
 require_relative "../lights/ambient_light"
 require_relative "../lights/directional_light"
+require_relative "../lights/point_light"
 require_relative "../materials/mesh_basic_material"
 require_relative "../materials/mesh_lambert_material"
 require_relative "../materials/mesh_normal_material"
@@ -140,6 +141,8 @@ module Three
           @adapter.new_ambient_light(object.color.hex, object.intensity)
         when DirectionalLight
           @adapter.new_directional_light(object.color.hex, object.intensity)
+        when PointLight
+          @adapter.new_point_light(object.color.hex, object.intensity, object.distance, object.decay)
         when BoxGeometry
           parameters = object.parameters
           @adapter.new_box_geometry(
@@ -256,7 +259,12 @@ module Three
       end
 
       def sync_light(object, handle)
-        @adapter.update_light(handle, object.color.hex, object.intensity)
+        case object
+        when PointLight
+          @adapter.update_point_light(handle, object.color.hex, object.intensity, object.distance, object.decay)
+        else
+          @adapter.update_light(handle, object.color.hex, object.intensity)
+        end
       end
 
       def sync_material(material, handle)
@@ -480,6 +488,10 @@ module Three
           @three[:DirectionalLight].new(color, intensity)
         end
 
+        def new_point_light(color, intensity, distance, decay)
+          @three[:PointLight].new(color, intensity, distance, decay)
+        end
+
         def new_mesh(geometry, material)
           @three[:Mesh].new(geometry, material)
         end
@@ -590,6 +602,12 @@ module Three
         def update_light(light, color, intensity)
           light[:color].call(:setHex, color)
           light[:intensity] = intensity
+        end
+
+        def update_point_light(light, color, intensity, distance, decay)
+          update_light(light, color, intensity)
+          light[:distance] = distance
+          light[:decay] = decay
         end
 
         def update_material(material, parameters)

@@ -27,6 +27,16 @@ class ThreeLightTest < Minitest::Test
     assert_equal 2, light.intensity
   end
 
+  def test_point_light_accepts_distance_and_decay
+    light = Three::PointLight.new(0x112233, 1.5, 12, 1.8)
+
+    assert_equal "PointLight", light.type
+    assert_equal 0x112233, light.color.hex
+    assert_equal 1.5, light.intensity
+    assert_equal 12, light.distance
+    assert_equal 1.8, light.decay
+  end
+
   def test_marks_dirty_when_color_changes
     light = Three::AmbientLight.new(0xffffff)
     light.mark_clean!
@@ -43,5 +53,25 @@ class ThreeLightTest < Minitest::Test
     light.intensity = 0.25
 
     assert light.dirty_field?(:light)
+  end
+
+  def test_marks_dirty_when_point_light_distance_or_decay_changes
+    light = Three::PointLight.new
+    light.mark_clean!
+
+    light.distance = 5
+    light.decay = 1.5
+
+    assert light.dirty_field?(:light)
+    assert_equal 5, light.distance
+    assert_equal 1.5, light.decay
+  end
+
+  def test_point_light_to_h
+    light = Three::PointLight.new(0xffffff, 2, 8, 2)
+
+    assert_equal "PointLight", light.to_h[:type]
+    assert_equal 8, light.to_h[:distance]
+    assert_equal 2, light.to_h[:decay]
   end
 end

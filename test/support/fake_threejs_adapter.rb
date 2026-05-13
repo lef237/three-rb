@@ -98,6 +98,10 @@ class FakeThreeJSAdapter
     handle(:directional_light, color: color, intensity: intensity, children: [])
   end
 
+  def new_point_light(color, intensity, distance, decay)
+    handle(:point_light, color: color, intensity: intensity, distance: distance, decay: decay, children: [])
+  end
+
   def new_mesh(geometry, material)
     handle(:mesh, geometry: geometry, material: material, children: [])
   end
@@ -242,6 +246,14 @@ class FakeThreeJSAdapter
     @calls << [:update_light, light, color, intensity]
     light[:color] = color
     light[:intensity] = intensity
+  end
+
+  def update_point_light(light, color, intensity, distance, decay)
+    @calls << [:update_point_light, light, color, intensity, distance, decay]
+    light[:color] = color
+    light[:intensity] = intensity
+    light[:distance] = distance
+    light[:decay] = decay
   end
 
   def update_material(material, parameters)

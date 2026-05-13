@@ -54,6 +54,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::Loaders::TextureLoader"
     assert_includes ruby, "Three::RepeatWrapping"
     assert_includes ruby, "Three::NearestFilter"
+    assert_includes ruby, "Three::PointLight"
     assert_includes ruby, "Three::Controls::OrbitControls"
     assert_includes ruby, "Three::Group"
     assert_includes ruby, "rig.add(primary)"
