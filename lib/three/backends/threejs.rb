@@ -24,6 +24,20 @@ require_relative "base"
 module Three
   module Backends
     class ThreeJS < Base
+      MATERIAL_TEXTURE_PARAMETERS = {
+        map: :map,
+        alpha_map: :alphaMap,
+        ao_map: :aoMap,
+        bump_map: :bumpMap,
+        displacement_map: :displacementMap,
+        emissive_map: :emissiveMap,
+        env_map: :envMap,
+        light_map: :lightMap,
+        metalness_map: :metalnessMap,
+        normal_map: :normalMap,
+        roughness_map: :roughnessMap
+      }.freeze
+
       attr_reader :adapter, :handles
 
       def initialize(adapter: nil)
@@ -344,7 +358,7 @@ module Three
       end
 
       def sync_material_textures(material)
-        sync(material.map) if material.respond_to?(:map) && material.map
+        material_textures(material).each { |texture| sync(texture) }
       end
 
       def sync_texture(texture, handle)
@@ -447,9 +461,9 @@ module Three
       end
 
       def material_textures(material)
-        return [] unless material.respond_to?(:map)
+        return material.textures if material.respond_to?(:textures)
 
-        [material.map].compact.uniq
+        []
       end
 
       def mark_clean_after_materialize(object)
@@ -476,10 +490,17 @@ module Three
         parameters[:color] = material.color.hex if material.respond_to?(:color)
         parameters[:roughness] = material.roughness if material.respond_to?(:roughness)
         parameters[:metalness] = material.metalness if material.respond_to?(:metalness)
-        parameters[:map] = material.map ? sync(material.map) : nil if material.respond_to?(:map)
+        material_texture_parameters(material).each do |ruby_name, threejs_name|
+          texture = material.public_send(ruby_name)
+          parameters[threejs_name] = texture ? sync(texture) : nil
+        end
         parameters[:wireframe] = material.wireframe if material.respond_to?(:wireframe)
         parameters[:flatShading] = material.flat_shading if material.respond_to?(:flat_shading)
         parameters
+      end
+
+      def material_texture_parameters(material)
+        MATERIAL_TEXTURE_PARAMETERS.select { |ruby_name, _threejs_name| material.respond_to?(ruby_name) }
       end
 
       def texture_parameters(texture)

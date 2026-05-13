@@ -499,7 +499,7 @@ Current implementation status:
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
-- `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial#map` on a textured cube.
+- `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial` base/PBR texture maps on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, and disposing the loaded subtree through the renderer API.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
@@ -509,7 +509,8 @@ Current implementation status:
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
 - `Three::Renderers::ThreeJSRenderer#traverse_handles` and `#dispose_subtree` expose loaded-asset traversal and cleanup without changing Ruby `Object3D#traverse`.
 - Loaded asset traversal/disposal design and implementation status are documented in `docs/loaded-assets-design.md`.
-- The next implementation step is broadening Ruby-side resource ownership helpers as more material texture slots are modeled.
+- `MeshStandardMaterial` supports common Ruby-side PBR texture slots such as `normal_map`, `roughness_map`, and `metalness_map`, and backend resource ownership helpers track all modeled texture slots.
+- The next implementation step is adding more material classes or addon loaders only when an example or API target needs them.
 
 Recommended structure:
 
@@ -619,7 +620,7 @@ Important details:
 
 Completion criteria:
 
-- Textures can be assigned to materials.
+- Textures can be assigned to materials, including common `MeshStandardMaterial` PBR texture slots.
 - glTF models can be added to a scene.
 - Loaded glTF model resources can be explicitly disposed.
 
@@ -794,8 +795,8 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Expand Ruby-side resource ownership helpers beyond single material maps as more material texture slots are introduced.
-2. Add more addon loaders only when an example or API target needs them.
+1. Add the next material class or addon loader only when a concrete example or API target needs it.
+2. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
 3. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open

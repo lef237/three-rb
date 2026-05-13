@@ -44,7 +44,7 @@ The recommended design has been implemented for the current loaded-asset MVP:
 
 Remaining work:
 
-- The Ruby material model still exposes only the texture slots currently implemented by Ruby material classes. Broaden Ruby-side ownership helpers as more material texture slots are added.
+- The Ruby material model exposes common `MeshStandardMaterial` PBR texture slots. Broaden ownership helpers further if additional material classes introduce new texture slots.
 - If future APIs need to inspect or edit loaded child objects, design explicit wrapper types instead of changing `Object3D#traverse`.
 
 ## Decision

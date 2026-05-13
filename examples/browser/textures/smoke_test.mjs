@@ -38,6 +38,8 @@ async function main() {
       geometryType: globalThis.__threeRbTexturedMesh?.geometry?.type,
       materialType: globalThis.__threeRbTexturedMesh?.material?.type,
       materialMapType: globalThis.__threeRbTexturedMesh?.material?.map?.isTexture,
+      materialRoughnessMapType: globalThis.__threeRbTextureMaterial?.roughnessMap?.isTexture,
+      materialMetalnessMapType: globalThis.__threeRbTextureMaterial?.metalnessMap?.isTexture,
       materialRoughness: globalThis.__threeRbTextureMaterial?.roughness,
       materialMetalness: globalThis.__threeRbTextureMaterial?.metalness,
       textureType: globalThis.__threeRbTextureExampleTexture?.isTexture,
@@ -57,6 +59,9 @@ async function main() {
     }
     if (scene.materialType !== "MeshStandardMaterial" || scene.materialMapType !== true) {
       throw new Error(`expected MeshStandardMaterial with a texture map: ${JSON.stringify(scene)}`);
+    }
+    if (scene.materialRoughnessMapType !== true || scene.materialMetalnessMapType !== true) {
+      throw new Error(`expected MeshStandardMaterial with PBR texture maps: ${JSON.stringify(scene)}`);
     }
     if (scene.materialRoughness !== 0.42 || scene.materialMetalness !== 0.08) {
       throw new Error(`expected configured PBR material values: ${JSON.stringify(scene)}`);

@@ -113,11 +113,17 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
   def test_materializes_mesh_standard_material
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    normal_map = Three::Texture.new("/normal.png")
+    roughness_map = Three::Texture.new("/roughness.png")
+    metalness_map = Three::Texture.new("/metalness.png")
     material = Three::MeshStandardMaterial.new(
       color: 0x336699,
       roughness: 0.4,
       metalness: 0.7,
       map: Three::Texture.new("/texture.png"),
+      normal_map: normal_map,
+      roughness_map: roughness_map,
+      metalness_map: metalness_map,
       flat_shading: true
     )
 
@@ -129,6 +135,9 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 0.7, handle[:parameters][:metalness]
     assert_equal :texture, handle[:parameters][:map][:type]
     assert_equal "/texture.png", handle[:parameters][:map][:source]
+    assert_equal "/normal.png", handle[:parameters][:normalMap][:source]
+    assert_equal "/roughness.png", handle[:parameters][:roughnessMap][:source]
+    assert_equal "/metalness.png", handle[:parameters][:metalnessMap][:source]
     assert_equal true, handle[:parameters][:flatShading]
   end
 
@@ -349,10 +358,12 @@ class ThreeThreeJSBackendTest < Minitest::Test
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)
     texture = Three::Texture.new("/texture.png")
-    material = Three::MeshStandardMaterial.new(map: texture)
+    normal_map = Three::Texture.new("/normal.png")
+    material = Three::MeshStandardMaterial.new(map: texture, normal_map: normal_map, roughness_map: texture)
 
     material_handle = backend.materialize(material)
     texture_handle = backend.materialize(texture)
+    normal_map_handle = backend.materialize(normal_map)
     adapter.calls.clear
 
     disposed_material = backend.dispose(material, dispose_textures: true)
@@ -360,10 +371,12 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_same material_handle, disposed_material
     assert_equal [
       [:dispose, texture_handle],
+      [:dispose, normal_map_handle],
       [:dispose, material_handle]
     ], adapter.calls
     refute backend.handles.key?(material.uuid)
     refute backend.handles.key?(texture.uuid)
+    refute backend.handles.key?(normal_map.uuid)
   end
 
   def test_traverse_handles_walks_external_object3d_handle
@@ -481,16 +494,18 @@ class ThreeThreeJSBackendTest < Minitest::Test
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)
     texture = Three::Texture.new("/texture.png")
-    material = Three::MeshLambertMaterial.new(map: texture)
+    roughness_map = Three::Texture.new("/roughness.png")
+    material = Three::MeshStandardMaterial.new(map: texture, roughness_map: roughness_map)
 
-    texture_handle = backend.materialize(texture)
+    backend.materialize(texture)
+    roughness_map_handle = backend.materialize(roughness_map)
     backend.sync(material)
     adapter.calls.clear
 
-    texture.repeat.set(2, 2)
+    roughness_map.repeat.set(2, 2)
     backend.sync(material)
 
-    assert_equal [:update_texture, texture_handle, {
+    assert_equal [:update_texture, roughness_map_handle, {
       flip_y: true,
       wrap_s: Three::ClampToEdgeWrapping,
       wrap_t: Three::ClampToEdgeWrapping,

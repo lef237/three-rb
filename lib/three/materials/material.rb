@@ -116,6 +116,17 @@ module Three
       dispatch_event(:dispose)
     end
 
+    def texture_slots
+      respond_to?(:map) ? [:map] : []
+    end
+
+    def textures
+      texture_slots.each_with_object([]) do |slot, result|
+        texture = public_send(slot)
+        result << texture if texture && !result.include?(texture)
+      end
+    end
+
     def to_h
       {
         uuid: @uuid,

@@ -35,7 +35,9 @@ begin
     color: 0xffffff,
     roughness: 0.42,
     metalness: 0.08,
-    map: texture
+    map: texture,
+    roughness_map: texture,
+    metalness_map: texture
   )
   mesh = Three::Mesh.new(Three::BoxGeometry.new(1.8, 1.15, 0.32), material)
   mesh.rotation.x = -0.25
