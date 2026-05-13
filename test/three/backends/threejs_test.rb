@@ -268,6 +268,27 @@ class ThreeThreeJSBackendTest < Minitest::Test
     refute backend.handles.key?(texture.uuid)
   end
 
+  def test_dispose_material_can_dispose_texture_maps
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    texture = Three::Texture.new("/texture.png")
+    material = Three::MeshStandardMaterial.new(map: texture)
+
+    material_handle = backend.materialize(material)
+    texture_handle = backend.materialize(texture)
+    adapter.calls.clear
+
+    disposed_material = backend.dispose(material, dispose_textures: true)
+
+    assert_same material_handle, disposed_material
+    assert_equal [
+      [:dispose, texture_handle],
+      [:dispose, material_handle]
+    ], adapter.calls
+    refute backend.handles.key?(material.uuid)
+    refute backend.handles.key?(texture.uuid)
+  end
+
   def test_sync_skips_clean_object_updates
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

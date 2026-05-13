@@ -11,7 +11,7 @@ module Three
         raise NotImplementedError
       end
 
-      def dispose(_object)
+      def dispose(_object, **_options)
         raise NotImplementedError
       end
     end

@@ -504,7 +504,8 @@ Current implementation status:
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
-- The next implementation step is improving resource disposal ergonomics or adding more loader coverage.
+- `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
+- The next implementation step is adding more loader coverage or expanding resource ownership helpers.
 
 Recommended structure:
 
@@ -782,8 +783,8 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add convenience resource cleanup helpers for common material/texture ownership patterns.
-2. Add more loader coverage, starting with `CubeTextureLoader` or a minimal `GLTFLoader` wrapper.
+1. Add more loader coverage, starting with `CubeTextureLoader` or a minimal `GLTFLoader` wrapper.
+2. Expand resource ownership helpers beyond single material maps when more texture slots exist.
 3. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open

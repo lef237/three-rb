@@ -57,4 +57,22 @@ class ThreeThreeJSRendererTest < Minitest::Test
     assert_equal :render, adapter.calls.last[0]
     assert_vector3_in_delta [1, 2, 3], mesh.get_world_position
   end
+
+  def test_dispose_delegates_to_backend
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+    texture = Three::Texture.new("/texture.png")
+    material = Three::MeshBasicMaterial.new(map: texture)
+
+    material_handle = backend.materialize(material)
+    texture_handle = backend.materialize(texture)
+    adapter.calls.clear
+
+    assert_same renderer, renderer.dispose(material, dispose_textures: true)
+    assert_equal [
+      [:dispose, texture_handle],
+      [:dispose, material_handle]
+    ], adapter.calls
+  end
 end

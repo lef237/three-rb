@@ -38,6 +38,11 @@ module Three
         @backend.render(@handle, scene, camera)
         self
       end
+
+      def dispose(object, **options)
+        @backend.dispose(object, **options)
+        self
+      end
     end
   end
 end

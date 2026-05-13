@@ -113,7 +113,9 @@ module Three
         handle
       end
 
-      def dispose(object)
+      def dispose(object, dispose_textures: false)
+        dispose_material_textures(object) if dispose_textures && object.is_a?(Material)
+
         key = cache_key(object)
         handle = key ? @handles.delete(key) : nil
         @adapter.dispose(handle) if handle
@@ -337,6 +339,16 @@ module Three
 
       def built_in_geometry?(geometry)
         geometry.is_a?(BoxGeometry) || geometry.is_a?(PlaneGeometry) || geometry.is_a?(SphereGeometry)
+      end
+
+      def dispose_material_textures(material)
+        material_textures(material).each { |texture| dispose(texture) }
+      end
+
+      def material_textures(material)
+        return [] unless material.respond_to?(:map)
+
+        [material.map].compact.uniq
       end
 
       def mark_clean_after_materialize(object)

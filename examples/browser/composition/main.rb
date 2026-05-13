@@ -129,8 +129,7 @@ begin
   disposable_material_handle = renderer.backend.materialize(disposable_material)
   disposable_texture_handle.call(:addEventListener, "dispose", proc { JS.global[:__threeRbTextureDisposeEvent] = true })
   disposable_material_handle.call(:addEventListener, "dispose", proc { JS.global[:__threeRbMaterialDisposeEvent] = true })
-  renderer.backend.dispose(disposable_material)
-  renderer.backend.dispose(disposable_texture)
+  renderer.dispose(disposable_material, dispose_textures: true)
   JS.global[:__threeRbMaterialHandleCachedAfterDispose] = renderer.backend.handles.key?(disposable_material.uuid)
   JS.global[:__threeRbTextureHandleCachedAfterDispose] = renderer.backend.handles.key?(disposable_texture.uuid)
   JS.global[:__threeRbInitialMaterialColor] = primary_material.color.hex
