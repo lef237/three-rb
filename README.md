@@ -35,6 +35,7 @@ ruby -run -e httpd . -p 8000
 ```text
 http://localhost:8000/examples/browser/cube/
 http://localhost:8000/examples/browser/composition/
+http://localhost:8000/examples/browser/textures/
 ```
 
 The example loads pnpm-managed browser packages from `node_modules/`: `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`, `@ruby/wasm-wasi@2.9.4-2026-05-11-a`, and `three@0.184.0`.

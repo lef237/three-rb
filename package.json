@@ -4,9 +4,10 @@
   "type": "module",
   "packageManager": "pnpm@11.1.1",
   "scripts": {
-    "test:browser": "pnpm test:browser:cube && pnpm test:browser:composition",
+    "test:browser": "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures",
     "test:browser:cube": "node examples/browser/cube/smoke_test.mjs",
-    "test:browser:composition": "node examples/browser/composition/smoke_test.mjs"
+    "test:browser:composition": "node examples/browser/composition/smoke_test.mjs",
+    "test:browser:textures": "node examples/browser/textures/smoke_test.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "0.4.2",
