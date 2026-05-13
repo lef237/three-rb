@@ -552,6 +552,13 @@ Completion criteria:
 
 The goal is to make three.rb scenes useful beyond immediate rendering.
 
+Current implementation status:
+
+- `Three::Exporters::ThreeJSONExporter` exports a Ruby-authored object tree with separate deduplicated `geometries`, `materials`, and `textures` arrays.
+- `Object3D#to_json` delegates to the exporter format when the full `three` entrypoint is loaded.
+- The exporter serializes transform arrays directly instead of relying on a potentially stale local matrix, and stores resource references by UUID.
+- A minimal importer/reconstructor is still pending; add it after the exporter format has covered more real examples.
+
 Implementation targets:
 
 - `Object3D#to_h`
@@ -819,8 +826,9 @@ The MVP is complete when:
 ## Next Tasks
 
 1. Add the next material class or addon loader only when a concrete example or API target needs it.
-2. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
-3. Keep reviewing low-risk dependency updates after checking their CI results.
+2. Add a minimal importer for the `ThreeJSONExporter` format after the exporter is exercised by browser examples or saved fixtures.
+3. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
+4. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open
 

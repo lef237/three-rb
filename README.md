@@ -72,6 +72,13 @@ Run tests:
 bundle exec rake test
 ```
 
+Export a Ruby-authored scene to a deterministic JSON-friendly hash:
+
+```ruby
+exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+json = scene.to_json
+```
+
 Run the full local CI-equivalent check:
 
 ```sh

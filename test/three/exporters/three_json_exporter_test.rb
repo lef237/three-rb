@@ -1,0 +1,92 @@
+# frozen_string_literal: true
+
+require "test_helper"
+require "json"
+
+class ThreeThreeJSONExporterTest < Minitest::Test
+  def test_exports_scene_graph_with_deduplicated_resources
+    scene = Three::Scene.new
+    scene.name = "root"
+    texture = Three::Texture.new("/texture.png", repeat: [2, 3])
+    geometry = Three::BoxGeometry.new(1, 2, 3)
+    material = Three::MeshBasicMaterial.new(color: 0x00ff00, map: texture)
+    first = Three::Mesh.new(geometry, material)
+    second = Three::Mesh.new(geometry, material)
+    first.position.set(1, 2, 3)
+    second.scale.set(2, 2, 2)
+    scene.add(first, second)
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+
+    assert_equal({ version: 1, generator: "three.rb", type: "Object" }, exported[:metadata])
+    assert_equal "Scene", exported[:object][:type]
+    assert_equal "root", exported[:object][:name]
+    assert_equal 2, exported[:object][:children].length
+    assert_equal [1, 2, 3], exported[:object][:children][0][:position]
+    assert_equal [2, 2, 2], exported[:object][:children][1][:scale]
+
+    assert_equal [geometry.uuid], exported[:geometries].map { |entry| entry[:uuid] }
+    assert_equal [material.uuid], exported[:materials].map { |entry| entry[:uuid] }
+    assert_equal [texture.uuid], exported[:textures].map { |entry| entry[:uuid] }
+    assert_equal geometry.uuid, exported[:object][:children][0][:geometry]
+    assert_equal material.uuid, exported[:object][:children][0][:material]
+    assert_equal texture.uuid, exported[:materials][0][:map]
+    assert_equal "/texture.png", exported[:textures][0][:source]
+    assert_equal [2, 3], exported[:textures][0][:repeat]
+  end
+
+  def test_exports_cameras_lights_scene_textures_and_instanced_mesh_data
+    scene = Three::Scene.new
+    scene.background = Three::CubeTexture.new(%w[/px.png /nx.png /py.png /ny.png /pz.png /nz.png])
+    camera = Three::PerspectiveCamera.new(60, aspect: 1.5, near: 0.2, far: 500)
+    light = Three::DirectionalLight.new(0xffddaa, 1.4)
+    light.cast_shadow = true
+    light.set_shadow_camera(left: -2, right: 2)
+    instanced = Three::InstancedMesh.new(Three::PlaneGeometry.new(2, 2), Three::MeshLambertMaterial.new(color: 0xffffff), 2)
+    matrix = Three::Matrix4.new.make_translation(1, 0, 0)
+    instanced.set_matrix_at(1, matrix)
+    instanced.set_color_at(1, [0.2, 0.4, 0.6])
+    scene.add(camera, light, instanced)
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+    children = exported[:object][:children]
+
+    assert_equal scene.background.uuid, exported[:object][:background]
+    assert_equal [scene.background.uuid], exported[:textures].map { |entry| entry[:uuid] }
+
+    camera_data = children.find { |entry| entry[:type] == "PerspectiveCamera" }
+    assert_equal 60, camera_data[:fov]
+    assert_equal 1.5, camera_data[:aspect]
+    assert_equal 0.2, camera_data[:near]
+    assert_equal 500, camera_data[:far]
+
+    light_data = children.find { |entry| entry[:type] == "DirectionalLight" }
+    assert_equal 0xffddaa, light_data[:color]
+    assert_equal 1.4, light_data[:intensity]
+    assert_equal true, light_data[:cast_shadow]
+    assert_equal(-2, light_data[:shadow_camera][:left])
+    assert_equal 2, light_data[:shadow_camera][:right]
+
+    instanced_data = children.find { |entry| entry[:type] == "InstancedMesh" }
+    assert_equal 2, instanced_data[:count]
+    assert_equal 2, instanced_data[:capacity]
+    assert_equal matrix.to_a, instanced_data[:instance_matrices][1]
+    assert_equal [0.2, 0.4, 0.6], instanced_data[:instance_colors][1]
+  end
+
+  def test_object3d_to_json_uses_exporter_format
+    scene = Three::Scene.new
+    scene.add(Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new))
+
+    parsed = JSON.parse(scene.to_json)
+
+    assert_equal "three.rb", parsed.fetch("metadata").fetch("generator")
+    assert_equal "Scene", parsed.fetch("object").fetch("type")
+    assert_equal 1, parsed.fetch("geometries").length
+    assert_equal 1, parsed.fetch("materials").length
+  end
+
+  def test_export_rejects_non_object3d_roots
+    assert_raises(TypeError) { Three::Exporters::ThreeJSONExporter.new.export(Three::BoxGeometry.new) }
+  end
+end

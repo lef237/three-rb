@@ -262,6 +262,10 @@ module Three
       }
     end
 
+    def to_json(*args)
+      Exporters::ThreeJSONExporter.new.to_json(self, *args)
+    end
+
     protected
 
     attr_writer :parent

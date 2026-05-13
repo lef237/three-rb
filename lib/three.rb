@@ -46,6 +46,7 @@ require_relative "three/backends/threejs"
 require_relative "three/renderers/renderer"
 require_relative "three/renderers/threejs_renderer"
 require_relative "three/controls/orbit_controls"
+require_relative "three/exporters/three_json_exporter"
 
 module Three
 end
