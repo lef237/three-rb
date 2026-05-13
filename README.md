@@ -3,15 +3,22 @@ Ruby 3D Library.
 
 ## Status
 
-This project is in the initial implementation phase. The current focus is the Ruby gem foundation and the first math/core APIs.
+This project is in the initial implementation phase. The current code covers the gem foundation, math primitives, scene graph basics, and initial geometry/material objects.
 
 ## Quick Start
 
 ```ruby
 require "three"
 
-vector = Three::Vector3.new(1, 2, 2)
-puts vector.length # 3.0
+scene = Three::Scene.new
+camera = Three::PerspectiveCamera.new(75, aspect: 16.0 / 9.0)
+camera.position.z = 5
+
+geometry = Three::BoxGeometry.new(1, 1, 1)
+material = Three::MeshBasicMaterial.new(color: 0x00ff00)
+cube = Three::Mesh.new(geometry, material)
+
+scene.add(cube)
 ```
 
 ## Development

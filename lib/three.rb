@@ -1,17 +1,25 @@
 # frozen_string_literal: true
 
 require_relative "three/version"
+require_relative "three/constants"
 require_relative "three/math/math_utils"
+require_relative "three/math/color"
 require_relative "three/math/vector3"
 require_relative "three/math/quaternion"
 require_relative "three/math/matrix4"
 require_relative "three/math/euler"
 require_relative "three/core/event_dispatcher"
 require_relative "three/core/object3d"
+require_relative "three/core/buffer_attribute"
+require_relative "three/core/buffer_geometry"
 require_relative "three/objects/group"
+require_relative "three/objects/mesh"
 require_relative "three/scenes/scene"
 require_relative "three/cameras/camera"
 require_relative "three/cameras/perspective_camera"
+require_relative "three/materials/material"
+require_relative "three/materials/mesh_basic_material"
+require_relative "three/geometries/box_geometry"
 
 module Three
 end
