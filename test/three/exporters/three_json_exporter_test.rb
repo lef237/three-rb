@@ -86,6 +86,31 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal 1, parsed.fetch("materials").length
   end
 
+  def test_deterministic_ids_make_equivalent_exports_equal
+    build_scene = proc do
+      scene = Three::Scene.new
+      texture = Three::Texture.new("/texture.png")
+      geometry = Three::BoxGeometry.new(1, 1, 1)
+      material = Three::MeshBasicMaterial.new(color: 0x336699, map: texture)
+      scene.add(Three::Mesh.new(geometry, material))
+      scene
+    end
+    exporter = Three::Exporters::ThreeJSONExporter.new(deterministic_ids: true)
+
+    first = exporter.export(build_scene.call)
+    second = exporter.export(build_scene.call)
+
+    assert_equal first, second
+    assert_equal "object-0", first[:object][:uuid]
+    assert_equal "object-1", first[:object][:children][0][:uuid]
+    assert_equal "geometry-0", first[:geometries][0][:uuid]
+    assert_equal "material-0", first[:materials][0][:uuid]
+    assert_equal "texture-0", first[:textures][0][:uuid]
+    assert_equal "geometry-0", first[:object][:children][0][:geometry]
+    assert_equal "material-0", first[:object][:children][0][:material]
+    assert_equal "texture-0", first[:materials][0][:map]
+  end
+
   def test_export_rejects_non_object3d_roots
     assert_raises(TypeError) { Three::Exporters::ThreeJSONExporter.new.export(Three::BoxGeometry.new) }
   end

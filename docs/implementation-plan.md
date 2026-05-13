@@ -557,6 +557,7 @@ Current implementation status:
 - `Three::Exporters::ThreeJSONExporter` exports a Ruby-authored object tree with separate deduplicated `geometries`, `materials`, and `textures` arrays.
 - `Object3D#to_json` delegates to the exporter format when the full `three` entrypoint is loaded.
 - The exporter serializes transform arrays directly instead of relying on a potentially stale local matrix, and stores resource references by UUID.
+- `Three::Exporters::ThreeJSONExporter.new(deterministic_ids: true)` assigns traversal-order stable IDs for regression fixtures while preserving real UUIDs by default.
 - `Three::Loaders::ThreeJSONLoader#parse` reconstructs the exporter format into Ruby `Scene`, camera, light, mesh, material, texture, geometry, and `InstancedMesh` objects while preserving shared resource identity.
 
 Implementation targets:

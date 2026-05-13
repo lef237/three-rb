@@ -7,6 +7,10 @@ module Three
     class ThreeJSONExporter
       FORMAT_VERSION = 1
 
+      def initialize(deterministic_ids: false)
+        @deterministic_ids = deterministic_ids
+      end
+
       def export(object)
         raise TypeError, "object must be a Three::Object3D" unless object.is_a?(Object3D)
 
@@ -34,11 +38,13 @@ module Three
         @geometries = {}
         @materials = {}
         @textures = {}
+        @stable_ids = {}
+        @stable_id_counts = Hash.new(0)
       end
 
       def serialize_object(object)
         data = {
-          uuid: object.uuid,
+          uuid: export_id(object, :object),
           type: object.type,
           name: object.name,
           visible: object.visible,
@@ -114,11 +120,12 @@ module Three
         return nil unless geometry&.respond_to?(:uuid)
 
         @geometries[geometry.uuid] ||= serialize_geometry(geometry)
-        geometry.uuid
+        export_id(geometry, :geometry)
       end
 
       def serialize_geometry(geometry)
         data = geometry.to_h
+        data[:uuid] = export_id(geometry, :geometry)
         data[:parameters] = geometry.parameters.dup if geometry.respond_to?(:parameters)
         data
       end
@@ -128,11 +135,12 @@ module Three
         return nil unless material&.respond_to?(:uuid)
 
         @materials[material.uuid] ||= serialize_material(material)
-        material.uuid
+        export_id(material, :material)
       end
 
       def serialize_material(material)
         data = material.to_h
+        data[:uuid] = export_id(material, :material)
         material.textures.each { |texture| register_texture(texture) } if material.respond_to?(:textures)
 
         return data unless material.respond_to?(:texture_slots)
@@ -151,8 +159,22 @@ module Three
       end
 
       def register_texture(texture)
-        @textures[texture.uuid] ||= texture.to_h
-        texture.uuid
+        @textures[texture.uuid] ||= serialize_texture(texture)
+        export_id(texture, :texture)
+      end
+
+      def serialize_texture(texture)
+        texture.to_h.merge(uuid: export_id(texture, :texture))
+      end
+
+      def export_id(resource, prefix)
+        return resource.uuid unless @deterministic_ids
+
+        @stable_ids[resource.uuid] ||= begin
+          index = @stable_id_counts[prefix]
+          @stable_id_counts[prefix] += 1
+          "#{prefix}-#{index}"
+        end
       end
     end
   end

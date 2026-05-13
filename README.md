@@ -76,6 +76,7 @@ Export a Ruby-authored scene to a deterministic JSON-friendly hash:
 
 ```ruby
 exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+fixture = Three::Exporters::ThreeJSONExporter.new(deterministic_ids: true).export(scene)
 json = scene.to_json
 loaded_scene = Three::Loaders::ThreeJSONLoader.new.parse(json)
 ```
