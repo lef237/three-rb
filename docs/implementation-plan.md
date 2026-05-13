@@ -498,7 +498,8 @@ Current implementation status:
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
-- The next implementation step is running the smoke test in CI and tightening `RubyWasmAdapter` based on real-browser failures.
+- CI runs the Ruby unit tests and the Playwright cube smoke test with pnpm-managed browser dependencies.
+- The next implementation step is dirty tracking so `RubyWasmAdapter` can avoid unnecessary full sync work.
 
 Recommended structure:
 
@@ -770,9 +771,9 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Run the browser smoke test in CI with Playwright browsers installed.
-2. Verify the ruby.wasm bridge in a real browser and tighten `RubyWasmAdapter` where needed.
-3. Add dirty tracking so the backend can avoid full scene syncing on every render.
+1. Push the CI workflow and verify the first remote GitHub Actions run.
+2. Add dirty tracking so the backend can avoid unnecessary scene, transform, geometry, and material sync work.
+3. Add the next small rendering surface area: `PlaneGeometry`, `SphereGeometry`, `MeshNormalMaterial`, or `OrthographicCamera`.
 
 ## Decisions Still Open
 

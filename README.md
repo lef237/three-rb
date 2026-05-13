@@ -60,6 +60,17 @@ Run tests:
 bundle exec rake test
 ```
 
+Run the full local CI-equivalent check:
+
+```sh
+bundle exec rake test
+pnpm install --frozen-lockfile --ignore-scripts
+pnpm audit --audit-level moderate
+pnpm audit signatures
+pnpm exec playwright install chromium
+pnpm test:browser:cube
+```
+
 ## Documents
 
 - [Implementation Plan](docs/implementation-plan.md)
