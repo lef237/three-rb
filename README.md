@@ -3,7 +3,7 @@ Ruby 3D Library.
 
 ## Status
 
-This project is in the initial implementation phase. The current code covers the gem foundation, math primitives, scene graph basics, and initial geometry/material objects.
+This project is in the initial implementation phase. The current code covers the gem foundation, math primitives, scene graph basics, initial geometry/material objects, and the first three.js backend/renderer bridge skeleton.
 
 ## Quick Start
 
@@ -20,6 +20,8 @@ cube = Three::Mesh.new(geometry, material)
 
 scene.add(cube)
 ```
+
+Browser rendering is being wired through `Three::Renderers::ThreeJSRenderer`, which targets three.js from ruby.wasm.
 
 ## Development
 

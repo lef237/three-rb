@@ -20,6 +20,10 @@ require_relative "three/cameras/perspective_camera"
 require_relative "three/materials/material"
 require_relative "three/materials/mesh_basic_material"
 require_relative "three/geometries/box_geometry"
+require_relative "three/backends/base"
+require_relative "three/backends/threejs"
+require_relative "three/renderers/renderer"
+require_relative "three/renderers/threejs_renderer"
 
 module Three
 end

@@ -1,0 +1,34 @@
+# frozen_string_literal: true
+
+require_relative "../backends/threejs"
+require_relative "renderer"
+
+module Three
+  module Renderers
+    class ThreeJSRenderer < Renderer
+      attr_reader :backend, :handle
+
+      def initialize(canvas: nil, backend: Backends::ThreeJS.new, **options)
+        @backend = backend
+        @handle = @backend.create_renderer(canvas: canvas, **options)
+      end
+
+      def set_size(width, height)
+        @backend.set_renderer_size(@handle, width, height)
+        self
+      end
+
+      def animation_loop(&block)
+        @backend.set_animation_loop(@handle, block)
+        self
+      end
+
+      def render(scene, camera)
+        scene.update_matrix_world if scene.respond_to?(:update_matrix_world)
+        camera.update_matrix_world if camera.respond_to?(:update_matrix_world) && camera.parent.nil?
+        @backend.render(@handle, scene, camera)
+        self
+      end
+    end
+  end
+end

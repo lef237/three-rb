@@ -490,6 +490,14 @@ Completion criteria:
 
 The goal is to render a Ruby-authored scene in the browser.
 
+Current implementation status:
+
+- `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
+- `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, generic `BufferGeometry`, `BufferAttribute`, and `MeshBasicMaterial`.
+- Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
+- The next implementation step is the browser cube example that loads ruby.wasm and three.js together.
+
 Recommended structure:
 
 - `examples/browser/cube/index.html`
@@ -747,16 +755,16 @@ The MVP is complete when:
 
 ## First 10 Tasks
 
-1. Add `three.rb.gemspec`, `Gemfile`, `Rakefile`, and `lib/three.rb`.
-2. Add `Three::Version` and the module skeleton.
-3. Implement `Vector3`, `Matrix4`, `Quaternion`, `Euler`, and `Color`.
-4. Add math unit tests.
-5. Implement `EventDispatcher` and `Object3D`.
-6. Implement `Scene`, `Camera`, `PerspectiveCamera`, and `Group`.
-7. Implement `BufferAttribute`, `BufferGeometry`, and `BoxGeometry`.
-8. Implement `Material`, `MeshBasicMaterial`, and `Mesh`.
-9. Add skeletons for `Three::Backends::ThreeJS` and `ThreeJSRenderer`.
-10. Build `examples/browser/cube` and render a cube with ruby.wasm + three.js.
+- [x] Add `three.rb.gemspec`, `Gemfile`, `Rakefile`, and `lib/three.rb`.
+- [x] Add `Three::Version` and the module skeleton.
+- [x] Implement `Vector3`, `Matrix4`, `Quaternion`, `Euler`, and `Color`.
+- [x] Add math unit tests.
+- [x] Implement `EventDispatcher` and `Object3D`.
+- [x] Implement `Scene`, `Camera`, `PerspectiveCamera`, and `Group`.
+- [x] Implement `BufferAttribute`, `BufferGeometry`, and `BoxGeometry`.
+- [x] Implement `Material`, `MeshBasicMaterial`, and `Mesh`.
+- [x] Add skeletons for `Three::Backends::ThreeJS` and `ThreeJSRenderer`.
+- [ ] Build `examples/browser/cube` and render a cube with ruby.wasm + three.js.
 
 ## Decisions Still Open
 
