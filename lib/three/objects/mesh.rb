@@ -12,20 +12,26 @@ module Three
     def initialize(geometry = BufferGeometry.new, material = MeshBasicMaterial.new)
       super()
       @type = "Mesh"
-      @geometry = geometry
-      @material = material
+      @geometry = nil
+      @material = nil
       @morph_target_dictionary = nil
       @morph_target_influences = nil
       @count = 1
+      self.geometry = geometry
+      self.material = material
     end
 
     def geometry=(value)
+      @geometry.remove_dirty_dependent(self) if @geometry.respond_to?(:remove_dirty_dependent)
       @geometry = value
+      @geometry.add_dirty_dependent(self) if @geometry.respond_to?(:add_dirty_dependent)
       mark_dirty!(:mesh)
     end
 
     def material=(value)
+      @material.remove_dirty_dependent(self) if @material.respond_to?(:remove_dirty_dependent)
       @material = value
+      @material.add_dirty_dependent(self) if @material.respond_to?(:add_dirty_dependent)
       mark_dirty!(:mesh)
     end
 

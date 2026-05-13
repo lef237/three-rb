@@ -584,6 +584,89 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal :set_object_transform, adapter.calls.last[0]
   end
 
+  def test_sync_skips_clean_child_subtrees
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    clean_mesh = Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new)
+    dirty_mesh = Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new)
+    scene.add(clean_mesh, dirty_mesh)
+
+    backend.sync(scene)
+    clean_handle = backend.materialize(clean_mesh)
+    dirty_handle = backend.materialize(dirty_mesh)
+    adapter.calls.clear
+
+    dirty_mesh.position.x = 1
+    backend.sync(scene)
+
+    transform_calls = adapter.calls.select { |call| call[0] == :set_object_transform }
+    assert_equal 1, transform_calls.length
+    assert_same dirty_handle, transform_calls.first[1]
+    refute transform_calls.any? { |call| call[1].equal?(clean_handle) }
+  end
+
+  def test_sync_reaches_dirty_material_through_clean_scene_graph
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    material = Three::MeshBasicMaterial.new(color: 0xff0000)
+    mesh = Three::Mesh.new(Three::BoxGeometry.new, material)
+    scene.add(mesh)
+
+    backend.sync(scene)
+    material_handle = backend.materialize(material)
+    adapter.calls.clear
+
+    material.color.set_hex(0x00ff00)
+    backend.sync(scene)
+
+    call = adapter.calls.find { |entry| entry[0] == :update_material && entry[1].equal?(material_handle) }
+    refute_nil call
+    assert_equal 0x00ff00, call[2][:color]
+  end
+
+  def test_sync_reaches_dirty_texture_through_clean_scene_graph
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/texture.png", repeat: [1, 1])
+    material = Three::MeshBasicMaterial.new(map: texture)
+    mesh = Three::Mesh.new(Three::BoxGeometry.new, material)
+    scene.add(mesh)
+
+    backend.sync(scene)
+    texture_handle = backend.materialize(texture)
+    adapter.calls.clear
+
+    texture.repeat.set(2, 3)
+    backend.sync(scene)
+
+    call = adapter.calls.find { |entry| entry[0] == :update_texture && entry[1].equal?(texture_handle) }
+    refute_nil call
+    assert_equal [2, 3], call[2][:repeat]
+  end
+
+  def test_sync_reaches_dirty_geometry_through_clean_scene_graph
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    geometry = Three::BufferGeometry.new
+    geometry.set_attribute(:position, Three::Float32BufferAttribute.new([0, 0, 0, 1, 0, 0, 0, 1, 0], 3))
+    material = Three::MeshBasicMaterial.new
+    mesh = Three::Mesh.new(geometry, material)
+    scene.add(mesh)
+
+    backend.sync(scene)
+    geometry_handle = backend.materialize(geometry)
+    adapter.calls.clear
+
+    geometry.set_draw_range(0, 3)
+    backend.sync(scene)
+
+    assert adapter.calls.any? { |call| call == [:set_geometry_draw_range, geometry_handle, 0, 3] }
+  end
+
   def test_sync_updates_dirty_material_only
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)
@@ -653,14 +736,14 @@ class ThreeThreeJSBackendTest < Minitest::Test
     roughness_map.repeat.set(2, 2)
     backend.sync(material)
 
-    assert_equal [:update_texture, roughness_map_handle, {
+    assert_includes adapter.calls, [:update_texture, roughness_map_handle, {
       flip_y: true,
       wrap_s: Three::ClampToEdgeWrapping,
       wrap_t: Three::ClampToEdgeWrapping,
       mag_filter: Three::LinearFilter,
       min_filter: Three::LinearMipmapLinearFilter,
       repeat: [2, 2]
-    }], adapter.calls.last
+    }]
   end
 
   def test_sync_updates_dirty_orthographic_camera_only_after_change

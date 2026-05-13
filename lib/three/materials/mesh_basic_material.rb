@@ -27,8 +27,7 @@ module Three
     end
 
     def map=(value)
-      @map = value
-      mark_dirty!(:parameters)
+      replace_texture_slot(:map, value)
     end
 
     def wireframe=(value)

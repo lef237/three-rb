@@ -116,6 +116,10 @@ module Three
       dispatch_event(:dispose)
     end
 
+    def dirty_dependency_changed(_resource, _field)
+      mark_dirty!(:textures)
+    end
+
     def texture_slots
       respond_to?(:map) ? [:map] : []
     end
@@ -138,6 +142,17 @@ module Three
         visible: @visible,
         vertex_colors: @vertex_colors
       }
+    end
+
+    private
+
+    def replace_texture_slot(slot, value)
+      current = instance_variable_get(:"@#{slot}")
+      current.remove_dirty_dependent(self) if current.respond_to?(:remove_dirty_dependent)
+
+      instance_variable_set(:"@#{slot}", value)
+      value.add_dirty_dependent(self) if value.respond_to?(:add_dirty_dependent)
+      mark_dirty!(:parameters)
     end
   end
 end

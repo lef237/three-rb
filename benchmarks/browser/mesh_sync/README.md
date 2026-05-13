@@ -16,3 +16,5 @@ The output reports:
 - backend handle count
 
 Use this benchmark to decide whether normal `Mesh` synchronization needs additional batching. Repeated geometry should still prefer `Three::InstancedMesh`.
+
+The sync layer should skip clean child subtrees. If clean sync time regresses toward dirty transform sync time, check `Object3D` descendant dirty tracking and resource dirty propagation first.

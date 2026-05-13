@@ -89,6 +89,24 @@ module Three
       mark_dirty!(:properties)
     end
 
+    def mark_dirty!(field = :all)
+      super
+      @parent&.mark_descendant_dirty!
+      self
+    end
+
+    def mark_descendant_dirty!
+      return self if dirty_fields.key?(:descendants)
+
+      dirty_fields[:descendants] = true
+      @parent&.mark_descendant_dirty!
+      self
+    end
+
+    def dirty_dependency_changed(_resource, _field)
+      mark_dirty!(:resources)
+    end
+
     def self.allocate_id
       id = Object3D.next_id
       Object3D.next_id += 1

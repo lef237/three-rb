@@ -143,8 +143,7 @@ module Three
     end
 
     def set_texture_slot(slot, value)
-      instance_variable_set(:"@#{slot}", value)
-      mark_dirty!(:parameters)
+      replace_texture_slot(slot, value)
     end
   end
 end

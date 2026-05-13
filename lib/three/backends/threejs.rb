@@ -325,8 +325,10 @@ module Three
             child_handle = sync(child)
             @adapter.add_child(handle, child_handle)
           end
+        elsif object.dirty_field?(:descendants)
+          object.children.each { |child| sync(child) if child.dirty? }
         else
-          object.children.each { |child| sync(child) }
+          # Clean subtrees do not need a Ruby-to-JavaScript sync pass.
         end
 
         object.mark_clean! if object.respond_to?(:mark_clean!)

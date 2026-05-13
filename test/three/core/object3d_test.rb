@@ -122,6 +122,19 @@ class ThreeObject3DTest < Minitest::Test
     assert object.dirty_field?(:transform)
   end
 
+  def test_marks_ancestors_dirty_when_descendant_changes
+    root = Three::Object3D.new
+    child = Three::Object3D.new
+    root.add(child)
+    root.mark_clean!
+    child.mark_clean!
+
+    child.position.set(1, 2, 3)
+
+    assert child.dirty_field?(:transform)
+    assert root.dirty_field?(:descendants)
+  end
+
   def test_marks_children_dirty_when_child_is_added
     parent = Three::Object3D.new
     parent.mark_clean!

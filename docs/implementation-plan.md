@@ -649,13 +649,20 @@ Current instancing direction:
 - Treat the initial `InstancedMesh` API as matrix-and-color focused: `capacity`, `count`, `set_matrix_at`, `get_matrix_at`, `set_color_at`, `get_color_at`, `instance_matrix_needs_update!`, and `instance_color_needs_update!`. `capacity` is fixed at construction because three.js allocates the instance buffers then; `count` may be lowered within that capacity to render fewer active instances.
 - Browser verification should include a 1000-count instanced scene so Phase 8 measures a realistic high-volume path, not only small object graphs.
 
+Current sync performance direction:
+
+- Track dirty descendants on `Object3D` ancestors so clean subtrees can be skipped during backend sync.
+- Propagate dirty state from shared resources upward: `Texture` -> `Material` -> `Mesh` -> ancestor `Object3D`.
+- Keep render-time world matrix recomputation separate from backend dirty tracking. A clean render should not make transforms dirty merely because matrices were recomputed.
+- Use `pnpm benchmark:browser:mesh-sync` to measure 1000 individual `Mesh` sync before and after sync-layer changes.
+
 Completion criteria:
 
 - A basic lighting scene works.
 - Directional shadow mapping can be enabled and verified in a browser smoke test.
 - Material and texture disposal does not leak resources.
 - Synchronizing 1000 repeated meshes through `InstancedMesh` remains interactive.
-- A later benchmark should separately measure 1000 individual `Mesh` transform sync to decide whether backend batching is needed there too.
+- A benchmark separately measures 1000 individual `Mesh` transform sync to decide whether backend batching is needed there too.
 
 ### Phase 9: Native Renderer Evaluation
 
