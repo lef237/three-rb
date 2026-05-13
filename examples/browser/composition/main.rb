@@ -33,7 +33,7 @@ begin
   primary.position.z = 0.15
   rig.add(primary)
 
-  satellite_material = Three::MeshBasicMaterial.new(color: 0xf2c14e)
+  satellite_material = Three::MeshNormalMaterial.new(flat_shading: true)
   satellite = Three::Mesh.new(Three::BoxGeometry.new(0.42, 0.42, 0.42), satellite_material)
   satellite.position.x = 1.35
   satellite.position.y = -0.7
@@ -69,6 +69,7 @@ begin
   JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)
   JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)
   JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
+  JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)
   JS.global[:__threeRbInitialMaterialColor] = primary_material.color.hex
   JS.global[:__threeRbCompositionFrame] = 0
 

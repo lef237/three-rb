@@ -66,6 +66,8 @@ async function main() {
       rigType: globalThis.__threeRbRig?.type,
       primaryParentType: globalThis.__threeRbPrimaryMesh?.parent?.type,
       satelliteParentType: globalThis.__threeRbSatelliteMesh?.parent?.type,
+      satelliteMaterialType: globalThis.__threeRbSatelliteMesh?.material?.type,
+      normalMaterialFlatShading: globalThis.__threeRbNormalMaterial?.flatShading,
       currentMaterialColor: globalThis.__threeRbChangingMaterial?.color?.getHex?.(),
       initialMaterialColor: globalThis.__threeRbInitialMaterialColor
     }));
@@ -75,6 +77,9 @@ async function main() {
     }
     if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group") {
       throw new Error(`expected grouped child meshes: ${JSON.stringify(scene)}`);
+    }
+    if (scene.satelliteMaterialType !== "MeshNormalMaterial" || scene.normalMaterialFlatShading !== true) {
+      throw new Error(`expected a flat-shaded MeshNormalMaterial satellite: ${JSON.stringify(scene)}`);
     }
     if (!scene.renderInfo || scene.renderInfo.triangles < 26) {
       throw new Error(`renderer did not draw the composition triangles: ${JSON.stringify(scene)}`);

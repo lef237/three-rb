@@ -57,6 +57,17 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 5, handle[:height_segments]
   end
 
+  def test_materializes_mesh_normal_material
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    material = Three::MeshNormalMaterial.new(flat_shading: true, wireframe: true)
+
+    handle = backend.materialize(material)
+
+    assert_equal :mesh_normal_material, handle[:type]
+    assert_equal true, handle[:parameters][:flatShading]
+    assert_equal true, handle[:parameters][:wireframe]
+  end
+
   def test_sync_updates_object_transform
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     object = Three::Object3D.new

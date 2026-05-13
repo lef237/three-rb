@@ -3,7 +3,7 @@ Ruby 3D Library.
 
 ## Status
 
-This project is in the initial implementation phase. The current code covers the gem foundation, math primitives, scene graph basics, initial geometry/material objects, dirty-tracked backend sync, and the first three.js backend/renderer bridge.
+This project is in the initial implementation phase. The current code covers the gem foundation, math primitives, scene graph basics, initial geometry/material objects, dirty-tracked backend sync, browser examples, and the first three.js backend/renderer bridge.
 
 ## Quick Start
 

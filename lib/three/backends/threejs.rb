@@ -5,6 +5,7 @@ require_relative "../core/buffer_geometry"
 require_relative "../geometries/box_geometry"
 require_relative "../geometries/plane_geometry"
 require_relative "../materials/mesh_basic_material"
+require_relative "../materials/mesh_normal_material"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
 require_relative "base"
@@ -110,6 +111,8 @@ module Three
           build_buffer_geometry(object)
         when MeshBasicMaterial
           @adapter.new_mesh_basic_material(material_parameters(object))
+        when MeshNormalMaterial
+          @adapter.new_mesh_normal_material(material_parameters(object))
         when Group
           @adapter.new_group
         when Object3D
@@ -250,6 +253,7 @@ module Three
         }
         parameters[:color] = material.color.hex if material.respond_to?(:color)
         parameters[:wireframe] = material.wireframe if material.respond_to?(:wireframe)
+        parameters[:flatShading] = material.flat_shading if material.respond_to?(:flat_shading)
         parameters
       end
 
@@ -359,6 +363,10 @@ module Three
 
         def new_mesh_basic_material(parameters)
           @three[:MeshBasicMaterial].new(stringify_keys(parameters))
+        end
+
+        def new_mesh_normal_material(parameters)
+          @three[:MeshNormalMaterial].new(stringify_keys(parameters))
         end
 
         def set_object_name(object, name)

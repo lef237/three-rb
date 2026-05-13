@@ -121,6 +121,10 @@ class FakeThreeJSAdapter
     handle(:mesh_basic_material, parameters: parameters.dup)
   end
 
+  def new_mesh_normal_material(parameters)
+    handle(:mesh_normal_material, parameters: parameters.dup)
+  end
+
   def set_object_name(object, name)
     @calls << [:set_object_name, object, name]
     object[:name] = name
