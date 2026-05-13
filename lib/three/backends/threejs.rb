@@ -101,6 +101,8 @@ module Three
           sync_object3d(object, handle)
         when BufferGeometry
           sync_geometry(object, handle)
+        when Texture
+          sync_texture(object, handle)
         when Material
           sync_material(object, handle)
         end
@@ -132,7 +134,7 @@ module Three
         when Mesh
           @adapter.new_mesh(materialize(object.geometry), materialize(object.material))
         when Texture
-          @adapter.load_texture(object.source, flip_y: object.flip_y)
+          @adapter.load_texture(object.source, texture_parameters(object))
         when AmbientLight
           @adapter.new_ambient_light(object.color.hex, object.intensity)
         when DirectionalLight
@@ -255,10 +257,23 @@ module Three
       end
 
       def sync_material(material, handle)
+        sync_material_textures(material)
         return handle unless material.dirty?
 
         @adapter.update_material(handle, material_parameters(material))
         material.mark_clean!
+        handle
+      end
+
+      def sync_material_textures(material)
+        sync(material.map) if material.respond_to?(:map) && material.map
+      end
+
+      def sync_texture(texture, handle)
+        return handle unless texture.dirty?
+
+        @adapter.update_texture(handle, texture_parameters(texture))
+        texture.mark_clean!
         handle
       end
 
@@ -330,10 +345,21 @@ module Three
           side: material.side
         }
         parameters[:color] = material.color.hex if material.respond_to?(:color)
-        parameters[:map] = material.map ? materialize(material.map) : nil if material.respond_to?(:map)
+        parameters[:map] = material.map ? sync(material.map) : nil if material.respond_to?(:map)
         parameters[:wireframe] = material.wireframe if material.respond_to?(:wireframe)
         parameters[:flatShading] = material.flat_shading if material.respond_to?(:flat_shading)
         parameters
+      end
+
+      def texture_parameters(texture)
+        {
+          flip_y: texture.flip_y,
+          wrap_s: texture.wrap_s,
+          wrap_t: texture.wrap_t,
+          mag_filter: texture.mag_filter,
+          min_filter: texture.min_filter,
+          repeat: texture.repeat.to_a
+        }
       end
 
       class RubyWasmAdapter
@@ -380,9 +406,20 @@ module Three
           dom_element ? constructor.new(camera, dom_element) : constructor.new(camera)
         end
 
-        def load_texture(source, flip_y: true)
+        def load_texture(source, parameters = {})
           texture = @three[:TextureLoader].new.call(:load, source)
-          texture[:flipY] = flip_y
+          update_texture(texture, parameters)
+          texture
+        end
+
+        def update_texture(texture, parameters)
+          texture[:flipY] = parameters[:flip_y] unless parameters[:flip_y].nil?
+          texture[:wrapS] = parameters[:wrap_s] unless parameters[:wrap_s].nil?
+          texture[:wrapT] = parameters[:wrap_t] unless parameters[:wrap_t].nil?
+          texture[:magFilter] = parameters[:mag_filter] unless parameters[:mag_filter].nil?
+          texture[:minFilter] = parameters[:min_filter] unless parameters[:min_filter].nil?
+          texture[:repeat].call(:set, *parameters[:repeat]) if parameters[:repeat]
+          texture[:needsUpdate] = true
           texture
         end
 

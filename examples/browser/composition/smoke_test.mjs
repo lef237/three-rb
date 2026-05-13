@@ -40,6 +40,11 @@ async function main() {
       textureType: globalThis.__threeRbTexture?.isTexture,
       materialTextureType: globalThis.__threeRbLambertMaterial?.map?.isTexture,
       materialTextureWidth: globalThis.__threeRbLambertMaterial?.map?.source?.data?.naturalWidth,
+      materialTextureWrapS: globalThis.__threeRbLambertMaterial?.map?.wrapS,
+      materialTextureWrapT: globalThis.__threeRbLambertMaterial?.map?.wrapT,
+      materialTextureMagFilter: globalThis.__threeRbLambertMaterial?.map?.magFilter,
+      materialTextureMinFilter: globalThis.__threeRbLambertMaterial?.map?.minFilter,
+      materialTextureRepeat: globalThis.__threeRbLambertMaterial?.map?.repeat?.toArray?.(),
       sceneChildren: globalThis.__threeRbScene?.children?.length,
       ambientLightType: globalThis.__threeRbAmbientLight?.type,
       directionalLightType: globalThis.__threeRbDirectionalLight?.type,
@@ -67,6 +72,12 @@ async function main() {
     }
     if (scene.textureType !== true || scene.materialTextureType !== true || scene.materialTextureWidth <= 0) {
       throw new Error(`expected a loaded material texture: ${JSON.stringify(scene)}`);
+    }
+    if (scene.materialTextureWrapS !== 1000 || scene.materialTextureWrapT !== 1000 || scene.materialTextureMagFilter !== 1003 || scene.materialTextureMinFilter !== 1004) {
+      throw new Error(`expected configured texture wrapping and filters: ${JSON.stringify(scene)}`);
+    }
+    if (!Array.isArray(scene.materialTextureRepeat) || scene.materialTextureRepeat[0] !== 2 || scene.materialTextureRepeat[1] !== 2) {
+      throw new Error(`expected configured texture repeat: ${JSON.stringify(scene)}`);
     }
     if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight") {
       throw new Error(`expected ambient and directional lights: ${JSON.stringify(scene)}`);

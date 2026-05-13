@@ -1,6 +1,6 @@
 # Browser Composition Example
 
-This example renders a Ruby-authored scene through ruby.wasm and the JavaScript three.js renderer. It uses a `PlaneGeometry` backdrop, `SphereGeometry`, grouped child meshes, `TextureLoader`, `MeshLambertMaterial`, `MeshNormalMaterial`, `OrbitControls`, and a material color update in the animation loop.
+This example renders a Ruby-authored scene through ruby.wasm and the JavaScript three.js renderer. It uses a `PlaneGeometry` backdrop, `SphereGeometry`, grouped child meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshNormalMaterial`, `OrbitControls`, and a material color update in the animation loop.
 
 Install browser dependencies and serve the repository root over HTTP:
 
@@ -32,4 +32,4 @@ Run the browser smoke test:
 pnpm test:browser:composition
 ```
 
-The smoke test serves the repository root, waits for the Ruby scene to reach `Running`, samples the WebGL canvas for nonblank pixels, verifies grouped meshes, `PlaneGeometry`, `SphereGeometry`, `TextureLoader`, `MeshLambertMaterial`, `MeshNormalMaterial`, and `OrbitControls`, then confirms that material changes and camera drag controls reach the renderer.
+The smoke test serves the repository root, waits for the Ruby scene to reach `Running`, samples the WebGL canvas for nonblank pixels, verifies grouped meshes, `PlaneGeometry`, `SphereGeometry`, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshNormalMaterial`, and `OrbitControls`, then confirms that material changes and camera drag controls reach the renderer.

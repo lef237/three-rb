@@ -35,6 +35,11 @@ begin
   scene.add(rig)
 
   primary_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  primary_texture.wrap_s = Three::RepeatWrapping
+  primary_texture.wrap_t = Three::RepeatWrapping
+  primary_texture.mag_filter = Three::NearestFilter
+  primary_texture.min_filter = Three::NearestMipmapNearestFilter
+  primary_texture.repeat.set(2, 2)
   primary_material = Three::MeshLambertMaterial.new(color: 0xffffff, map: primary_texture)
   primary = Three::Mesh.new(Three::BoxGeometry.new(0.85, 0.85, 0.85), primary_material)
   primary.position.x = -0.55

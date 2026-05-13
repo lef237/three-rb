@@ -99,13 +99,46 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
   def test_materializes_texture
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
-    texture = Three::Texture.new("/texture.png", flip_y: false)
+    texture = Three::Texture.new(
+      "/texture.png",
+      flip_y: false,
+      wrap_s: Three::RepeatWrapping,
+      wrap_t: Three::MirroredRepeatWrapping,
+      mag_filter: Three::NearestFilter,
+      min_filter: Three::NearestMipmapNearestFilter,
+      repeat: [2, 3]
+    )
 
     handle = backend.materialize(texture)
 
     assert_equal :texture, handle[:type]
     assert_equal "/texture.png", handle[:source]
     assert_equal false, handle[:flip_y]
+    assert_equal Three::RepeatWrapping, handle[:wrap_s]
+    assert_equal Three::MirroredRepeatWrapping, handle[:wrap_t]
+    assert_equal Three::NearestFilter, handle[:mag_filter]
+    assert_equal Three::NearestMipmapNearestFilter, handle[:min_filter]
+    assert_equal [2, 3], handle[:repeat]
+    refute texture.dirty?
+  end
+
+  def test_sync_updates_dirty_texture_only_after_change
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    texture = Three::Texture.new("/texture.png", repeat: [1, 1])
+
+    handle = backend.sync(texture)
+    adapter.calls.clear
+    backend.sync(texture)
+
+    assert_empty adapter.calls
+
+    texture.repeat.set(4, 5)
+    backend.sync(texture)
+
+    assert_equal :update_texture, adapter.calls.last[0]
+    assert_same handle, adapter.calls.last[1]
+    assert_equal [4, 5], adapter.calls.last[2][:repeat]
     refute texture.dirty?
   end
 
@@ -213,6 +246,29 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
     assert_equal :update_material, adapter.calls.last[0]
     assert_equal 0x00ff00, adapter.calls.last[2][:color]
+  end
+
+  def test_sync_updates_dirty_material_texture_even_when_material_is_clean
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    texture = Three::Texture.new("/texture.png")
+    material = Three::MeshLambertMaterial.new(map: texture)
+
+    texture_handle = backend.materialize(texture)
+    backend.sync(material)
+    adapter.calls.clear
+
+    texture.repeat.set(2, 2)
+    backend.sync(material)
+
+    assert_equal [:update_texture, texture_handle, {
+      flip_y: true,
+      wrap_s: Three::ClampToEdgeWrapping,
+      wrap_t: Three::ClampToEdgeWrapping,
+      mag_filter: Three::LinearFilter,
+      min_filter: Three::LinearMipmapLinearFilter,
+      repeat: [2, 2]
+    }], adapter.calls.last
   end
 
   def test_sync_updates_dirty_orthographic_camera_only_after_change
