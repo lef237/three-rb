@@ -169,6 +169,14 @@ class FakeThreeJSAdapter
     handle(:mesh, geometry: geometry, material: material, children: [])
   end
 
+  def new_line(geometry, material)
+    handle(:line, geometry: geometry, material: material, children: [])
+  end
+
+  def new_points(geometry, material)
+    handle(:points, geometry: geometry, material: material, children: [])
+  end
+
   def new_instanced_mesh(geometry, material, count)
     handle(
       :instanced_mesh,
@@ -180,6 +188,16 @@ class FakeThreeJSAdapter
       instance_colors: nil,
       children: []
     )
+  end
+
+  def set_object_geometry(object, geometry)
+    @calls << [:set_object_geometry, object, geometry]
+    object[:geometry] = geometry
+  end
+
+  def set_object_material(object, material)
+    @calls << [:set_object_material, object, material]
+    object[:material] = material
   end
 
   def set_mesh_geometry(mesh, geometry)
@@ -297,6 +315,10 @@ class FakeThreeJSAdapter
     handle(:mesh_basic_material, parameters: parameters.dup)
   end
 
+  def new_line_basic_material(parameters)
+    handle(:line_basic_material, parameters: parameters.dup)
+  end
+
   def new_mesh_lambert_material(parameters)
     handle(:mesh_lambert_material, parameters: parameters.dup)
   end
@@ -311,6 +333,10 @@ class FakeThreeJSAdapter
 
   def new_mesh_standard_material(parameters)
     handle(:mesh_standard_material, parameters: parameters.dup)
+  end
+
+  def new_points_material(parameters)
+    handle(:points_material, parameters: parameters.dup)
   end
 
   def set_object_name(object, name)

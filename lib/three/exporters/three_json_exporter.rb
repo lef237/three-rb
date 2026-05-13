@@ -61,7 +61,7 @@ module Three
         serialize_scene(object, data) if object.is_a?(Scene)
         serialize_camera(object, data) if object.is_a?(Camera)
         serialize_light(object, data) if object.is_a?(Light)
-        serialize_mesh(object, data) if object.is_a?(Mesh)
+        serialize_geometry_material_object(object, data) if geometry_material_object?(object)
         data[:external] = true if object.is_a?(ExternalObject3D)
 
         data
@@ -104,16 +104,20 @@ module Three
         data[:ground_color] = light.ground_color.hex if light.respond_to?(:ground_color)
       end
 
-      def serialize_mesh(mesh, data)
-        data[:geometry] = register_geometry(mesh.geometry)
-        data[:material] = register_material(mesh.material)
+      def geometry_material_object?(object)
+        object.is_a?(Mesh) || object.is_a?(Line) || object.is_a?(Points)
+      end
 
-        return unless mesh.is_a?(InstancedMesh)
+      def serialize_geometry_material_object(object, data)
+        data[:geometry] = register_geometry(object.geometry)
+        data[:material] = register_material(object.material)
 
-        data[:count] = mesh.count
-        data[:capacity] = mesh.capacity
-        data[:instance_matrices] = mesh.instance_matrices.map(&:to_a)
-        data[:instance_colors] = mesh.instance_colors&.map(&:to_a)
+        return unless object.is_a?(InstancedMesh)
+
+        data[:count] = object.count
+        data[:capacity] = object.capacity
+        data[:instance_matrices] = object.instance_matrices.map(&:to_a)
+        data[:instance_colors] = object.instance_colors&.map(&:to_a)
       end
 
       def register_geometry(geometry)

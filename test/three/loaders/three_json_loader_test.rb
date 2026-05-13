@@ -92,4 +92,30 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert_instance_of Three::MeshNormalMaterial, loaded.children.first.material
     assert loaded.children.first.material.flat_shading
   end
+
+  def test_parse_reconstructs_line_and_points
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/points.png")
+    geometry = Three::BufferGeometry.new
+    geometry.set_attribute(:position, Three::Float32BufferAttribute.new([0, 0, 0, 1, 0, 0, 0, 1, 0], 3))
+    line = Three::Line.new(geometry, Three::LineBasicMaterial.new(color: 0xff8844, linewidth: 2))
+    points = Three::Points.new(geometry, Three::PointsMaterial.new(color: 0x66ddff, map: texture, size: 0.5, size_attenuation: false))
+    scene.add(line, points)
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(scene.to_json)
+    loaded_line = loaded.children[0]
+    loaded_points = loaded.children[1]
+
+    assert_instance_of Three::Line, loaded_line
+    assert_instance_of Three::LineBasicMaterial, loaded_line.material
+    assert_equal 0xff8844, loaded_line.material.color.hex
+    assert_equal 2, loaded_line.material.linewidth
+    assert_instance_of Three::Points, loaded_points
+    assert_instance_of Three::PointsMaterial, loaded_points.material
+    assert_equal 0x66ddff, loaded_points.material.color.hex
+    assert_equal "/points.png", loaded_points.material.map.source
+    assert_equal 0.5, loaded_points.material.size
+    refute loaded_points.material.size_attenuation
+    assert_same loaded_line.geometry, loaded_points.geometry
+  end
 end

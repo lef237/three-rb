@@ -20,6 +20,12 @@ module Three
           parameters[:shininess] = material.shininess if material.respond_to?(:shininess)
           parameters[:roughness] = material.roughness if material.respond_to?(:roughness)
           parameters[:metalness] = material.metalness if material.respond_to?(:metalness)
+          parameters[:linewidth] = material.linewidth if material.respond_to?(:linewidth)
+          parameters[:linecap] = material.linecap if material.respond_to?(:linecap)
+          parameters[:linejoin] = material.linejoin if material.respond_to?(:linejoin)
+          parameters[:size] = material.size if material.respond_to?(:size)
+          parameters[:sizeAttenuation] = material.size_attenuation if material.respond_to?(:size_attenuation)
+          parameters[:fog] = material.fog if material.respond_to?(:fog)
           material_texture_parameters(material).each do |ruby_name, threejs_name|
             texture = material.public_send(ruby_name)
             parameters[threejs_name] = texture ? sync(texture) : nil

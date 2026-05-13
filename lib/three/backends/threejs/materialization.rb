@@ -16,8 +16,12 @@ module Three
             @adapter.new_scene
           when InstancedMesh
             @adapter.new_instanced_mesh(materialize(object.geometry), materialize(object.material), object.count)
+          when Line
+            @adapter.new_line(materialize(object.geometry), materialize(object.material))
           when Mesh
             @adapter.new_mesh(materialize(object.geometry), materialize(object.material))
+          when Points
+            @adapter.new_points(materialize(object.geometry), materialize(object.material))
           when CubeTexture
             @adapter.load_cube_texture(object.sources, texture_parameters(object))
           when Texture
@@ -61,6 +65,8 @@ module Three
             )
           when BufferGeometry
             build_buffer_geometry(object)
+          when LineBasicMaterial
+            @adapter.new_line_basic_material(material_parameters(object))
           when MeshBasicMaterial
             @adapter.new_mesh_basic_material(material_parameters(object))
           when MeshLambertMaterial
@@ -71,6 +77,8 @@ module Three
             @adapter.new_mesh_phong_material(material_parameters(object))
           when MeshStandardMaterial
             @adapter.new_mesh_standard_material(material_parameters(object))
+          when PointsMaterial
+            @adapter.new_points_material(material_parameters(object))
           when Group
             @adapter.new_group
           when ExternalObject3D

@@ -123,6 +123,8 @@ module Three
         case value(entry, :type)
         when "MeshBasicMaterial"
           MeshBasicMaterial.new(parameters)
+        when "LineBasicMaterial"
+          LineBasicMaterial.new(parameters)
         when "MeshLambertMaterial"
           MeshLambertMaterial.new(parameters)
         when "MeshNormalMaterial"
@@ -131,6 +133,8 @@ module Three
           MeshPhongMaterial.new(parameters)
         when "MeshStandardMaterial"
           MeshStandardMaterial.new(parameters)
+        when "PointsMaterial"
+          PointsMaterial.new(parameters)
         else
           Material.new(parameters)
         end
@@ -153,8 +157,13 @@ module Three
           metalness
           wireframe
           wireframe_linewidth
+          linewidth
+          linecap
+          linejoin
           fog
           flat_shading
+          size
+          size_attenuation
         ].each do |key|
           next unless has_value?(entry, key)
 
@@ -233,6 +242,10 @@ module Three
           build_instanced_mesh(entry)
         when "Mesh"
           Mesh.new(@geometries[value(entry, :geometry)], material_reference(entry))
+        when "Line"
+          Line.new(@geometries[value(entry, :geometry)], material_reference(entry))
+        when "Points"
+          Points.new(@geometries[value(entry, :geometry)], material_reference(entry))
         when "Group"
           Group.new
         else

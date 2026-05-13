@@ -164,6 +164,27 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal true, handle[:parameters][:wireframe]
   end
 
+  def test_materializes_line_and_points_materials
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    line = Three::LineBasicMaterial.new(color: 0xff8844, linewidth: 2, linecap: "butt", linejoin: "miter", fog: false)
+    points = Three::PointsMaterial.new(color: 0x66ddff, map: Three::Texture.new("/points.png"), size: 0.5, size_attenuation: false)
+
+    line_handle = backend.materialize(line)
+    points_handle = backend.materialize(points)
+
+    assert_equal :line_basic_material, line_handle[:type]
+    assert_equal 0xff8844, line_handle[:parameters][:color]
+    assert_equal 2, line_handle[:parameters][:linewidth]
+    assert_equal "butt", line_handle[:parameters][:linecap]
+    assert_equal "miter", line_handle[:parameters][:linejoin]
+    assert_equal false, line_handle[:parameters][:fog]
+    assert_equal :points_material, points_handle[:type]
+    assert_equal 0x66ddff, points_handle[:parameters][:color]
+    assert_equal "/points.png", points_handle[:parameters][:map][:source]
+    assert_equal 0.5, points_handle[:parameters][:size]
+    assert_equal false, points_handle[:parameters][:sizeAttenuation]
+  end
+
   def test_materializes_material_vertex_colors
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     material = Three::MeshBasicMaterial.new(vertex_colors: true)
@@ -387,6 +408,26 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 0xddeeff, hemisphere[:sky_color]
     assert_equal 0x223344, hemisphere[:ground_color]
     assert_equal 0.75, hemisphere[:intensity]
+  end
+
+  def test_materializes_line_and_points_objects
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    geometry = Three::BufferGeometry.new
+    geometry.set_attribute(:position, Three::Float32BufferAttribute.new([0, 0, 0, 1, 0, 0], 3))
+    line = Three::Line.new(geometry, Three::LineBasicMaterial.new(color: 0xff0000))
+    points = Three::Points.new(geometry, Three::PointsMaterial.new(color: 0x00ff00, size: 2))
+
+    line_handle = backend.sync(line)
+    points_handle = backend.sync(points)
+
+    assert_equal :line, line_handle[:type]
+    assert_equal :buffer_geometry, line_handle[:geometry][:type]
+    assert_equal :line_basic_material, line_handle[:material][:type]
+    assert_equal 0xff0000, line_handle[:material][:parameters][:color]
+    assert_equal :points, points_handle[:type]
+    assert_same line_handle[:geometry], points_handle[:geometry]
+    assert_equal :points_material, points_handle[:material][:type]
+    assert_equal 2, points_handle[:material][:parameters][:size]
   end
 
   def test_sync_updates_object_transform
@@ -665,6 +706,21 @@ class ThreeThreeJSBackendTest < Minitest::Test
     backend.sync(scene)
 
     assert adapter.calls.any? { |call| call == [:set_geometry_draw_range, geometry_handle, 0, 3] }
+  end
+
+  def test_sync_updates_dirty_line_material_reference
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    line = Three::Line.new(Three::BufferGeometry.new, Three::LineBasicMaterial.new(color: 0xff0000))
+    handle = backend.sync(line)
+    adapter.calls.clear
+
+    material = Three::LineBasicMaterial.new(color: 0x00ff00)
+    line.material = material
+    backend.sync(line)
+
+    material_handle = backend.materialize(material)
+    assert adapter.calls.any? { |call| call == [:set_object_material, handle, material_handle] }
   end
 
   def test_sync_updates_dirty_material_only

@@ -74,6 +74,31 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal [0.2, 0.4, 0.6], instanced_data[:instance_colors][1]
   end
 
+  def test_exports_line_and_points_resources
+    scene = Three::Scene.new
+    geometry = Three::BufferGeometry.new
+    geometry.set_attribute(:position, Three::Float32BufferAttribute.new([0, 0, 0, 1, 0, 0, 0, 1, 0], 3))
+    line_material = Three::LineBasicMaterial.new(color: 0xff8844, linewidth: 2)
+    points_material = Three::PointsMaterial.new(color: 0x66ddff, size: 0.5)
+    scene.add(
+      Three::Line.new(geometry, line_material),
+      Three::Points.new(geometry, points_material)
+    )
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+    children = exported[:object][:children]
+
+    assert_equal %w[Line Points], children.map { |entry| entry[:type] }
+    assert_equal [geometry.uuid], exported[:geometries].map { |entry| entry[:uuid] }
+    assert_equal [line_material.uuid, points_material.uuid], exported[:materials].map { |entry| entry[:uuid] }
+    assert_equal geometry.uuid, children[0][:geometry]
+    assert_equal geometry.uuid, children[1][:geometry]
+    assert_equal line_material.uuid, children[0][:material]
+    assert_equal points_material.uuid, children[1][:material]
+    assert_equal "LineBasicMaterial", exported[:materials][0][:type]
+    assert_equal "PointsMaterial", exported[:materials][1][:type]
+  end
+
   def test_object3d_to_json_uses_exporter_format
     scene = Three::Scene.new
     scene.add(Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new))

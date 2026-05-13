@@ -494,7 +494,7 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, external loaded `Object3D` handles, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `MeshLambertMaterial`, `MeshStandardMaterial`, and `MeshNormalMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, external loaded `Object3D` handles, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `Line`, `Points`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `LineBasicMaterial`, `PointsMaterial`, `MeshLambertMaterial`, `MeshStandardMaterial`, and `MeshNormalMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
@@ -504,6 +504,7 @@ Current implementation status:
 - `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, and disposing the loaded subtree through the renderer API.
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
 - `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
+- `examples/browser/primitives` focuses on `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.

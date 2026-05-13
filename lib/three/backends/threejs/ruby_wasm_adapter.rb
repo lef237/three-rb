@@ -183,16 +183,32 @@ module Three
           @three[:Mesh].new(geometry, material)
         end
 
+        def new_line(geometry, material)
+          @three[:Line].new(geometry, material)
+        end
+
+        def new_points(geometry, material)
+          @three[:Points].new(geometry, material)
+        end
+
         def new_instanced_mesh(geometry, material, count)
           @three[:InstancedMesh].new(geometry, material, count)
         end
 
+        def set_object_geometry(object, geometry)
+          object[:geometry] = geometry
+        end
+
+        def set_object_material(object, material)
+          object[:material] = material
+        end
+
         def set_mesh_geometry(mesh, geometry)
-          mesh[:geometry] = geometry
+          set_object_geometry(mesh, geometry)
         end
 
         def set_mesh_material(mesh, material)
-          mesh[:material] = material
+          set_object_material(mesh, material)
         end
 
         def set_instanced_mesh_count(mesh, count)
@@ -267,6 +283,10 @@ module Three
           @three[:MeshBasicMaterial].new(stringify_keys(parameters))
         end
 
+        def new_line_basic_material(parameters)
+          @three[:LineBasicMaterial].new(stringify_keys(parameters))
+        end
+
         def new_mesh_lambert_material(parameters)
           @three[:MeshLambertMaterial].new(stringify_keys(parameters))
         end
@@ -281,6 +301,10 @@ module Three
 
         def new_mesh_standard_material(parameters)
           @three[:MeshStandardMaterial].new(stringify_keys(parameters))
+        end
+
+        def new_points_material(parameters)
+          @three[:PointsMaterial].new(stringify_keys(parameters))
         end
 
         def set_object_name(object, name)

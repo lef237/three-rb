@@ -27,14 +27,8 @@ module Three
 
           if object.is_a?(InstancedMesh)
             sync_instanced_mesh(object, handle)
-          elsif object.is_a?(Mesh)
-            geometry_handle = sync(object.geometry)
-            material_handle = sync(object.material) if object.material.respond_to?(:uuid)
-
-            if object.dirty_field?(:mesh)
-              @adapter.set_mesh_geometry(handle, geometry_handle)
-              @adapter.set_mesh_material(handle, material_handle) if material_handle
-            end
+          elsif geometry_material_object?(object)
+            sync_geometry_material_object(object, handle)
           end
 
           if object.dirty_field?(:children)
@@ -58,8 +52,8 @@ module Three
           material_handle = sync(object.material) if object.material.respond_to?(:uuid)
 
           if object.dirty_field?(:mesh)
-            @adapter.set_mesh_geometry(handle, geometry_handle)
-            @adapter.set_mesh_material(handle, material_handle) if material_handle
+            @adapter.set_object_geometry(handle, geometry_handle)
+            @adapter.set_object_material(handle, material_handle) if material_handle
             @adapter.set_instanced_mesh_count(handle, object.count)
           end
 
@@ -71,6 +65,32 @@ module Three
           end
 
           sync_instanced_mesh_colors(object, handle) if object.dirty_field?(:instance_colors)
+        end
+
+        def geometry_material_object?(object)
+          object.is_a?(Mesh) || object.is_a?(Line) || object.is_a?(Points)
+        end
+
+        def sync_geometry_material_object(object, handle)
+          geometry_handle = sync(object.geometry)
+          material_handle = sync(object.material) if object.material.respond_to?(:uuid)
+          dirty_field = geometry_material_dirty_field(object)
+
+          if object.dirty_field?(dirty_field)
+            @adapter.set_object_geometry(handle, geometry_handle)
+            @adapter.set_object_material(handle, material_handle) if material_handle
+          end
+        end
+
+        def geometry_material_dirty_field(object)
+          case object
+          when Line
+            :line
+          when Points
+            :points
+          else
+            :mesh
+          end
         end
 
         def sync_instanced_mesh_colors(object, handle)
