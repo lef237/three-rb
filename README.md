@@ -77,6 +77,7 @@ Export a Ruby-authored scene to a deterministic JSON-friendly hash:
 ```ruby
 exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
 json = scene.to_json
+loaded_scene = Three::Loaders::ThreeJSONLoader.new.parse(json)
 ```
 
 Run the full local CI-equivalent check:
