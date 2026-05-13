@@ -53,7 +53,7 @@ begin
   satellite.position.z = 0.45
   rig.add(satellite)
 
-  orb_material = Three::MeshBasicMaterial.new(color: 0x77a8ff)
+  orb_material = Three::MeshStandardMaterial.new(color: 0x77a8ff, roughness: 0.38, metalness: 0.45)
   orb = Three::Mesh.new(Three::SphereGeometry.new(0.24, width_segments: 16, height_segments: 8), orb_material)
   orb.position.x = 0.25
   orb.position.y = 0.9
@@ -110,6 +110,7 @@ begin
   JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbLambertMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)
+  JS.global[:__threeRbStandardMaterial] = renderer.backend.materialize(orb_material)
   JS.global[:__threeRbInitialMaterialColor] = primary_material.color.hex
   JS.global[:__threeRbCompositionFrame] = 0
 

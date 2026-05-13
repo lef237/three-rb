@@ -11,6 +11,7 @@ require_relative "../lights/directional_light"
 require_relative "../materials/mesh_basic_material"
 require_relative "../materials/mesh_lambert_material"
 require_relative "../materials/mesh_normal_material"
+require_relative "../materials/mesh_standard_material"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
 require_relative "../textures/texture"
@@ -176,6 +177,8 @@ module Three
           @adapter.new_mesh_lambert_material(material_parameters(object))
         when MeshNormalMaterial
           @adapter.new_mesh_normal_material(material_parameters(object))
+        when MeshStandardMaterial
+          @adapter.new_mesh_standard_material(material_parameters(object))
         when Group
           @adapter.new_group
         when Object3D
@@ -345,6 +348,8 @@ module Three
           side: material.side
         }
         parameters[:color] = material.color.hex if material.respond_to?(:color)
+        parameters[:roughness] = material.roughness if material.respond_to?(:roughness)
+        parameters[:metalness] = material.metalness if material.respond_to?(:metalness)
         parameters[:map] = material.map ? sync(material.map) : nil if material.respond_to?(:map)
         parameters[:wireframe] = material.wireframe if material.respond_to?(:wireframe)
         parameters[:flatShading] = material.flat_shading if material.respond_to?(:flat_shading)
@@ -542,6 +547,10 @@ module Three
 
         def new_mesh_normal_material(parameters)
           @three[:MeshNormalMaterial].new(stringify_keys(parameters))
+        end
+
+        def new_mesh_standard_material(parameters)
+          @three[:MeshStandardMaterial].new(stringify_keys(parameters))
         end
 
         def set_object_name(object, name)

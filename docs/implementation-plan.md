@@ -494,16 +494,16 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `AmbientLight`, `DirectionalLight`, `Texture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `MeshLambertMaterial`, and `MeshNormalMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `AmbientLight`, `DirectionalLight`, `Texture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `MeshLambertMaterial`, `MeshStandardMaterial`, and `MeshNormalMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
-- `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshNormalMaterial`, and a material color update through the same renderer path.
+- `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, and a material color update through the same renderer path.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
-- The next implementation step is adding a dedicated textured browser example or expanding physically based material coverage.
+- The next implementation step is adding a dedicated textured browser example or expanding light coverage.
 
 Recommended structure:
 
@@ -782,7 +782,7 @@ The MVP is complete when:
 ## Next Tasks
 
 1. Add a dedicated textured browser example once texture assignment needs more coverage.
-2. Add `MeshStandardMaterial` and a small PBR-oriented browser smoke path.
+2. Add `PointLight` or `HemisphereLight` so PBR materials have richer lighting coverage.
 3. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open

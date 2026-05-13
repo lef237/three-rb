@@ -50,6 +50,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::PlaneGeometry"
     assert_includes ruby, "Three::SphereGeometry"
     assert_includes ruby, "Three::MeshNormalMaterial"
+    assert_includes ruby, "Three::MeshStandardMaterial"
     assert_includes ruby, "Three::Loaders::TextureLoader"
     assert_includes ruby, "Three::RepeatWrapping"
     assert_includes ruby, "Three::NearestFilter"

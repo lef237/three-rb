@@ -55,8 +55,11 @@ async function main() {
       satelliteParentType: globalThis.__threeRbSatelliteMesh?.parent?.type,
       sphereParentType: globalThis.__threeRbSphereMesh?.parent?.type,
       sphereGeometryType: globalThis.__threeRbSphereMesh?.geometry?.type,
+      sphereMaterialType: globalThis.__threeRbSphereMesh?.material?.type,
       satelliteMaterialType: globalThis.__threeRbSatelliteMesh?.material?.type,
       normalMaterialFlatShading: globalThis.__threeRbNormalMaterial?.flatShading,
+      standardMaterialRoughness: globalThis.__threeRbStandardMaterial?.roughness,
+      standardMaterialMetalness: globalThis.__threeRbStandardMaterial?.metalness,
       currentMaterialColor: globalThis.__threeRbChangingMaterial?.color?.getHex?.(),
       initialMaterialColor: globalThis.__threeRbInitialMaterialColor
     }));
@@ -90,6 +93,9 @@ async function main() {
     }
     if (scene.sphereGeometryType !== "SphereGeometry") {
       throw new Error(`expected a SphereGeometry child mesh: ${JSON.stringify(scene)}`);
+    }
+    if (scene.sphereMaterialType !== "MeshStandardMaterial" || scene.standardMaterialRoughness !== 0.38 || scene.standardMaterialMetalness !== 0.45) {
+      throw new Error(`expected a configured MeshStandardMaterial sphere: ${JSON.stringify(scene)}`);
     }
     if (scene.satelliteMaterialType !== "MeshNormalMaterial" || scene.normalMaterialFlatShading !== true) {
       throw new Error(`expected a flat-shaded MeshNormalMaterial satellite: ${JSON.stringify(scene)}`);

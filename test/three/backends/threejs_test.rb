@@ -97,6 +97,27 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal true, handle[:parameters][:flatShading]
   end
 
+  def test_materializes_mesh_standard_material
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    material = Three::MeshStandardMaterial.new(
+      color: 0x336699,
+      roughness: 0.4,
+      metalness: 0.7,
+      map: Three::Texture.new("/texture.png"),
+      flat_shading: true
+    )
+
+    handle = backend.materialize(material)
+
+    assert_equal :mesh_standard_material, handle[:type]
+    assert_equal 0x336699, handle[:parameters][:color]
+    assert_equal 0.4, handle[:parameters][:roughness]
+    assert_equal 0.7, handle[:parameters][:metalness]
+    assert_equal :texture, handle[:parameters][:map][:type]
+    assert_equal "/texture.png", handle[:parameters][:map][:source]
+    assert_equal true, handle[:parameters][:flatShading]
+  end
+
   def test_materializes_texture
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     texture = Three::Texture.new(
@@ -246,6 +267,23 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
     assert_equal :update_material, adapter.calls.last[0]
     assert_equal 0x00ff00, adapter.calls.last[2][:color]
+  end
+
+  def test_sync_updates_dirty_mesh_standard_material_parameters
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    material = Three::MeshStandardMaterial.new(roughness: 1, metalness: 0)
+
+    backend.sync(material)
+    adapter.calls.clear
+
+    material.roughness = 0.25
+    material.metalness = 0.85
+    backend.sync(material)
+
+    assert_equal :update_material, adapter.calls.last[0]
+    assert_equal 0.25, adapter.calls.last[2][:roughness]
+    assert_equal 0.85, adapter.calls.last[2][:metalness]
   end
 
   def test_sync_updates_dirty_material_texture_even_when_material_is_clean
