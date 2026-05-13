@@ -499,9 +499,10 @@ Current implementation status:
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - `examples/browser/composition` renders an `OrthographicCamera` view with `PlaneGeometry`, `SphereGeometry`, grouped meshes, `MeshNormalMaterial`, and a material color update through the same renderer path.
+- Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
-- The next implementation step is reviewing low-risk dependency updates, then factoring shared browser boot utilities if example duplication starts slowing changes down.
+- The next implementation step is adding the first renderer-adjacent object family, likely `AmbientLight` and `DirectionalLight`, once material behavior needs lighting.
 
 Recommended structure:
 
@@ -774,9 +775,9 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Review and merge low-risk Dependabot updates after checking their CI results.
-2. Factor shared browser boot and smoke-test utilities if example duplication starts slowing changes down.
-3. Add the next renderer-adjacent object family, likely `AmbientLight` and `DirectionalLight`, once material behavior needs lighting.
+1. Add the next renderer-adjacent object family, likely `AmbientLight` and `DirectionalLight`, once material behavior needs lighting.
+2. Add a light-reactive material such as `MeshLambertMaterial` after basic lights exist.
+3. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open
 
