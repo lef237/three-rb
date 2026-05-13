@@ -13,6 +13,7 @@ require_relative "../materials/mesh_lambert_material"
 require_relative "../materials/mesh_normal_material"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
+require_relative "../textures/texture"
 require_relative "base"
 
 module Three
@@ -130,6 +131,8 @@ module Three
           @adapter.new_scene
         when Mesh
           @adapter.new_mesh(materialize(object.geometry), materialize(object.material))
+        when Texture
+          @adapter.load_texture(object.source, flip_y: object.flip_y)
         when AmbientLight
           @adapter.new_ambient_light(object.color.hex, object.intensity)
         when DirectionalLight
@@ -309,6 +312,8 @@ module Three
         case object
         when Material
           object.mark_clean!
+        when Texture
+          object.mark_clean!
         when BufferGeometry
           @geometry_attribute_names[object.uuid] = object.attributes.keys
           object.mark_clean!
@@ -325,6 +330,7 @@ module Three
           side: material.side
         }
         parameters[:color] = material.color.hex if material.respond_to?(:color)
+        parameters[:map] = material.map ? materialize(material.map) : nil if material.respond_to?(:map)
         parameters[:wireframe] = material.wireframe if material.respond_to?(:wireframe)
         parameters[:flatShading] = material.flat_shading if material.respond_to?(:flat_shading)
         parameters
@@ -372,6 +378,12 @@ module Three
         def new_orbit_controls(camera, dom_element)
           constructor = orbit_controls_constructor
           dom_element ? constructor.new(camera, dom_element) : constructor.new(camera)
+        end
+
+        def load_texture(source, flip_y: true)
+          texture = @three[:TextureLoader].new.call(:load, source)
+          texture[:flipY] = flip_y
+          texture
         end
 
         def set_control_property(control, name, value)
@@ -538,6 +550,8 @@ module Three
           parameters.each do |key, value|
             if key == :color
               material[:color].call(:setHex, value)
+            elsif key == :map
+              material[:map] = value
             else
               material[key] = value
             end

@@ -86,13 +86,27 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
   def test_materializes_mesh_lambert_material
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
-    material = Three::MeshLambertMaterial.new(color: 0x224466, flat_shading: true)
+    material = Three::MeshLambertMaterial.new(color: 0x224466, map: Three::Texture.new("/texture.png"), flat_shading: true)
 
     handle = backend.materialize(material)
 
     assert_equal :mesh_lambert_material, handle[:type]
     assert_equal 0x224466, handle[:parameters][:color]
+    assert_equal :texture, handle[:parameters][:map][:type]
+    assert_equal "/texture.png", handle[:parameters][:map][:source]
     assert_equal true, handle[:parameters][:flatShading]
+  end
+
+  def test_materializes_texture
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    texture = Three::Texture.new("/texture.png", flip_y: false)
+
+    handle = backend.materialize(texture)
+
+    assert_equal :texture, handle[:type]
+    assert_equal "/texture.png", handle[:source]
+    assert_equal false, handle[:flip_y]
+    refute texture.dirty?
   end
 
   def test_materializes_orthographic_camera

@@ -5,12 +5,13 @@ require_relative "material"
 
 module Three
   class MeshLambertMaterial < Material
-    attr_reader :color, :wireframe, :wireframe_linewidth, :fog, :flat_shading
+    attr_reader :color, :wireframe, :wireframe_linewidth, :fog, :flat_shading, :map
 
     def initialize(parameters = nil)
       super(nil)
       @type = "MeshLambertMaterial"
       @color = Color.new(0xffffff)
+      @map = nil
       @wireframe = false
       @wireframe_linewidth = 1
       @fog = true
@@ -23,6 +24,11 @@ module Three
     def color=(value)
       @color = value.is_a?(Color) ? value : Color.new(value)
       bind_color_changes
+      mark_dirty!(:parameters)
+    end
+
+    def map=(value)
+      @map = value
       mark_dirty!(:parameters)
     end
 
@@ -49,6 +55,7 @@ module Three
     def to_h
       super.merge(
         color: @color.hex,
+        map: @map&.to_h,
         wireframe: @wireframe,
         wireframe_linewidth: @wireframe_linewidth,
         fog: @fog,

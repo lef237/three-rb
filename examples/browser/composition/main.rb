@@ -34,7 +34,8 @@ begin
   rig.name = "composition-rig"
   scene.add(rig)
 
-  primary_material = Three::MeshLambertMaterial.new(color: 0x61d394)
+  primary_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  primary_material = Three::MeshLambertMaterial.new(color: 0xffffff, map: primary_texture)
   primary = Three::Mesh.new(Three::BoxGeometry.new(0.85, 0.85, 0.85), primary_material)
   primary.position.x = -0.55
   primary.position.z = 0.15
@@ -100,6 +101,7 @@ begin
   JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)
   JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)
   JS.global[:__threeRbSphereMesh] = renderer.backend.materialize(orb)
+  JS.global[:__threeRbTexture] = renderer.backend.materialize(primary_texture)
   JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbLambertMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)

@@ -20,6 +20,11 @@ async function main() {
 
     await page.goto(`${server.url}/examples/browser/composition/`, { waitUntil: "load" });
     await waitForRunning(page, diagnostics);
+    await page.waitForFunction(
+      () => globalThis.__threeRbLambertMaterial?.map?.source?.data?.complete === true,
+      null,
+      { timeout: 10_000 }
+    );
     await page.waitForTimeout(1_000);
 
     assertNonBlankCanvas(await sampleCanvas(page));
@@ -32,6 +37,9 @@ async function main() {
       controlsEnableDamping: globalThis.__threeRbControls?.enableDamping,
       controlsEnablePan: globalThis.__threeRbControls?.enablePan,
       controlsTarget: globalThis.__threeRbControls?.target?.toArray?.(),
+      textureType: globalThis.__threeRbTexture?.isTexture,
+      materialTextureType: globalThis.__threeRbLambertMaterial?.map?.isTexture,
+      materialTextureWidth: globalThis.__threeRbLambertMaterial?.map?.source?.data?.naturalWidth,
       sceneChildren: globalThis.__threeRbScene?.children?.length,
       ambientLightType: globalThis.__threeRbAmbientLight?.type,
       directionalLightType: globalThis.__threeRbDirectionalLight?.type,
@@ -56,6 +64,9 @@ async function main() {
     }
     if (scene.controlsType !== "OrbitControls" || scene.controlsEnableDamping !== true || scene.controlsEnablePan !== false) {
       throw new Error(`expected configured OrbitControls: ${JSON.stringify(scene)}`);
+    }
+    if (scene.textureType !== true || scene.materialTextureType !== true || scene.materialTextureWidth <= 0) {
+      throw new Error(`expected a loaded material texture: ${JSON.stringify(scene)}`);
     }
     if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight") {
       throw new Error(`expected ambient and directional lights: ${JSON.stringify(scene)}`);

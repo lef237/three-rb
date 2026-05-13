@@ -35,6 +35,10 @@ class FakeThreeJSAdapter
     handle(:orbit_controls, camera: camera, dom_element: dom_element, target: [0, 0, 0])
   end
 
+  def load_texture(source, flip_y: true)
+    handle(:texture, source: source, flip_y: flip_y)
+  end
+
   def set_control_property(control, name, value)
     @calls << [:set_control_property, control, name, value]
     control[name.to_sym] = value
