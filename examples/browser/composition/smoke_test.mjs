@@ -85,6 +85,21 @@ async function main() {
       instancedMaterialType: globalThis.__threeRbInstancedMaterial?.type,
       instancedMaterialTransparent: globalThis.__threeRbInstancedMaterial?.transparent,
       instancedMatrixNeedsUpdate: globalThis.__threeRbInstancedMesh?.instanceMatrix?.needsUpdate,
+      instancedHasInstanceColor: Boolean(globalThis.__threeRbInstancedMesh?.instanceColor),
+      instancedColorItemSize: globalThis.__threeRbInstancedMesh?.instanceColor?.itemSize,
+      instancedColorCount: globalThis.__threeRbInstancedMesh?.instanceColor?.count,
+      instancedFirstColor: (() => {
+        if (!globalThis.__threeRbInstancedMesh || !globalThis.THREE?.Color) return undefined;
+        const color = new globalThis.THREE.Color();
+        globalThis.__threeRbInstancedMesh.getColorAt(0, color);
+        return color.toArray();
+      })(),
+      instancedLastColor: (() => {
+        if (!globalThis.__threeRbInstancedMesh || !globalThis.THREE?.Color) return undefined;
+        const color = new globalThis.THREE.Color();
+        globalThis.__threeRbInstancedMesh.getColorAt(999, color);
+        return color.toArray();
+      })(),
       instancedLastMatrix: (() => {
         if (!globalThis.__threeRbInstancedMesh || !globalThis.THREE?.Matrix4) return undefined;
         const matrix = new globalThis.THREE.Matrix4();
@@ -172,6 +187,12 @@ async function main() {
     if (!Array.isArray(scene.instancedLastMatrix) || Math.abs(scene.instancedLastMatrix[12] - 2.695) > 0.001 || Math.abs(scene.instancedLastMatrix[13] - 1.14) > 0.001) {
       throw new Error(`expected InstancedMesh matrix data to sync: ${JSON.stringify(scene)}`);
     }
+    if (scene.instancedHasInstanceColor !== true || scene.instancedColorItemSize !== 3 || scene.instancedColorCount !== 1000) {
+      throw new Error(`expected InstancedMesh color attribute data: ${JSON.stringify(scene)}`);
+    }
+    if (!colorClose(scene.instancedFirstColor, [0.35, 0.55, 0.9]) || !colorClose(scene.instancedLastColor, [0.8, 0.8, 0.55])) {
+      throw new Error(`expected InstancedMesh color data to sync: ${JSON.stringify(scene)}`);
+    }
     if (scene.satelliteMaterialType !== "MeshNormalMaterial" || scene.normalMaterialFlatShading !== true) {
       throw new Error(`expected a flat-shaded MeshNormalMaterial satellite: ${JSON.stringify(scene)}`);
     }
@@ -216,4 +237,10 @@ function cameraPositionChanged(before, after) {
   if (!Array.isArray(before) || !Array.isArray(after)) return false;
 
   return before.some((value, index) => Math.abs(value - after[index]) > 0.001);
+}
+
+function colorClose(actual, expected) {
+  if (!Array.isArray(actual)) return false;
+
+  return expected.every((value, index) => Math.abs(actual[index] - value) < 0.001);
 }

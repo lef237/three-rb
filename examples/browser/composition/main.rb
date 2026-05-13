@@ -90,16 +90,19 @@ begin
 
   instance_count = 1000
   instance_columns = 50
-  instanced_material = Three::MeshLambertMaterial.new(color: 0x88d8ff, opacity: 0.42, transparent: true)
+  instanced_material = Three::MeshLambertMaterial.new(color: 0xffffff, opacity: 0.42, transparent: true)
   instanced_field = Three::InstancedMesh.new(Three::BoxGeometry.new(0.032, 0.032, 0.032), instanced_material, instance_count)
   instance_matrix = Three::Matrix4.new
   instance_count.times do |index|
     column = index % instance_columns
     row = index / instance_columns
+    column_t = column.to_f / (instance_columns - 1)
+    row_t = row.to_f / ((instance_count / instance_columns) - 1)
     x = (column - ((instance_columns - 1) / 2.0)) * 0.11
     y = (row - ((instance_count / instance_columns - 1) / 2.0)) * 0.12
     z = -0.85 - ((index % 7) * 0.012)
     instanced_field.set_matrix_at(index, instance_matrix.make_translation(x, y, z))
+    instanced_field.set_color_at(index, [0.35 + (0.45 * column_t), 0.55 + (0.25 * row_t), 0.9 - (0.35 * column_t)])
   end
   scene.add(instanced_field)
 

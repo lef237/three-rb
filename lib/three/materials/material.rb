@@ -135,7 +135,8 @@ module Three
         side: @side,
         opacity: @opacity,
         transparent: @transparent,
-        visible: @visible
+        visible: @visible,
+        vertex_colors: @vertex_colors
       }
     end
   end

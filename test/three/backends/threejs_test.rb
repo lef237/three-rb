@@ -25,9 +25,13 @@ class ThreeThreeJSBackendTest < Minitest::Test
     mesh = Three::InstancedMesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new(color: 0x88ccff), 2)
     first_matrix = Three::Matrix4.new.make_translation(1, 0, 0)
     second_matrix = Three::Matrix4.new.make_translation(0, 2, 0)
+    first_color = Three::Color.new(0xff0000)
+    second_color = Three::Color.new(0x336699)
 
     mesh.set_matrix_at(0, first_matrix)
     mesh.set_matrix_at(1, second_matrix)
+    mesh.set_color_at(0, first_color)
+    mesh.set_color_at(1, second_color)
 
     handle = backend.sync(mesh)
 
@@ -36,6 +40,9 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal first_matrix.to_a, handle[:instance_matrices][0]
     assert_equal second_matrix.to_a, handle[:instance_matrices][1]
     assert_equal true, handle[:instance_matrix_needs_update]
+    assert_equal first_color.to_a, handle[:instance_colors][0]
+    assert_equal second_color.to_a, handle[:instance_colors][1]
+    assert_equal true, handle[:instance_color_needs_update]
     refute mesh.dirty?
   end
 
@@ -57,6 +64,24 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal matrix.to_a, handle[:instance_matrices][0]
     assert adapter.calls.any? { |call| call == [:set_instanced_mesh_count, handle, 1] }
     assert adapter.calls.any? { |call| call == [:set_instanced_mesh_matrix_at, handle, 0, matrix.to_a] }
+    refute mesh.dirty?
+  end
+
+  def test_syncs_instanced_mesh_dirty_color_updates
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    mesh = Three::InstancedMesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new, 2)
+    handle = backend.sync(mesh)
+
+    adapter.calls.clear
+    color = Three::Color.new(0x99cc33)
+    mesh.set_color_at(1, color)
+    backend.sync(mesh)
+
+    assert_equal color.to_a, handle[:instance_colors][1]
+    assert adapter.calls.any? { |call| call == [:set_instanced_mesh_color_at, handle, 1, color.to_a] }
+    assert adapter.calls.any? { |call| call == [:set_instanced_mesh_instance_color_needs_update, handle, true] }
+    refute adapter.calls.any? { |call| call[0] == :set_instanced_mesh_matrix_at }
     refute mesh.dirty?
   end
 
@@ -137,6 +162,15 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal :mesh_normal_material, handle[:type]
     assert_equal true, handle[:parameters][:flatShading]
     assert_equal true, handle[:parameters][:wireframe]
+  end
+
+  def test_materializes_material_vertex_colors
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    material = Three::MeshBasicMaterial.new(vertex_colors: true)
+
+    handle = backend.materialize(material)
+
+    assert_equal true, handle[:parameters][:vertexColors]
   end
 
   def test_materializes_mesh_lambert_material

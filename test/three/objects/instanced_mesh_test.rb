@@ -39,6 +39,21 @@ class ThreeInstancedMeshTest < Minitest::Test
     assert mesh.dirty_field?(:instances)
   end
 
+  def test_set_and_get_color_at
+    mesh = Three::InstancedMesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new, 2)
+    color = Three::Color.new(0x336699)
+
+    mesh.mark_clean!
+    assert_equal Three::Color.new, mesh.get_color_at(1)
+
+    mesh.set_color_at(1, color)
+    result = mesh.get_color_at(1)
+
+    assert_equal color, result
+    refute_same color, result
+    assert mesh.dirty_field?(:instance_colors)
+  end
+
   def test_count_sets_rendered_instance_count_within_capacity
     mesh = Three::InstancedMesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new, 3)
     matrix = Three::Matrix4.new.make_translation(4, 5, 6)
@@ -63,6 +78,8 @@ class ThreeInstancedMeshTest < Minitest::Test
 
     assert_raises(ArgumentError) { mesh.count = 2 }
     assert_raises(IndexError) { mesh.set_matrix_at(1, Three::Matrix4.new) }
+    assert_raises(IndexError) { mesh.set_color_at(1, Three::Color.new) }
     assert_raises(IndexError) { mesh.get_matrix_at(-1) }
+    assert_raises(IndexError) { mesh.get_color_at(-1) }
   end
 end

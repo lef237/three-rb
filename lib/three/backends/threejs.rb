@@ -343,12 +343,23 @@ module Three
           @adapter.set_instanced_mesh_count(handle, object.count)
         end
 
-        return unless object.dirty_field?(:instances)
-
-        object.instance_matrices.each_with_index do |matrix, index|
-          @adapter.set_instanced_mesh_matrix_at(handle, index, matrix.to_a)
+        if object.dirty_field?(:instances)
+          object.instance_matrices.each_with_index do |matrix, index|
+            @adapter.set_instanced_mesh_matrix_at(handle, index, matrix.to_a)
+          end
+          @adapter.set_instanced_mesh_instance_matrix_needs_update(handle, true)
         end
-        @adapter.set_instanced_mesh_instance_matrix_needs_update(handle, true)
+
+        sync_instanced_mesh_colors(object, handle) if object.dirty_field?(:instance_colors)
+      end
+
+      def sync_instanced_mesh_colors(object, handle)
+        return unless object.instance_colors
+
+        object.instance_colors.each_with_index do |color, index|
+          @adapter.set_instanced_mesh_color_at(handle, index, color.to_a)
+        end
+        @adapter.set_instanced_mesh_instance_color_needs_update(handle, true)
       end
 
       def sync_scene(scene, handle)
@@ -524,7 +535,8 @@ module Three
           opacity: material.opacity,
           transparent: material.transparent,
           visible: material.visible,
-          side: material.side
+          side: material.side,
+          vertexColors: material.vertex_colors
         }
         parameters[:color] = material.color.hex if material.respond_to?(:color)
         parameters[:emissive] = material.emissive.hex if material.respond_to?(:emissive)
@@ -759,6 +771,15 @@ module Three
 
         def set_instanced_mesh_instance_matrix_needs_update(mesh, value)
           mesh[:instanceMatrix][:needsUpdate] = value
+        end
+
+        def set_instanced_mesh_color_at(mesh, index, color)
+          mesh.call(:setColorAt, index, @three[:Color].new(*color))
+        end
+
+        def set_instanced_mesh_instance_color_needs_update(mesh, value)
+          instance_color = mesh[:instanceColor]
+          instance_color[:needsUpdate] = value if js_present?(instance_color)
         end
 
         def new_box_geometry(width, height, depth, width_segments, height_segments, depth_segments)

@@ -91,6 +91,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "rig.add(primary)"
     assert_includes ruby, "rig.add(satellite)"
     assert_includes ruby, "instanced_field.set_matrix_at"
+    assert_includes ruby, "instanced_field.set_color_at"
     assert_includes ruby, "primary_material.color.set_rgb"
     assert_includes ruby, "renderer.animation_loop"
   end

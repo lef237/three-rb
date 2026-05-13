@@ -646,7 +646,7 @@ Current instancing direction:
 
 - Prefer `Three::InstancedMesh` for large repeated geometry before optimizing thousands of individual `Mesh` objects.
 - Keep Ruby as the source of truth for instance matrices and batch them into three.js with `setMatrixAt` during dirty sync.
-- Treat the initial `InstancedMesh` API as matrix-only: `capacity`, `count`, `set_matrix_at`, `get_matrix_at`, and `instance_matrix_needs_update!`. `capacity` is fixed at construction because three.js allocates the instance matrix buffer then; `count` may be lowered within that capacity to render fewer active instances.
+- Treat the initial `InstancedMesh` API as matrix-and-color focused: `capacity`, `count`, `set_matrix_at`, `get_matrix_at`, `set_color_at`, `get_color_at`, `instance_matrix_needs_update!`, and `instance_color_needs_update!`. `capacity` is fixed at construction because three.js allocates the instance buffers then; `count` may be lowered within that capacity to render fewer active instances.
 - Browser verification should include a 1000-count instanced scene so Phase 8 measures a realistic high-volume path, not only small object graphs.
 
 Completion criteria:

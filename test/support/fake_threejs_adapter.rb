@@ -153,7 +153,16 @@ class FakeThreeJSAdapter
   end
 
   def new_instanced_mesh(geometry, material, count)
-    handle(:instanced_mesh, geometry: geometry, material: material, count: count, capacity: count, instance_matrices: Array.new(count), children: [])
+    handle(
+      :instanced_mesh,
+      geometry: geometry,
+      material: material,
+      count: count,
+      capacity: count,
+      instance_matrices: Array.new(count),
+      instance_colors: nil,
+      children: []
+    )
   end
 
   def set_mesh_geometry(mesh, geometry)
@@ -181,6 +190,17 @@ class FakeThreeJSAdapter
   def set_instanced_mesh_instance_matrix_needs_update(mesh, value)
     @calls << [:set_instanced_mesh_instance_matrix_needs_update, mesh, value]
     mesh[:instance_matrix_needs_update] = value
+  end
+
+  def set_instanced_mesh_color_at(mesh, index, color)
+    @calls << [:set_instanced_mesh_color_at, mesh, index, color]
+    mesh[:instance_colors] ||= Array.new(mesh[:capacity]) { [1, 1, 1] }
+    mesh[:instance_colors][index] = color.dup
+  end
+
+  def set_instanced_mesh_instance_color_needs_update(mesh, value)
+    @calls << [:set_instanced_mesh_instance_color_needs_update, mesh, value]
+    mesh[:instance_color_needs_update] = value
   end
 
   def new_box_geometry(width, height, depth, width_segments, height_segments, depth_segments)
