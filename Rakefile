@@ -36,6 +36,12 @@ namespace :release do
 
   desc "Run Ruby tests and release install smoke"
   task check: [:test, :gem_smoke]
+
+  desc "Run non-publishing release preflight checks after browser dependencies are installed"
+  task preflight: [:check] do
+    run_release_command!("pnpm", "test:browser")
+    run_release_command!(Gem.ruby, "-S", "gem", "build", "three.rb.gemspec")
+  end
 end
 
 task default: :test

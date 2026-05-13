@@ -32,14 +32,11 @@ Explicitly out of scope for the first public scope:
 Run these before publishing or tagging:
 
 ```sh
-bundle exec rake test
-bundle exec rake release:gem_smoke
 pnpm install --frozen-lockfile --ignore-scripts
 pnpm audit --audit-level moderate
 pnpm audit signatures
 pnpm exec playwright install chromium
-pnpm test:browser
-gem build three.rb.gemspec
+bundle exec rake release:preflight
 ```
 
 Optional but recommended when renderer internals change:
@@ -55,8 +52,8 @@ The release is acceptable when:
 - The required gate passes locally and in CI.
 - `CHANGELOG.md` describes the release as unreleased or tagged with the final date.
 - README documents the browser-first alpha scope and unsupported areas.
-- `gem build three.rb.gemspec` succeeds.
 - `bundle exec rake release:gem_smoke` proves the built gem can be installed into a temporary `GEM_HOME` and used without the repository `lib/` path.
+- `bundle exec rake release:preflight` proves the Ruby tests, install smoke, browser smoke tests, and gem build pass without publishing.
 - Browser smoke tests cover every advertised browser example.
 
 ## Recommended Next Work

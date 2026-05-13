@@ -19,6 +19,20 @@ Out of scope for the first public release:
 - Full three.js API compatibility.
 - Stable APIs for every addon loader, render target, postprocessing pass, WebGPU, or XR workflow.
 
+## Installation
+
+After a release is published:
+
+```sh
+gem install three.rb
+```
+
+Or add it to a Gemfile:
+
+```ruby
+gem "three.rb", "~> 0.1"
+```
+
 ## Quick Start
 
 ```ruby
@@ -105,17 +119,22 @@ json = scene.to_json
 loaded_scene = Three::Loaders::ThreeJSONLoader.new.parse(json)
 ```
 
-Run the full local CI-equivalent check:
+Run the local release preflight check:
 
 ```sh
-bundle exec rake test
-bundle exec rake release:gem_smoke
+pnpm install
+pnpm exec playwright install chromium
+bundle exec rake release:preflight
+```
+
+Run the full local CI-equivalent check, including dependency audits:
+
+```sh
 pnpm install --frozen-lockfile --ignore-scripts
 pnpm audit --audit-level moderate
 pnpm audit signatures
 pnpm exec playwright install chromium
-pnpm test:browser
-gem build three.rb.gemspec
+bundle exec rake release:preflight
 ```
 
 ## Documents
@@ -123,3 +142,4 @@ gem build three.rb.gemspec
 - [Implementation Plan](docs/implementation-plan.md)
 - [Loaded Asset Traversal and Disposal Design](docs/loaded-assets-design.md)
 - [Release Readiness](docs/release-readiness.md)
+- [Publishing](docs/publishing.md)
