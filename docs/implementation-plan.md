@@ -512,6 +512,7 @@ Current implementation status:
 - `MeshStandardMaterial` supports common Ruby-side PBR texture slots such as `normal_map`, `roughness_map`, and `metalness_map`, and backend resource ownership helpers track all modeled texture slots.
 - `MeshPhongMaterial` supports specular color, emissive color, shininess, and common Phong texture slots including `specular_map`.
 - `Object3D#cast_shadow`, `Object3D#receive_shadow`, renderer shadow map configuration, and directional light shadow camera settings are supported through the Three.js backend.
+- The Three.js backend internals are split into materialization, synchronization, parameter conversion, resource management, and ruby.wasm adapter files so renderer additions do not keep growing one monolithic backend file.
 - The next implementation step is adding more material classes or addon loaders only when an example or API target needs them.
 
 Recommended structure:
@@ -648,6 +649,7 @@ Current instancing direction:
 - Keep Ruby as the source of truth for instance matrices and batch them into three.js with `setMatrixAt` during dirty sync.
 - Treat the initial `InstancedMesh` API as matrix-and-color focused: `capacity`, `count`, `set_matrix_at`, `get_matrix_at`, `set_color_at`, `get_color_at`, `instance_matrix_needs_update!`, and `instance_color_needs_update!`. `capacity` is fixed at construction because three.js allocates the instance buffers then; `count` may be lowered within that capacity to render fewer active instances.
 - Browser verification should include a 1000-count instanced scene so Phase 8 measures a realistic high-volume path, not only small object graphs.
+- `pnpm benchmark:browser:instanced-mesh-sync` measures a 1000-count `InstancedMesh` path separately from `pnpm benchmark:browser:mesh-sync`, including whole-object transform updates and per-instance matrix updates.
 
 Current sync performance direction:
 
@@ -716,6 +718,7 @@ Initial benchmarks:
 - 100 cubes with transform sync
 - 1000 cubes through `InstancedMesh`
 - 1000 individual cubes with transform sync (`pnpm benchmark:browser:mesh-sync`)
+- 1000 cubes through `InstancedMesh` sync (`pnpm benchmark:browser:instanced-mesh-sync`)
 - 1 mesh with 100k vertices
 - 10 textures
 - 1 glTF model
