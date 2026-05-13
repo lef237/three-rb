@@ -5,7 +5,7 @@ require_relative "camera"
 
 module Three
   class PerspectiveCamera < Camera
-    attr_accessor :fov, :zoom, :near, :far, :focus, :aspect, :film_gauge, :film_offset
+    attr_reader :fov, :zoom, :near, :far, :focus, :aspect, :film_gauge, :film_offset
     attr_reader :view
 
     def initialize(fov = 50, aspect: 1, near: 0.1, far: 2000)
@@ -23,9 +23,50 @@ module Three
       update_projection_matrix
     end
 
+    def fov=(value)
+      @fov = value
+      mark_dirty!(:camera)
+    end
+
+    def zoom=(value)
+      @zoom = value
+      mark_dirty!(:camera)
+    end
+
+    def near=(value)
+      @near = value
+      mark_dirty!(:camera)
+    end
+
+    def far=(value)
+      @far = value
+      mark_dirty!(:camera)
+    end
+
+    def focus=(value)
+      @focus = value
+      mark_dirty!(:camera)
+    end
+
+    def aspect=(value)
+      @aspect = value
+      mark_dirty!(:camera)
+    end
+
+    def film_gauge=(value)
+      @film_gauge = value
+      mark_dirty!(:camera)
+    end
+
+    def film_offset=(value)
+      @film_offset = value
+      mark_dirty!(:camera)
+    end
+
     def set_focal_length(focal_length)
       vertical_extent_slope = 0.5 * film_height / focal_length
       @fov = MathUtils.rad_to_deg(2 * Math.atan(vertical_extent_slope))
+      mark_dirty!(:camera)
       update_projection_matrix
       self
     end
@@ -58,12 +99,14 @@ module Three
         width: width,
         height: height
       }
+      mark_dirty!(:camera)
       update_projection_matrix
       self
     end
 
     def clear_view_offset
       @view[:enabled] = false if @view
+      mark_dirty!(:camera)
       update_projection_matrix
       self
     end
@@ -87,6 +130,7 @@ module Three
 
       @projection_matrix.make_perspective(left, left + width, top, top - height, @near, @far)
       @projection_matrix_inverse.copy(@projection_matrix).invert
+      mark_dirty!(:camera)
       self
     end
   end

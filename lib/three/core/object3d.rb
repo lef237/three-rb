@@ -5,10 +5,13 @@ require_relative "../math/math_utils"
 require_relative "../math/matrix4"
 require_relative "../math/quaternion"
 require_relative "../math/vector3"
+require_relative "../dirty"
 require_relative "event_dispatcher"
 
 module Three
   class Object3D < EventDispatcher
+    include Dirty
+
     DEFAULT_UP = Vector3.new(0, 1, 0)
     DEFAULT_MATRIX_AUTO_UPDATE = true
     DEFAULT_MATRIX_WORLD_AUTO_UPDATE = true
@@ -22,9 +25,9 @@ module Three
     attr_reader :id, :uuid, :parent, :children
     attr_reader :position, :rotation, :quaternion, :scale
     attr_reader :matrix, :matrix_world
-    attr_accessor :name, :type, :up
+    attr_reader :name, :type, :up, :visible
     attr_accessor :matrix_auto_update, :matrix_world_auto_update, :matrix_world_needs_update
-    attr_accessor :visible, :user_data
+    attr_accessor :user_data
 
     def initialize
       super
@@ -50,6 +53,28 @@ module Three
       @user_data = {}
 
       bind_rotation_and_quaternion
+      bind_transform_changes
+      mark_dirty!
+    end
+
+    def name=(value)
+      @name = value
+      mark_dirty!(:properties)
+    end
+
+    def type=(value)
+      @type = value
+      mark_dirty!(:properties)
+    end
+
+    def up=(value)
+      @up = value
+      mark_dirty!(:transform)
+    end
+
+    def visible=(value)
+      @visible = value
+      mark_dirty!(:properties)
     end
 
     def self.allocate_id
@@ -131,6 +156,7 @@ module Three
     def update_matrix
       @matrix.compose(@position, @quaternion, @scale)
       @matrix_world_needs_update = true
+      mark_dirty!(:transform)
       self
     end
 
@@ -218,6 +244,8 @@ module Three
       object.remove_from_parent
       object.parent = self
       @children << object
+      mark_dirty!(:children)
+      object.mark_dirty!(:transform)
       object.dispatch_event(:added)
       dispatch_event(:childadded, object)
     end
@@ -227,6 +255,8 @@ module Three
 
       @children.delete(object)
       object.parent = nil
+      mark_dirty!(:children)
+      object.mark_dirty!(:transform)
       object.dispatch_event(:removed)
       dispatch_event(:childremoved, object)
     end
@@ -234,10 +264,23 @@ module Three
     def bind_rotation_and_quaternion
       @rotation.on_change do
         @quaternion.set_from_euler(@rotation, update: false)
+        @matrix_world_needs_update = true
+        mark_dirty!(:transform)
       end
 
       @quaternion.on_change do
         @rotation.set_from_quaternion(@quaternion, @rotation.order, update: false)
+        @matrix_world_needs_update = true
+        mark_dirty!(:transform)
+      end
+    end
+
+    def bind_transform_changes
+      [@position, @scale].each do |vector|
+        vector.on_change do
+          @matrix_world_needs_update = true
+          mark_dirty!(:transform)
+        end
       end
     end
   end

@@ -6,7 +6,8 @@ require_relative "group"
 
 module Three
   class Mesh < Object3D
-    attr_accessor :geometry, :material, :morph_target_dictionary, :morph_target_influences, :count
+    attr_reader :geometry, :material
+    attr_accessor :morph_target_dictionary, :morph_target_influences, :count
 
     def initialize(geometry = BufferGeometry.new, material = MeshBasicMaterial.new)
       super()
@@ -16,6 +17,16 @@ module Three
       @morph_target_dictionary = nil
       @morph_target_influences = nil
       @count = 1
+    end
+
+    def geometry=(value)
+      @geometry = value
+      mark_dirty!(:mesh)
+    end
+
+    def material=(value)
+      @material = value
+      mark_dirty!(:mesh)
     end
 
     def to_h

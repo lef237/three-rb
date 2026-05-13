@@ -47,6 +47,16 @@ class FakeThreeJSAdapter
     handle(:mesh, geometry: geometry, material: material, children: [])
   end
 
+  def set_mesh_geometry(mesh, geometry)
+    @calls << [:set_mesh_geometry, mesh, geometry]
+    mesh[:geometry] = geometry
+  end
+
+  def set_mesh_material(mesh, material)
+    @calls << [:set_mesh_material, mesh, material]
+    mesh[:material] = material
+  end
+
   def new_box_geometry(width, height, depth, width_segments, height_segments, depth_segments)
     handle(
       :box_geometry,
@@ -68,18 +78,32 @@ class FakeThreeJSAdapter
   end
 
   def set_geometry_index(geometry, attribute)
+    @calls << [:set_geometry_index, geometry, attribute]
     geometry[:index] = attribute
   end
 
   def set_geometry_attribute(geometry, name, attribute)
+    @calls << [:set_geometry_attribute, geometry, name, attribute]
     geometry[:attributes][name] = attribute
   end
 
+  def delete_geometry_attribute(geometry, name)
+    @calls << [:delete_geometry_attribute, geometry, name]
+    geometry[:attributes].delete(name)
+  end
+
+  def clear_geometry_groups(geometry)
+    @calls << [:clear_geometry_groups, geometry]
+    geometry[:groups].clear
+  end
+
   def add_geometry_group(geometry, start, count, material_index)
+    @calls << [:add_geometry_group, geometry, start, count, material_index]
     geometry[:groups] << { start: start, count: count, material_index: material_index }
   end
 
   def set_geometry_draw_range(geometry, start, count)
+    @calls << [:set_geometry_draw_range, geometry, start, count]
     geometry[:draw_range] = { start: start, count: count }
   end
 
@@ -88,20 +112,24 @@ class FakeThreeJSAdapter
   end
 
   def set_object_name(object, name)
+    @calls << [:set_object_name, object, name]
     object[:name] = name
   end
 
   def set_object_visible(object, visible)
+    @calls << [:set_object_visible, object, visible]
     object[:visible] = visible
   end
 
   def set_object_transform(object, position, quaternion, scale)
+    @calls << [:set_object_transform, object, position, quaternion, scale]
     object[:position] = position
     object[:quaternion] = quaternion
     object[:scale] = scale
   end
 
   def update_perspective_camera(camera, fov, aspect, near, far, zoom)
+    @calls << [:update_perspective_camera, camera, fov, aspect, near, far, zoom]
     camera[:fov] = fov
     camera[:aspect] = aspect
     camera[:near] = near
@@ -110,11 +138,18 @@ class FakeThreeJSAdapter
   end
 
   def update_material(material, parameters)
+    @calls << [:update_material, material, parameters]
     material[:parameters] = parameters.dup
   end
 
   def add_child(parent, child)
+    @calls << [:add_child, parent, child]
     parent[:children] << child unless parent[:children].include?(child)
+  end
+
+  def clear_children(parent)
+    @calls << [:clear_children, parent]
+    parent[:children].clear
   end
 
   def dispose(handle)

@@ -4,11 +4,13 @@ module Three
   class Color
     include Enumerable
 
-    attr_accessor :r, :g, :b
+    attr_reader :r, :g, :b
 
     DEFAULT = Object.new
 
     def initialize(r = DEFAULT, g = nil, b = nil)
+      @on_change_callback = proc {}
+
       if r.equal?(DEFAULT)
         set_rgb(1, 1, 1)
       elsif g.nil? && b.nil?
@@ -16,6 +18,21 @@ module Three
       else
         set_rgb(r, g, b)
       end
+    end
+
+    def r=(value)
+      @r = value
+      changed!
+    end
+
+    def g=(value)
+      @g = value
+      changed!
+    end
+
+    def b=(value)
+      @b = value
+      changed!
     end
 
     def set(value)
@@ -35,6 +52,7 @@ module Three
       @r = r
       @g = g
       @b = b
+      changed!
       self
     end
 
@@ -43,6 +61,7 @@ module Three
       @r = ((hex >> 16) & 255) / 255.0
       @g = ((hex >> 8) & 255) / 255.0
       @b = (hex & 255) / 255.0
+      changed!
       self
     end
 
@@ -57,6 +76,7 @@ module Three
       @r = color.r
       @g = color.g
       @b = color.b
+      changed!
       self
     end
 
@@ -95,6 +115,19 @@ module Three
 
     def deconstruct
       to_a
+    end
+
+    def on_change(&callback)
+      @on_change_callback = callback || proc {}
+      self
+    end
+
+    alias _on_change on_change
+
+    private
+
+    def changed!
+      @on_change_callback.call
     end
   end
 end

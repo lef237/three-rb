@@ -499,7 +499,8 @@ Current implementation status:
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - CI runs the Ruby unit tests and the Playwright cube smoke test with pnpm-managed browser dependencies.
-- The next implementation step is dirty tracking so `RubyWasmAdapter` can avoid unnecessary full sync work.
+- Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
+- The next implementation step is adding a small amount of new rendering surface area.
 
 Recommended structure:
 
@@ -771,9 +772,9 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Push the CI workflow and verify the first remote GitHub Actions run.
-2. Add dirty tracking so the backend can avoid unnecessary scene, transform, geometry, and material sync work.
-3. Add the next small rendering surface area: `PlaneGeometry`, `SphereGeometry`, `MeshNormalMaterial`, or `OrthographicCamera`.
+1. Add the next small rendering surface area: `PlaneGeometry`, `SphereGeometry`, `MeshNormalMaterial`, or `OrthographicCamera`.
+2. Add a second browser example that exercises multiple meshes, parent/child transforms, and material changes.
+3. Review and merge low-risk Dependabot updates after checking their CI results.
 
 ## Decisions Still Open
 

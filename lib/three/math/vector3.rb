@@ -4,18 +4,35 @@ module Three
   class Vector3
     include Enumerable
 
-    attr_accessor :x, :y, :z
+    attr_reader :x, :y, :z
 
     def initialize(x = 0, y = 0, z = 0)
       @x = x
       @y = y
       @z = z
+      @on_change_callback = proc {}
+    end
+
+    def x=(value)
+      @x = value
+      changed!
+    end
+
+    def y=(value)
+      @y = value
+      changed!
+    end
+
+    def z=(value)
+      @z = value
+      changed!
     end
 
     def set(x, y, z = @z)
       @x = x
       @y = y
       @z = z
+      changed!
       self
     end
 
@@ -23,21 +40,25 @@ module Three
       @x = scalar
       @y = scalar
       @z = scalar
+      changed!
       self
     end
 
     def set_x(x)
       @x = x
+      changed!
       self
     end
 
     def set_y(y)
       @y = y
+      changed!
       self
     end
 
     def set_z(z)
       @z = z
+      changed!
       self
     end
 
@@ -49,6 +70,7 @@ module Three
       else raise IndexError, "index is out of range: #{index}"
       end
 
+      changed!
       self
     end
 
@@ -72,6 +94,7 @@ module Three
       @x = vector.x
       @y = vector.y
       @z = vector.z
+      changed!
       self
     end
 
@@ -79,6 +102,7 @@ module Three
       @x += vector.x
       @y += vector.y
       @z += vector.z
+      changed!
       self
     end
 
@@ -86,6 +110,7 @@ module Three
       @x += scalar
       @y += scalar
       @z += scalar
+      changed!
       self
     end
 
@@ -93,6 +118,7 @@ module Three
       @x = a.x + b.x
       @y = a.y + b.y
       @z = a.z + b.z
+      changed!
       self
     end
 
@@ -100,6 +126,7 @@ module Three
       @x += vector.x * scale
       @y += vector.y * scale
       @z += vector.z * scale
+      changed!
       self
     end
 
@@ -107,6 +134,7 @@ module Three
       @x -= vector.x
       @y -= vector.y
       @z -= vector.z
+      changed!
       self
     end
 
@@ -114,6 +142,7 @@ module Three
       @x -= scalar
       @y -= scalar
       @z -= scalar
+      changed!
       self
     end
 
@@ -121,6 +150,7 @@ module Three
       @x = a.x - b.x
       @y = a.y - b.y
       @z = a.z - b.z
+      changed!
       self
     end
 
@@ -128,6 +158,7 @@ module Three
       @x *= vector.x
       @y *= vector.y
       @z *= vector.z
+      changed!
       self
     end
 
@@ -135,6 +166,7 @@ module Three
       @x *= scalar
       @y *= scalar
       @z *= scalar
+      changed!
       self
     end
 
@@ -142,6 +174,7 @@ module Three
       @x = @x.to_f / vector.x
       @y = @y.to_f / vector.y
       @z = @z.to_f / vector.z
+      changed!
       self
     end
 
@@ -172,6 +205,7 @@ module Three
       @x = ay * bz - az * by
       @y = az * bx - ax * bz
       @z = ax * by - ay * bx
+      changed!
       self
     end
 
@@ -220,6 +254,7 @@ module Three
       @x = (elements[0] * x + elements[4] * y + elements[8] * z + elements[12]) * w
       @y = (elements[1] * x + elements[5] * y + elements[9] * z + elements[13]) * w
       @z = (elements[2] * x + elements[6] * y + elements[10] * z + elements[14]) * w
+      changed!
       self
     end
 
@@ -239,6 +274,7 @@ module Three
       @x = vx + qw * tx + qy * tz - qz * ty
       @y = vy + qw * ty + qz * tx - qx * tz
       @z = vz + qw * tz + qx * ty - qy * tx
+      changed!
       self
     end
 
@@ -247,6 +283,7 @@ module Three
       @x = elements[12]
       @y = elements[13]
       @z = elements[14]
+      changed!
       self
     end
 
@@ -265,8 +302,16 @@ module Three
       @x = array[offset]
       @y = array[offset + 1]
       @z = array[offset + 2]
+      changed!
       self
     end
+
+    def on_change(&callback)
+      @on_change_callback = callback || proc {}
+      self
+    end
+
+    alias _on_change on_change
 
     def to_array(array = [], offset = 0)
       array[offset] = @x
@@ -323,6 +368,12 @@ module Three
 
     def inspect
       "#<#{self.class} x=#{@x.inspect} y=#{@y.inspect} z=#{@z.inspect}>"
+    end
+
+    private
+
+    def changed!
+      @on_change_callback.call
     end
   end
 end

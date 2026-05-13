@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require_relative "../dirty"
 require_relative "event_dispatcher"
 
 module Three
   class BufferAttribute < EventDispatcher
+    include Dirty
+
     @next_id = 0
 
     class << self
@@ -25,6 +28,7 @@ module Three
       @update_ranges = []
       @version = 0
       @component_type = component_type
+      mark_dirty!
     end
 
     def self.allocate_id
@@ -38,21 +42,33 @@ module Three
     end
 
     def needs_update=(value)
-      @version += 1 if value
+      return unless value
+
+      needs_update!
+    end
+
+    def needs_update!
+      @version += 1
+      mark_dirty!(:array)
+      dispatch_event(:change)
+      self
     end
 
     def set_usage(value)
       @usage = value
+      mark_dirty!(:usage)
       self
     end
 
     def add_update_range(start, count)
       @update_ranges << { start: start, count: count }
+      mark_dirty!(:update_ranges)
       self
     end
 
     def clear_update_ranges
       @update_ranges.clear
+      mark_dirty!(:update_ranges)
       self
     end
 
@@ -63,6 +79,7 @@ module Three
       @normalized = source.normalized
       @usage = source.usage
       @component_type = source.component_type
+      needs_update!
       self
     end
 
@@ -76,6 +93,7 @@ module Three
 
     def set_component(index, component, value)
       @array[index * @item_size + component] = value
+      needs_update!
       self
     end
 

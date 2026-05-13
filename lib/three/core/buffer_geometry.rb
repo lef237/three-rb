@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "../dirty"
 require_relative "../math/math_utils"
 require_relative "../math/vector3"
 require_relative "buffer_attribute"
@@ -7,6 +8,8 @@ require_relative "event_dispatcher"
 
 module Three
   class BufferGeometry < EventDispatcher
+    include Dirty
+
     @next_id = 0
 
     class << self
@@ -30,6 +33,7 @@ module Three
       @bounding_sphere = nil
       @draw_range = { start: 0, count: Float::INFINITY }
       @user_data = {}
+      mark_dirty!
     end
 
     def self.allocate_id
@@ -50,6 +54,8 @@ module Three
         else
           index
         end
+      bind_attribute_change(@index)
+      mark_dirty!(:index)
       self
     end
 
@@ -59,11 +65,14 @@ module Three
 
     def set_attribute(name, attribute)
       @attributes[name.to_sym] = attribute
+      bind_attribute_change(attribute)
+      mark_dirty!(:attributes)
       self
     end
 
     def delete_attribute(name)
       @attributes.delete(name.to_sym)
+      mark_dirty!(:attributes)
       self
     end
 
@@ -73,17 +82,20 @@ module Three
 
     def add_group(start, count, material_index = 0)
       @groups << { start: start, count: count, material_index: material_index }
+      mark_dirty!(:groups)
       self
     end
 
     def clear_groups
       @groups.clear
+      mark_dirty!(:groups)
       self
     end
 
     def set_draw_range(start, count)
       @draw_range[:start] = start
       @draw_range[:count] = count
+      mark_dirty!(:draw_range)
       self
     end
 
@@ -157,6 +169,12 @@ module Three
       return nil unless sphere
 
       { center: sphere[:center].to_a, radius: sphere[:radius] }
+    end
+
+    def bind_attribute_change(attribute)
+      return unless attribute.respond_to?(:on)
+
+      attribute.on(:change) { mark_dirty!(:attributes) }
     end
   end
 end

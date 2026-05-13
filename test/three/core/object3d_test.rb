@@ -102,4 +102,22 @@ class ThreeObject3DTest < Minitest::Test
 
     assert_in_delta Math::PI / 2, object.rotation.y, 1e-12
   end
+
+  def test_marks_transform_dirty_when_position_changes
+    object = Three::Object3D.new
+    object.mark_clean!
+
+    object.position.set(1, 2, 3)
+
+    assert object.dirty_field?(:transform)
+  end
+
+  def test_marks_children_dirty_when_child_is_added
+    parent = Three::Object3D.new
+    parent.mark_clean!
+
+    parent.add(Three::Object3D.new)
+
+    assert parent.dirty_field?(:children)
+  end
 end

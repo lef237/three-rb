@@ -20,4 +20,13 @@ class ThreeMeshBasicMaterialTest < Minitest::Test
     assert_equal 0.25, material.opacity
     assert material.transparent
   end
+
+  def test_marks_dirty_when_color_changes
+    material = Three::MeshBasicMaterial.new(color: 0xff0000)
+    material.mark_clean!
+
+    material.color.set_hex(0x00ff00)
+
+    assert material.dirty_field?(:parameters)
+  end
 end

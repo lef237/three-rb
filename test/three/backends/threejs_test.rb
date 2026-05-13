@@ -85,4 +85,59 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal [:dispose, handle], adapter.calls.last
     refute_includes backend.handles.values, handle
   end
+
+  def test_sync_skips_clean_object_updates
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    object = Three::Object3D.new
+
+    backend.sync(object)
+    adapter.calls.clear
+    backend.sync(object)
+
+    assert_empty adapter.calls
+
+    object.position.set(1, 2, 3)
+    backend.sync(object)
+
+    assert_equal :set_object_transform, adapter.calls.last[0]
+  end
+
+  def test_sync_updates_dirty_material_only
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    material = Three::MeshBasicMaterial.new(color: 0xff0000)
+
+    backend.sync(material)
+    adapter.calls.clear
+    backend.sync(material)
+
+    assert_empty adapter.calls
+
+    material.color.set_hex(0x00ff00)
+    backend.sync(material)
+
+    assert_equal :update_material, adapter.calls.last[0]
+    assert_equal 0x00ff00, adapter.calls.last[2][:color]
+  end
+
+  def test_sync_updates_dirty_buffer_attribute_only_after_change
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    geometry = Three::BufferGeometry.new
+    position = Three::Float32BufferAttribute.new([0, 0, 0, 1, 0, 0, 0, 1, 0], 3)
+    geometry.set_attribute(:position, position)
+
+    backend.sync(geometry)
+    adapter.calls.clear
+    backend.sync(geometry)
+
+    assert_empty adapter.calls
+
+    position.set_x(0, 2)
+    backend.sync(geometry)
+
+    assert_equal :set_geometry_attribute, adapter.calls.last[0]
+    assert_equal [2, 0, 0, 1, 0, 0, 0, 1, 0], adapter.calls.last[3][:array]
+  end
 end

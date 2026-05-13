@@ -2,6 +2,7 @@
 
 require_relative "three/version"
 require_relative "three/constants"
+require_relative "three/dirty"
 require_relative "three/math/math_utils"
 require_relative "three/math/color"
 require_relative "three/math/vector3"

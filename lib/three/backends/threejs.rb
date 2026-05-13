@@ -16,6 +16,7 @@ module Three
       def initialize(adapter: nil)
         @adapter = adapter || RubyWasmAdapter.new
         @handles = {}
+        @geometry_attribute_names = {}
       end
 
       def create_renderer(canvas: nil, **options)
@@ -46,6 +47,7 @@ module Three
 
         handle = build_handle(object)
         @handles[key] = handle if key
+        mark_clean_after_materialize(object)
         handle
       end
 
@@ -55,6 +57,8 @@ module Three
         case object
         when Object3D
           sync_object3d(object, handle)
+        when BufferGeometry
+          sync_geometry(object, handle)
         when Material
           sync_material(object, handle)
         end
@@ -125,30 +129,103 @@ module Three
       end
 
       def sync_object3d(object, handle)
-        @adapter.set_object_name(handle, object.name)
-        @adapter.set_object_visible(handle, object.visible)
-        @adapter.set_object_transform(handle, object.position.to_a, object.quaternion.to_a, object.scale.to_a)
+        if object.dirty_field?(:properties)
+          @adapter.set_object_name(handle, object.name)
+          @adapter.set_object_visible(handle, object.visible)
+        end
 
-        if object.is_a?(PerspectiveCamera)
+        if object.dirty_field?(:transform)
+          @adapter.set_object_transform(handle, object.position.to_a, object.quaternion.to_a, object.scale.to_a)
+        end
+
+        if object.is_a?(PerspectiveCamera) && object.dirty_field?(:camera)
           @adapter.update_perspective_camera(handle, object.fov, object.aspect, object.near, object.far, object.zoom)
         end
 
         if object.is_a?(Mesh)
-          sync(object.geometry)
-          sync(object.material) if object.material.respond_to?(:uuid)
+          geometry_handle = sync(object.geometry)
+          material_handle = sync(object.material) if object.material.respond_to?(:uuid)
+
+          if object.dirty_field?(:mesh)
+            @adapter.set_mesh_geometry(handle, geometry_handle)
+            @adapter.set_mesh_material(handle, material_handle) if material_handle
+          end
         end
 
-        object.children.each do |child|
-          child_handle = sync(child)
-          @adapter.add_child(handle, child_handle)
+        if object.dirty_field?(:children)
+          @adapter.clear_children(handle)
+          object.children.each do |child|
+            child_handle = sync(child)
+            @adapter.add_child(handle, child_handle)
+          end
+        else
+          object.children.each { |child| sync(child) }
         end
 
+        object.mark_clean! if object.respond_to?(:mark_clean!)
         handle
       end
 
       def sync_material(material, handle)
+        return handle unless material.dirty?
+
         @adapter.update_material(handle, material_parameters(material))
+        material.mark_clean!
         handle
+      end
+
+      def sync_geometry(geometry, handle)
+        return handle if geometry.is_a?(BoxGeometry)
+        return handle unless geometry_dirty?(geometry)
+
+        if geometry.dirty_field?(:all) || geometry.dirty_field?(:index) || geometry.index&.dirty?
+          @adapter.set_geometry_index(handle, geometry.index ? build_buffer_attribute(geometry.index) : nil)
+          geometry.index&.mark_clean!
+        end
+
+        if geometry.dirty_field?(:all) || geometry.dirty_field?(:attributes) || geometry.attributes.values.any?(&:dirty?)
+          previous_names = @geometry_attribute_names[geometry.uuid] || []
+          current_names = geometry.attributes.keys
+          (previous_names - current_names).each { |name| @adapter.delete_geometry_attribute(handle, name) }
+
+          geometry.attributes.each do |name, attribute|
+            @adapter.set_geometry_attribute(handle, name, build_buffer_attribute(attribute))
+            attribute.mark_clean!
+          end
+          @geometry_attribute_names[geometry.uuid] = current_names
+        end
+
+        if geometry.dirty_field?(:all) || geometry.dirty_field?(:groups)
+          @adapter.clear_geometry_groups(handle)
+          geometry.groups.each do |group|
+            @adapter.add_geometry_group(handle, group[:start], group[:count], group[:material_index])
+          end
+        end
+
+        if geometry.dirty_field?(:all) || geometry.dirty_field?(:draw_range)
+          @adapter.set_geometry_draw_range(handle, geometry.draw_range[:start], geometry.draw_range[:count])
+        end
+
+        geometry.mark_clean!
+        handle
+      end
+
+      def geometry_dirty?(geometry)
+        geometry.dirty? ||
+          geometry.index&.dirty? ||
+          geometry.attributes.values.any?(&:dirty?)
+      end
+
+      def mark_clean_after_materialize(object)
+        case object
+        when Material
+          object.mark_clean!
+        when BufferGeometry
+          @geometry_attribute_names[object.uuid] = object.attributes.keys
+          object.mark_clean!
+          object.index&.mark_clean!
+          object.attributes.each_value(&:mark_clean!)
+        end
       end
 
       def material_parameters(material)
@@ -218,6 +295,14 @@ module Three
           @three[:Mesh].new(geometry, material)
         end
 
+        def set_mesh_geometry(mesh, geometry)
+          mesh[:geometry] = geometry
+        end
+
+        def set_mesh_material(mesh, material)
+          mesh[:material] = material
+        end
+
         def new_box_geometry(width, height, depth, width_segments, height_segments, depth_segments)
           @three[:BoxGeometry].new(width, height, depth, width_segments, height_segments, depth_segments)
         end
@@ -237,6 +322,14 @@ module Three
 
         def set_geometry_attribute(geometry, name, attribute)
           geometry.call(:setAttribute, name.to_s, attribute)
+        end
+
+        def delete_geometry_attribute(geometry, name)
+          geometry.call(:deleteAttribute, name.to_s)
+        end
+
+        def clear_geometry_groups(geometry)
+          geometry.call(:clearGroups)
         end
 
         def add_geometry_group(geometry, start, count, material_index)
@@ -287,6 +380,10 @@ module Three
 
         def add_child(parent, child)
           parent.call(:add, child)
+        end
+
+        def clear_children(parent)
+          parent.call(:clear)
         end
 
         def dispose(handle)

@@ -2,10 +2,13 @@
 
 require_relative "../constants"
 require_relative "../core/event_dispatcher"
+require_relative "../dirty"
 require_relative "../math/math_utils"
 
 module Three
   class Material < EventDispatcher
+    include Dirty
+
     @next_id = 0
 
     class << self
@@ -13,8 +16,8 @@ module Three
     end
 
     attr_reader :id, :uuid
-    attr_accessor :name, :type, :side, :opacity, :transparent, :visible, :user_data
-    attr_accessor :blending, :vertex_colors, :needs_update
+    attr_reader :name, :type, :side, :opacity, :transparent, :visible, :blending, :vertex_colors
+    attr_accessor :user_data
 
     def initialize(parameters = nil)
       super()
@@ -31,6 +34,61 @@ module Three
       @user_data = {}
       @needs_update = false
       set_values(parameters) if parameters
+      mark_dirty!
+    end
+
+    def name=(value)
+      @name = value
+      mark_dirty!(:parameters)
+    end
+
+    def type=(value)
+      @type = value
+      mark_dirty!(:parameters)
+    end
+
+    def blending=(value)
+      @blending = value
+      mark_dirty!(:parameters)
+    end
+
+    def side=(value)
+      @side = value
+      mark_dirty!(:parameters)
+    end
+
+    def vertex_colors=(value)
+      @vertex_colors = value
+      mark_dirty!(:parameters)
+    end
+
+    def opacity=(value)
+      @opacity = value
+      mark_dirty!(:parameters)
+    end
+
+    def transparent=(value)
+      @transparent = value
+      mark_dirty!(:parameters)
+    end
+
+    def visible=(value)
+      @visible = value
+      mark_dirty!(:parameters)
+    end
+
+    def needs_update
+      @needs_update
+    end
+
+    def needs_update=(value)
+      @needs_update = value
+      mark_dirty!(:parameters) if value
+    end
+
+    def needs_update!
+      self.needs_update = true
+      self
     end
 
     def self.allocate_id
