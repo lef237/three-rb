@@ -502,6 +502,7 @@ Current implementation status:
 - `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial` base/PBR texture maps on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, and disposing the loaded subtree through the renderer API.
+- `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
