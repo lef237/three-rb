@@ -79,6 +79,19 @@ class FakeThreeJSAdapter
     )
   end
 
+  def new_sphere_geometry(radius, width_segments, height_segments, phi_start, phi_length, theta_start, theta_length)
+    handle(
+      :sphere_geometry,
+      radius: radius,
+      width_segments: width_segments,
+      height_segments: height_segments,
+      phi_start: phi_start,
+      phi_length: phi_length,
+      theta_start: theta_start,
+      theta_length: theta_length
+    )
+  end
+
   def new_buffer_geometry
     handle(:buffer_geometry, attributes: {}, groups: [])
   end

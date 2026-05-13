@@ -494,11 +494,11 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, `PlaneGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, and `MeshNormalMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, and `MeshNormalMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
-- `examples/browser/composition` renders a `PlaneGeometry` backdrop, grouped meshes, `MeshNormalMaterial`, and a material color update through the same renderer path.
+- `examples/browser/composition` renders `PlaneGeometry`, `SphereGeometry`, grouped meshes, `MeshNormalMaterial`, and a material color update through the same renderer path.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
 - The next implementation step is adding more small rendering surface area or reviewing low-risk dependency updates.
@@ -773,7 +773,7 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add the next small rendering surface area: `SphereGeometry` or `OrthographicCamera`.
+1. Add the next small rendering surface area: `OrthographicCamera`.
 2. Review and merge low-risk Dependabot updates after checking their CI results.
 3. Factor shared browser boot and smoke-test utilities if example duplication starts slowing changes down.
 

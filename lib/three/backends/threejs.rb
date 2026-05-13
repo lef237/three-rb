@@ -4,6 +4,7 @@ require_relative "../cameras/perspective_camera"
 require_relative "../core/buffer_geometry"
 require_relative "../geometries/box_geometry"
 require_relative "../geometries/plane_geometry"
+require_relative "../geometries/sphere_geometry"
 require_relative "../materials/mesh_basic_material"
 require_relative "../materials/mesh_normal_material"
 require_relative "../objects/mesh"
@@ -106,6 +107,17 @@ module Three
             parameters[:height],
             parameters[:width_segments],
             parameters[:height_segments]
+          )
+        when SphereGeometry
+          parameters = object.parameters
+          @adapter.new_sphere_geometry(
+            parameters[:radius],
+            parameters[:width_segments],
+            parameters[:height_segments],
+            parameters[:phi_start],
+            parameters[:phi_length],
+            parameters[:theta_start],
+            parameters[:theta_length]
           )
         when BufferGeometry
           build_buffer_geometry(object)
@@ -229,7 +241,7 @@ module Three
       end
 
       def built_in_geometry?(geometry)
-        geometry.is_a?(BoxGeometry) || geometry.is_a?(PlaneGeometry)
+        geometry.is_a?(BoxGeometry) || geometry.is_a?(PlaneGeometry) || geometry.is_a?(SphereGeometry)
       end
 
       def mark_clean_after_materialize(object)
@@ -326,6 +338,10 @@ module Three
 
         def new_plane_geometry(width, height, width_segments, height_segments)
           @three[:PlaneGeometry].new(width, height, width_segments, height_segments)
+        end
+
+        def new_sphere_geometry(radius, width_segments, height_segments, phi_start, phi_length, theta_start, theta_length)
+          @three[:SphereGeometry].new(radius, width_segments, height_segments, phi_start, phi_length, theta_start, theta_length)
         end
 
         def new_buffer_geometry

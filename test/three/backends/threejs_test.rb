@@ -57,6 +57,22 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 5, handle[:height_segments]
   end
 
+  def test_materializes_sphere_geometry_with_threejs_builtin
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    geometry = Three::SphereGeometry.new(2, width_segments: 8, height_segments: 6, phi_start: 0.25, phi_length: 1.5, theta_start: 0.5, theta_length: 2.0)
+
+    handle = backend.materialize(geometry)
+
+    assert_equal :sphere_geometry, handle[:type]
+    assert_equal 2, handle[:radius]
+    assert_equal 8, handle[:width_segments]
+    assert_equal 6, handle[:height_segments]
+    assert_equal 0.25, handle[:phi_start]
+    assert_equal 1.5, handle[:phi_length]
+    assert_equal 0.5, handle[:theta_start]
+    assert_equal 2.0, handle[:theta_length]
+  end
+
   def test_materializes_mesh_normal_material
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     material = Three::MeshNormalMaterial.new(flat_shading: true, wireframe: true)

@@ -47,6 +47,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     ruby = File.read(File.join(COMPOSITION_EXAMPLE_DIR, "main.rb"))
 
     assert_includes ruby, "Three::PlaneGeometry"
+    assert_includes ruby, "Three::SphereGeometry"
     assert_includes ruby, "Three::MeshNormalMaterial"
     assert_includes ruby, "Three::Group"
     assert_includes ruby, "rig.add(primary)"

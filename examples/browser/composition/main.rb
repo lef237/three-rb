@@ -40,6 +40,13 @@ begin
   satellite.position.z = 0.45
   rig.add(satellite)
 
+  orb_material = Three::MeshBasicMaterial.new(color: 0x77a8ff)
+  orb = Three::Mesh.new(Three::SphereGeometry.new(0.24, width_segments: 16, height_segments: 8), orb_material)
+  orb.position.x = 0.25
+  orb.position.y = 0.9
+  orb.position.z = 0.35
+  rig.add(orb)
+
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
     antialias: true,
@@ -68,6 +75,7 @@ begin
   JS.global[:__threeRbRig] = renderer.backend.materialize(rig)
   JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)
   JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)
+  JS.global[:__threeRbSphereMesh] = renderer.backend.materialize(orb)
   JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)
   JS.global[:__threeRbInitialMaterialColor] = primary_material.color.hex
@@ -80,6 +88,8 @@ begin
     primary.rotation.x += 0.017
     primary.rotation.y += 0.009
     satellite.rotation.y -= 0.025
+    orb.rotation.x += 0.018
+    orb.rotation.y -= 0.013
 
     pulse = (Math.sin(frame * 0.045) + 1) / 2.0
     primary_material.color.set_rgb(0.25 + (0.35 * pulse), 0.55 + (0.25 * pulse), 0.42)
