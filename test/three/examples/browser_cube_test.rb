@@ -125,6 +125,8 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     ruby = File.read(File.join(TEXTURES_EXAMPLE_DIR, "main.rb"))
 
     assert_includes ruby, "Three::Loaders::TextureLoader"
+    assert_includes ruby, "Three::Loaders::RGBELoader"
+    assert_includes ruby, "scene.environment = environment_texture"
     assert_includes ruby, "Three::RepeatWrapping"
     assert_includes ruby, "Three::NearestFilter"
     assert_includes ruby, "texture.offset.set(0.125, 0.25)"

@@ -17,6 +17,8 @@ class ThreeCubeTextureTest < Minitest::Test
 
     assert_equal SOURCES, texture.sources
     assert_equal SOURCES, texture.source
+    assert_equal Three::CubeReflectionMapping, texture.mapping
+    assert_equal Three::NoColorSpace, texture.color_space
     refute texture.flip_y
     assert_equal Three::ClampToEdgeWrapping, texture.wrap_s
     assert_equal Three::ClampToEdgeWrapping, texture.wrap_t
@@ -46,6 +48,7 @@ class ThreeCubeTextureTest < Minitest::Test
   def test_to_h
     texture = Three::CubeTexture.new(
       SOURCES,
+      mapping: Three::CubeRefractionMapping,
       wrap_s: Three::RepeatWrapping,
       wrap_t: Three::MirroredRepeatWrapping,
       mag_filter: Three::NearestFilter,
@@ -56,6 +59,7 @@ class ThreeCubeTextureTest < Minitest::Test
     assert_equal "CubeTexture", texture.to_h[:type]
     assert_equal SOURCES, texture.to_h[:source]
     assert_equal SOURCES, texture.to_h[:sources]
+    assert_equal Three::CubeRefractionMapping, texture.to_h[:mapping]
     assert_equal Three::RepeatWrapping, texture.to_h[:wrap_s]
     assert_equal Three::MirroredRepeatWrapping, texture.to_h[:wrap_t]
     assert_equal Three::NearestFilter, texture.to_h[:mag_filter]

@@ -342,6 +342,8 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
     assert_equal :texture, handle[:type]
     assert_equal "/texture.png", handle[:source]
+    assert_equal Three::UVMapping, handle[:mapping]
+    assert_equal Three::NoColorSpace, handle[:color_space]
     assert_equal false, handle[:flip_y]
     assert_equal Three::RepeatWrapping, handle[:wrap_s]
     assert_equal Three::MirroredRepeatWrapping, handle[:wrap_t]
@@ -372,11 +374,29 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
     assert_equal :cube_texture, handle[:type]
     assert_equal sources, handle[:sources]
+    assert_equal Three::CubeReflectionMapping, handle[:mapping]
+    assert_equal Three::NoColorSpace, handle[:color_space]
     assert_equal false, handle[:flip_y]
     assert_equal Three::ClampToEdgeWrapping, handle[:wrap_s]
     assert_equal Three::ClampToEdgeWrapping, handle[:wrap_t]
     assert_equal Three::LinearFilter, handle[:mag_filter]
     assert_equal Three::LinearMipmapLinearFilter, handle[:min_filter]
+    refute texture.dirty?
+  end
+
+  def test_materializes_rgbe_texture
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    texture = Three::RGBETexture.new("/studio.hdr")
+
+    handle = backend.materialize(texture)
+
+    assert_equal :rgbe_texture, handle[:type]
+    assert_equal "/studio.hdr", handle[:source]
+    assert_equal Three::EquirectangularReflectionMapping, handle[:mapping]
+    assert_equal Three::LinearSRGBColorSpace, handle[:color_space]
+    assert_equal true, handle[:flip_y]
+    assert_equal Three::LinearFilter, handle[:mag_filter]
+    assert_equal Three::LinearFilter, handle[:min_filter]
     refute texture.dirty?
   end
 
@@ -899,6 +919,8 @@ class ThreeThreeJSBackendTest < Minitest::Test
     backend.sync(material)
 
     assert_includes adapter.calls, [:update_texture, roughness_map_handle, {
+      mapping: Three::UVMapping,
+      color_space: Three::NoColorSpace,
       flip_y: true,
       wrap_s: Three::ClampToEdgeWrapping,
       wrap_t: Three::ClampToEdgeWrapping,

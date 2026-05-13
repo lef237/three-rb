@@ -104,6 +104,20 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal "PointsMaterial", exported[:materials][1][:type]
   end
 
+  def test_exports_rgbe_texture_resources
+    scene = Three::Scene.new
+    scene.environment = Three::RGBETexture.new("/studio.hdr")
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+    texture_data = exported[:textures].first
+
+    assert_equal "RGBETexture", texture_data[:type]
+    assert_equal "/studio.hdr", texture_data[:source]
+    assert_equal Three::EquirectangularReflectionMapping, texture_data[:mapping]
+    assert_equal Three::LinearSRGBColorSpace, texture_data[:color_space]
+    assert_equal texture_data[:uuid], exported[:object][:environment]
+  end
+
   def test_exports_mesh_physical_material_resources
     scene = Three::Scene.new
     texture = Three::Texture.new("/texture.png")

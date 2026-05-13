@@ -28,6 +28,8 @@ module Three
             value(entry, :sources) || value(entry, :source),
             **texture_parameters(entry)
           )
+        when "RGBETexture"
+          RGBETexture.new(value(entry, :source), **texture_parameters(entry))
         else
           Texture.new(value(entry, :source), **texture_parameters(entry))
         end
@@ -35,6 +37,8 @@ module Three
 
       def texture_parameters(entry)
         {
+          mapping: value(entry, :mapping),
+          color_space: value(entry, :color_space),
           flip_y: value(entry, :flip_y),
           wrap_s: value(entry, :wrap_s),
           wrap_t: value(entry, :wrap_t),

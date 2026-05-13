@@ -73,6 +73,8 @@ module Three
 
         def texture_parameters(texture)
           {
+            mapping: texture.mapping,
+            color_space: texture.color_space,
             flip_y: texture.flip_y,
             wrap_s: texture.wrap_s,
             wrap_t: texture.wrap_t,

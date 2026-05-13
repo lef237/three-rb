@@ -23,6 +23,16 @@ module Three
   LinearMipmapLinearFilter = 1008
   LinearMipMapLinearFilter = 1008
 
+  UVMapping = 300
+  CubeReflectionMapping = 301
+  CubeRefractionMapping = 302
+  EquirectangularReflectionMapping = 303
+  EquirectangularRefractionMapping = 304
+
+  NoColorSpace = ""
+  SRGBColorSpace = "srgb"
+  LinearSRGBColorSpace = "srgb-linear"
+
   BasicShadowMap = 0
   PCFShadowMap = 1
   PCFSoftShadowMap = 2

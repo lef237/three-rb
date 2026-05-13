@@ -25,6 +25,7 @@ require_relative "../objects/mesh"
 require_relative "../objects/points"
 require_relative "../scenes/scene"
 require_relative "../textures/cube_texture"
+require_relative "../textures/rgbe_texture"
 require_relative "../textures/texture"
 require_relative "base"
 

@@ -7,6 +7,8 @@ class ThreeTextureTest < Minitest::Test
     texture = Three::Texture.new("/texture.png")
 
     assert_equal "/texture.png", texture.source
+    assert_equal Three::UVMapping, texture.mapping
+    assert_equal Three::NoColorSpace, texture.color_space
     assert texture.flip_y
     assert_equal Three::ClampToEdgeWrapping, texture.wrap_s
     assert_equal Three::ClampToEdgeWrapping, texture.wrap_t
@@ -36,6 +38,8 @@ class ThreeTextureTest < Minitest::Test
 
     texture.wrap_s = Three::RepeatWrapping
     texture.wrap_t = Three::MirroredRepeatWrapping
+    texture.mapping = Three::EquirectangularReflectionMapping
+    texture.color_space = Three::SRGBColorSpace
     texture.mag_filter = Three::NearestFilter
     texture.min_filter = Three::NearestMipmapNearestFilter
     texture.rotation = Math::PI / 4
@@ -44,6 +48,8 @@ class ThreeTextureTest < Minitest::Test
     assert texture.dirty_field?(:parameters)
     assert_equal Three::RepeatWrapping, texture.wrap_s
     assert_equal Three::MirroredRepeatWrapping, texture.wrap_t
+    assert_equal Three::EquirectangularReflectionMapping, texture.mapping
+    assert_equal Three::SRGBColorSpace, texture.color_space
     assert_equal Three::NearestFilter, texture.mag_filter
     assert_equal Three::NearestMipmapNearestFilter, texture.min_filter
     assert_equal Math::PI / 4, texture.rotation
@@ -120,6 +126,8 @@ class ThreeTextureTest < Minitest::Test
   def test_to_h
     texture = Three::Texture.new(
       "/texture.png",
+      mapping: Three::EquirectangularReflectionMapping,
+      color_space: Three::SRGBColorSpace,
       flip_y: false,
       wrap_s: Three::RepeatWrapping,
       wrap_t: Three::MirroredRepeatWrapping,
@@ -139,6 +147,8 @@ class ThreeTextureTest < Minitest::Test
 
     assert_equal "Texture", texture.to_h[:type]
     assert_equal "/texture.png", texture.to_h[:source]
+    assert_equal Three::EquirectangularReflectionMapping, texture.to_h[:mapping]
+    assert_equal Three::SRGBColorSpace, texture.to_h[:color_space]
     refute texture.to_h[:flip_y]
     assert_equal Three::RepeatWrapping, texture.to_h[:wrap_s]
     assert_equal Three::MirroredRepeatWrapping, texture.to_h[:wrap_t]

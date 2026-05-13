@@ -494,12 +494,12 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, external loaded `Object3D` handles, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `Line`, `Points`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `LineBasicMaterial`, `PointsMaterial`, `MeshLambertMaterial`, `MeshStandardMaterial`, `MeshPhysicalMaterial`, and `MeshNormalMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, external loaded `Object3D` handles, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `Line`, `Points`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `RGBETexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `LineBasicMaterial`, `PointsMaterial`, `MeshLambertMaterial`, `MeshStandardMaterial`, `MeshPhysicalMaterial`, and `MeshNormalMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, directional shadow mapping, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshPhongMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
-- `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter/UV-transform settings, and `MeshPhysicalMaterial` standard/physical texture maps on a textured cube.
+- `examples/browser/textures` focuses on `TextureLoader`, `RGBELoader`, repeat/wrap/filter/UV-transform settings, `MeshPhysicalMaterial` standard/physical texture maps, and an HDR environment texture on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, playing loaded animation clips through `AnimationMixer`, and disposing the loaded subtree through the renderer API.
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
@@ -511,6 +511,7 @@ Current implementation status:
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
 - `Three::Matrix3` is implemented with inverse/transpose, normal-matrix, and UV-transform helpers; `Vector3` can apply `Matrix3` values.
 - `Texture` exposes `offset`, `repeat`, `center`, `rotation`, `matrix_auto_update`, and `matrix`, and the Three.js backend synchronizes these UV-transform settings.
+- `Texture` exposes `mapping` and `color_space`; `RGBETexture` defaults to equirectangular reflection mapping and linear-sRGB color space for HDR environment maps.
 - `Three::Clock` and `Three::Layers` are implemented; `Object3D#layers` is serialized and synchronized to Three.js `layers.mask`.
 - glTF animation is prioritized ahead of broader postprocessing or additional loader expansion because it builds directly on the existing `GLTFLoader`, `ExternalObject3D`, and browser smoke infrastructure while providing a visible user-facing capability with bounded backend API surface.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
@@ -522,7 +523,8 @@ Current implementation status:
 - `Object3D#cast_shadow`, `Object3D#receive_shadow`, renderer shadow map configuration, and directional light shadow camera settings are supported through the Three.js backend.
 - The Three.js backend internals are split into materialization, synchronization, parameter conversion, resource management, and ruby.wasm adapter files so renderer additions do not keep growing one monolithic backend file.
 - `MeshPhysicalMaterial` was prioritized before additional addon loaders because it extends the existing material, texture-slot, JSON, disposal, and browser-smoke boundaries without adding new decoder or renderer-pipeline constraints.
-- The next implementation step is adding more material classes or addon loaders only when an example or API target needs them; based on current coverage, environment-map loading through `RGBELoader` is the next likely candidate because it directly improves PBR/physical-material scenes.
+- `RGBELoader`/`RGBETexture` was prioritized after `MeshPhysicalMaterial` because HDR environment maps directly improve PBR and physical-material scenes while reusing the existing texture, scene environment, JSON, and browser-smoke boundaries.
+- The next implementation step is adding more material classes or addon loaders only when an example or API target needs them; based on current coverage, `DRACOLoader` should wait until a compressed glTF fixture is introduced, while postprocessing should wait for a dedicated render-pipeline example.
 
 Recommended structure:
 
@@ -616,7 +618,8 @@ Implemented delegate loaders so far:
 
 1. `TextureLoader`
 2. `CubeTextureLoader`
-3. `GLTFLoader`
+3. `RGBELoader`
+4. `GLTFLoader`
 
 Loader priority:
 
@@ -837,7 +840,7 @@ The MVP is complete when:
 ## Next Tasks
 
 1. Prefer feature work that has visible user value, reuses the current Three.js backend boundary, and can be verified by deterministic browser smoke tests.
-2. Prioritize `RGBELoader` next if the target example needs HDR environment maps for PBR/physical materials; otherwise add the next material class or addon loader only when a concrete example or API target needs it.
+2. Add `DRACOLoader` only with a compressed glTF fixture, or postprocessing only with a dedicated render-pipeline example; otherwise add the next material class or addon loader only when a concrete example or API target needs it.
 3. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable.
 4. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
 5. Keep reviewing low-risk dependency updates after checking their CI results.

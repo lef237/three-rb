@@ -17,12 +17,14 @@ module Three
       attr_accessor :next_id
     end
 
-    attr_reader :id, :uuid, :source, :flip_y, :wrap_s, :wrap_t, :mag_filter, :min_filter
+    attr_reader :id, :uuid, :source, :mapping, :color_space, :flip_y, :wrap_s, :wrap_t, :mag_filter, :min_filter
     attr_reader :offset, :repeat, :center, :rotation, :matrix_auto_update, :matrix
     attr_accessor :user_data
 
     def initialize(
       source = nil,
+      mapping: Three::UVMapping,
+      color_space: Three::NoColorSpace,
       flip_y: true,
       wrap_s: Three::ClampToEdgeWrapping,
       wrap_t: Three::ClampToEdgeWrapping,
@@ -39,6 +41,8 @@ module Three
       @id = self.class.allocate_id
       @uuid = MathUtils.generate_uuid
       @source = source
+      @mapping = mapping
+      @color_space = color_space
       @flip_y = flip_y
       @wrap_s = wrap_s
       @wrap_t = wrap_t
@@ -57,6 +61,16 @@ module Three
 
     def source=(value)
       @source = value
+      mark_dirty!(:parameters)
+    end
+
+    def mapping=(value)
+      @mapping = value
+      mark_dirty!(:parameters)
+    end
+
+    def color_space=(value)
+      @color_space = value
       mark_dirty!(:parameters)
     end
 
@@ -133,6 +147,8 @@ module Three
         uuid: @uuid,
         type: "Texture",
         source: @source,
+        mapping: @mapping,
+        color_space: @color_space,
         flip_y: @flip_y,
         wrap_s: @wrap_s,
         wrap_t: @wrap_t,

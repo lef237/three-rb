@@ -24,6 +24,8 @@ module Three
             @adapter.new_points(materialize(object.geometry), materialize(object.material))
           when CubeTexture
             @adapter.load_cube_texture(object.sources, texture_parameters(object))
+          when RGBETexture
+            @adapter.load_rgbe_texture(object.source, texture_parameters(object))
           when Texture
             @adapter.load_texture(object.source, texture_parameters(object))
           when AmbientLight

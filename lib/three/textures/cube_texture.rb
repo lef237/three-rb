@@ -8,6 +8,8 @@ module Three
 
     def initialize(
       sources,
+      mapping: Three::CubeReflectionMapping,
+      color_space: Three::NoColorSpace,
       flip_y: false,
       wrap_s: Three::ClampToEdgeWrapping,
       wrap_t: Three::ClampToEdgeWrapping,
@@ -22,6 +24,8 @@ module Three
     )
       super(
         validate_sources(sources),
+        mapping: mapping,
+        color_space: color_space,
         flip_y: flip_y,
         wrap_s: wrap_s,
         wrap_t: wrap_t,

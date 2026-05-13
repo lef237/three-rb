@@ -105,6 +105,13 @@ module Three
           texture
         end
 
+        def load_rgbe_texture(source, parameters = {})
+          texture = rgbe_loader_constructor.new.call(:loadAsync, source)
+          texture = texture.await if texture.respond_to?(:await)
+          update_texture(texture, parameters)
+          texture
+        end
+
         def load_gltf(source)
           gltf_loader_constructor.new.call(:loadAsync, source)
         end
@@ -169,6 +176,8 @@ module Three
         end
 
         def update_texture(texture, parameters)
+          texture[:mapping] = parameters[:mapping] unless parameters[:mapping].nil?
+          texture[:colorSpace] = parameters[:color_space] unless parameters[:color_space].nil?
           texture[:flipY] = parameters[:flip_y] unless parameters[:flip_y].nil?
           texture[:wrapS] = parameters[:wrap_s] unless parameters[:wrap_s].nil?
           texture[:wrapT] = parameters[:wrap_t] unless parameters[:wrap_t].nil?
@@ -595,6 +604,16 @@ module Three
           constructor
         rescue LoadError
           raise RuntimeError, "Three::Loaders::GLTFLoader requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def rgbe_loader_constructor
+          require "js"
+          constructor = JS.global[:THREE_RGBE_LOADER]
+          raise RuntimeError, "Three::Loaders::RGBELoader requires globalThis.THREE_RGBE_LOADER" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Loaders::RGBELoader requires ruby.wasm's js gem or an injected adapter"
         end
 
         def resolve_canvas(canvas)

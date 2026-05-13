@@ -95,6 +95,10 @@ class FakeThreeJSAdapter
     handle(:cube_texture, { sources: sources.dup }.merge(parameters))
   end
 
+  def load_rgbe_texture(source, parameters = {})
+    handle(:rgbe_texture, { source: source }.merge(parameters))
+  end
+
   def load_gltf(source)
     handle(
       :gltf,

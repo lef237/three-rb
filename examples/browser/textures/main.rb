@@ -18,6 +18,9 @@ begin
   camera = Three::OrthographicCamera.new(-2.5, 2.5, 1.6, -1.6, near: 0.1, far: 100)
   camera.position.z = 5
 
+  environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/assets/studio.hdr")
+  scene.environment = environment_texture
+
   scene.add(Three::AmbientLight.new(0xffffff, 0.45))
 
   key_light = Three::DirectionalLight.new(0xffffff, 1.1)
@@ -88,6 +91,7 @@ begin
   JS.global[:__threeRbTexturedMesh] = renderer.backend.materialize(mesh)
   JS.global[:__threeRbTextureMaterial] = renderer.backend.materialize(material)
   JS.global[:__threeRbTextureExampleTexture] = renderer.backend.materialize(texture)
+  JS.global[:__threeRbTextureExampleEnvironment] = renderer.backend.materialize(environment_texture)
   JS.global[:__threeRbTextureExampleFrame] = 0
 
   frame = 0

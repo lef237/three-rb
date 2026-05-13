@@ -98,6 +98,18 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert loaded.children.first.material.flat_shading
   end
 
+  def test_parse_reconstructs_rgbe_texture_resources
+    scene = Three::Scene.new
+    scene.environment = Three::RGBETexture.new("/studio.hdr")
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(Three::Exporters::ThreeJSONExporter.new.export(scene))
+
+    assert_instance_of Three::RGBETexture, loaded.environment
+    assert_equal "/studio.hdr", loaded.environment.source
+    assert_equal Three::EquirectangularReflectionMapping, loaded.environment.mapping
+    assert_equal Three::LinearSRGBColorSpace, loaded.environment.color_space
+  end
+
   def test_parse_reconstructs_line_and_points
     scene = Three::Scene.new
     texture = Three::Texture.new("/points.png")

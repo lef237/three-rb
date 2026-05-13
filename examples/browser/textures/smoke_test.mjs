@@ -21,7 +21,8 @@ async function main() {
     await page.goto(`${server.url}/examples/browser/textures/`, { waitUntil: "load" });
     await waitForRunning(page, diagnostics);
     await page.waitForFunction(
-      () => globalThis.__threeRbTextureMaterial?.map?.source?.data?.complete === true,
+      () => globalThis.__threeRbTextureMaterial?.map?.source?.data?.complete === true &&
+        globalThis.__threeRbTextureExampleEnvironment?.isDataTexture === true,
       null,
       { timeout: 10_000 }
     );
@@ -61,7 +62,13 @@ async function main() {
       textureRepeat: globalThis.__threeRbTextureExampleTexture?.repeat?.toArray?.(),
       textureCenter: globalThis.__threeRbTextureExampleTexture?.center?.toArray?.(),
       textureRotation: globalThis.__threeRbTextureExampleTexture?.rotation,
-      textureMatrixAutoUpdate: globalThis.__threeRbTextureExampleTexture?.matrixAutoUpdate
+      textureMatrixAutoUpdate: globalThis.__threeRbTextureExampleTexture?.matrixAutoUpdate,
+      environmentType: globalThis.__threeRbTextureExampleEnvironment?.isDataTexture,
+      environmentMapping: globalThis.__threeRbTextureExampleEnvironment?.mapping,
+      environmentColorSpace: globalThis.__threeRbTextureExampleEnvironment?.colorSpace,
+      environmentMagFilter: globalThis.__threeRbTextureExampleEnvironment?.magFilter,
+      environmentMinFilter: globalThis.__threeRbTextureExampleEnvironment?.minFilter,
+      sceneEnvironmentSame: globalThis.__threeRbScene?.environment === globalThis.__threeRbTextureExampleEnvironment
     }));
 
     if (scene.cameraType !== "OrthographicCamera") {
@@ -105,6 +112,12 @@ async function main() {
     }
     if (Math.abs(scene.textureRotation - 0.35) > 1e-12 || scene.textureMatrixAutoUpdate !== true) {
       throw new Error(`expected configured texture transform state: ${JSON.stringify(scene)}`);
+    }
+    if (scene.environmentType !== true || scene.environmentMapping !== 303 || scene.environmentColorSpace !== "srgb-linear") {
+      throw new Error(`expected an RGBE environment texture with equirectangular mapping: ${JSON.stringify(scene)}`);
+    }
+    if (scene.environmentMagFilter !== 1006 || scene.environmentMinFilter !== 1006 || scene.sceneEnvironmentSame !== true) {
+      throw new Error(`expected configured RGBE environment texture filters and scene binding: ${JSON.stringify(scene)}`);
     }
     if (!scene.renderInfo || scene.renderInfo.triangles < 12) {
       throw new Error(`renderer did not draw the textured cube triangles: ${JSON.stringify(scene)}`);

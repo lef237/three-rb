@@ -12,6 +12,7 @@ const mimeTypes = new Map([
   [".css", "text/css; charset=utf-8"],
   [".svg", "image/svg+xml"],
   [".gltf", "model/gltf+json"],
+  [".hdr", "image/vnd.radiance"],
   [".wasm", "application/wasm"]
 ]);
 
