@@ -23,6 +23,20 @@ scene.add(cube)
 
 Browser rendering is being wired through `Three::Renderers::ThreeJSRenderer`, which targets three.js from ruby.wasm.
 
+## Browser Example
+
+Serve the repository root and open the cube example:
+
+```sh
+ruby -run -e httpd . -p 8000
+```
+
+```text
+http://localhost:8000/examples/browser/cube/
+```
+
+The example loads `@ruby/3.4-wasm-wasi@2.9.4` and `three@0.184.0` in the browser.
+
 ## Development
 
 Install dependencies:

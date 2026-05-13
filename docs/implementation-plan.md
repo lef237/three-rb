@@ -496,7 +496,8 @@ Current implementation status:
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
 - The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, generic `BufferGeometry`, `BufferAttribute`, and `MeshBasicMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
-- The next implementation step is the browser cube example that loads ruby.wasm and three.js together.
+- `examples/browser/cube` loads ruby.wasm and three.js in the browser, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
+- The next implementation step is an automated browser smoke test for the cube example.
 
 Recommended structure:
 
@@ -764,7 +765,13 @@ The MVP is complete when:
 - [x] Implement `BufferAttribute`, `BufferGeometry`, and `BoxGeometry`.
 - [x] Implement `Material`, `MeshBasicMaterial`, and `Mesh`.
 - [x] Add skeletons for `Three::Backends::ThreeJS` and `ThreeJSRenderer`.
-- [ ] Build `examples/browser/cube` and render a cube with ruby.wasm + three.js.
+- [x] Build `examples/browser/cube` and render a cube with ruby.wasm + three.js.
+
+## Next Tasks
+
+1. Add an automated browser smoke test for `examples/browser/cube`.
+2. Verify the ruby.wasm bridge in a real browser and tighten `RubyWasmAdapter` where needed.
+3. Add dirty tracking so the backend can avoid full scene syncing on every render.
 
 ## Decisions Still Open
 

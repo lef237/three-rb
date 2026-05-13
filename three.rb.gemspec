@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.metadata["source_code_uri"] = spec.homepage
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  spec.files = Dir.glob("{lib,docs}/**/*") + %w[LICENSE README.md]
+  spec.files = Dir.glob("{lib,docs,examples}/**/*") + %w[LICENSE README.md]
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "minitest", "~> 5.0"
