@@ -120,4 +120,18 @@ class ThreeObject3DTest < Minitest::Test
 
     assert parent.dirty_field?(:children)
   end
+
+  def test_shadow_flags_mark_properties_dirty
+    object = Three::Object3D.new
+    object.mark_clean!
+
+    object.cast_shadow = true
+    object.receive_shadow = true
+
+    assert object.cast_shadow
+    assert object.receive_shadow
+    assert object.dirty_field?(:properties)
+    assert_equal true, object.to_h[:cast_shadow]
+    assert_equal true, object.to_h[:receive_shadow]
+  end
 end

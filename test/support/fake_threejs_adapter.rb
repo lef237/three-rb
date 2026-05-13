@@ -49,6 +49,14 @@ class FakeThreeJSAdapter
     @calls << [:set_clear_color, renderer, color, alpha]
   end
 
+  def set_renderer_shadow_map(renderer, enabled: nil, type: nil, auto_update: nil)
+    @calls << [:set_renderer_shadow_map, renderer, { enabled: enabled, type: type, auto_update: auto_update }]
+    renderer[:shadow_map] ||= {}
+    renderer[:shadow_map][:enabled] = enabled unless enabled.nil?
+    renderer[:shadow_map][:type] = type unless type.nil?
+    renderer[:shadow_map][:auto_update] = auto_update unless auto_update.nil?
+  end
+
   def set_animation_loop(renderer, callback)
     @calls << [:set_animation_loop, renderer, callback]
   end
@@ -129,11 +137,11 @@ class FakeThreeJSAdapter
   end
 
   def new_directional_light(color, intensity)
-    handle(:directional_light, color: color, intensity: intensity, children: [])
+    handle(:directional_light, color: color, intensity: intensity, children: [], shadow: default_shadow)
   end
 
   def new_point_light(color, intensity, distance, decay)
-    handle(:point_light, color: color, intensity: intensity, distance: distance, decay: decay, children: [])
+    handle(:point_light, color: color, intensity: intensity, distance: distance, decay: decay, children: [], shadow: default_shadow)
   end
 
   def new_hemisphere_light(sky_color, ground_color, intensity)
@@ -257,6 +265,12 @@ class FakeThreeJSAdapter
     object[:visible] = visible
   end
 
+  def set_object_shadow(object, cast_shadow, receive_shadow)
+    @calls << [:set_object_shadow, object, cast_shadow, receive_shadow]
+    object[:cast_shadow] = cast_shadow
+    object[:receive_shadow] = receive_shadow
+  end
+
   def set_object_transform(object, position, quaternion, scale)
     @calls << [:set_object_transform, object, position, quaternion, scale]
     object[:position] = position
@@ -303,6 +317,13 @@ class FakeThreeJSAdapter
     light[:sky_color] = sky_color
     light[:ground_color] = ground_color
     light[:intensity] = intensity
+  end
+
+  def update_light_shadow(light, parameters)
+    @calls << [:update_light_shadow, light, parameters]
+    return unless light[:shadow]
+
+    light[:shadow].merge!(parameters)
   end
 
   def update_material(material, parameters)
@@ -381,6 +402,16 @@ class FakeThreeJSAdapter
 
   def handle(type, attributes = {})
     { type: type }.merge(attributes)
+  end
+
+  def default_shadow
+    {
+      map_size: [512, 512],
+      bias: 0,
+      normal_bias: 0,
+      radius: 1,
+      camera: {}
+    }
   end
 
   def collect_object3d_resources(node, resources, dispose_geometries:, dispose_materials:, dispose_textures:, dispose_skeletons:)

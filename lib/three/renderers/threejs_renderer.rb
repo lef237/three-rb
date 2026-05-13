@@ -9,8 +9,14 @@ module Three
       attr_reader :backend, :handle
 
       def initialize(canvas: nil, backend: Backends::ThreeJS.new, **options)
+        shadow_map_enabled = options.delete(:shadow_map_enabled)
+        shadow_map_type = options.delete(:shadow_map_type)
+        shadow_map_auto_update = options.delete(:shadow_map_auto_update)
         @backend = backend
         @handle = @backend.create_renderer(canvas: canvas, **options)
+        if [shadow_map_enabled, shadow_map_type, shadow_map_auto_update].any?
+          configure_shadow_map(enabled: shadow_map_enabled, type: shadow_map_type, auto_update: shadow_map_auto_update)
+        end
       end
 
       def set_size(width, height)
@@ -24,6 +30,11 @@ module Three
 
       def set_clear_color(color, alpha = 1)
         @backend.set_clear_color(@handle, color, alpha)
+        self
+      end
+
+      def configure_shadow_map(enabled: nil, type: nil, auto_update: nil)
+        @backend.set_renderer_shadow_map(@handle, enabled: enabled, type: type, auto_update: auto_update)
         self
       end
 

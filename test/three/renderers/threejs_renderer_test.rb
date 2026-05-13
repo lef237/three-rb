@@ -35,6 +35,22 @@ class ThreeThreeJSRendererTest < Minitest::Test
     assert_equal [:set_clear_color, renderer.handle, 0x101418, 1], adapter.calls.last
   end
 
+  def test_configures_shadow_map_from_initializer_and_method
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(
+      backend: backend,
+      shadow_map_enabled: true,
+      shadow_map_type: Three::PCFShadowMap
+    )
+
+    assert_equal({ enabled: true, type: Three::PCFShadowMap }, renderer.handle[:shadow_map])
+
+    assert_same renderer, renderer.configure_shadow_map(type: Three::VSMShadowMap, auto_update: false)
+    assert_equal({ enabled: true, type: Three::VSMShadowMap, auto_update: false }, renderer.handle[:shadow_map])
+    assert_equal :set_renderer_shadow_map, adapter.calls.last[0]
+  end
+
   def test_dom_element_delegates_to_backend
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)

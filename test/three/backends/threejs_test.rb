@@ -318,14 +318,43 @@ class ThreeThreeJSBackendTest < Minitest::Test
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     object = Three::Object3D.new
     object.name = "node"
+    object.cast_shadow = true
+    object.receive_shadow = true
     object.position.set(1, 2, 3)
     object.scale.set(2, 2, 2)
 
     handle = backend.sync(object)
 
     assert_equal "node", handle[:name]
+    assert_equal true, handle[:cast_shadow]
+    assert_equal true, handle[:receive_shadow]
     assert_equal [1, 2, 3], handle[:position]
     assert_equal [2, 2, 2], handle[:scale]
+  end
+
+  def test_sync_updates_directional_light_shadow
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    light = Three::DirectionalLight.new
+    light.cast_shadow = true
+    light.shadow_map_size = [1024, 1024]
+    light.shadow_bias = -0.0001
+    light.shadow_normal_bias = 0.01
+    light.shadow_radius = 2
+    light.set_shadow_camera(left: -3, right: 3, top: 2, bottom: -2, near: 0.2, far: 20)
+
+    handle = backend.sync(light)
+
+    assert_equal true, handle[:cast_shadow]
+    shadow_call = adapter.calls.find { |call| call[0] == :update_light_shadow }
+    refute_nil shadow_call
+    assert_equal({
+      map_size: [1024, 1024],
+      bias: -0.0001,
+      normal_bias: 0.01,
+      radius: 2,
+      camera: { left: -3, right: 3, top: 2, bottom: -2, near: 0.2, far: 20 }
+    }, shadow_call[2])
   end
 
   def test_render_materializes_and_delegates

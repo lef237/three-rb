@@ -25,7 +25,7 @@ module Three
     attr_reader :id, :uuid, :parent, :children
     attr_reader :position, :rotation, :quaternion, :scale
     attr_reader :matrix, :matrix_world
-    attr_reader :name, :type, :up, :visible
+    attr_reader :name, :type, :up, :visible, :cast_shadow, :receive_shadow
     attr_accessor :matrix_auto_update, :matrix_world_auto_update, :matrix_world_needs_update
     attr_accessor :user_data
 
@@ -50,6 +50,8 @@ module Three
       @matrix_world_auto_update = DEFAULT_MATRIX_WORLD_AUTO_UPDATE
       @matrix_world_needs_update = false
       @visible = true
+      @cast_shadow = false
+      @receive_shadow = false
       @user_data = {}
 
       bind_rotation_and_quaternion
@@ -74,6 +76,16 @@ module Three
 
     def visible=(value)
       @visible = value
+      mark_dirty!(:properties)
+    end
+
+    def cast_shadow=(value)
+      @cast_shadow = value
+      mark_dirty!(:properties)
+    end
+
+    def receive_shadow=(value)
+      @receive_shadow = value
       mark_dirty!(:properties)
     end
 
@@ -226,6 +238,8 @@ module Three
         name: @name,
         matrix: @matrix.to_a,
         visible: @visible,
+        cast_shadow: @cast_shadow,
+        receive_shadow: @receive_shadow,
         user_data: @user_data,
         children: @children.map(&:to_h)
       }

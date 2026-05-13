@@ -66,6 +66,10 @@ module Three
         @adapter.set_clear_color(renderer_handle, color, alpha)
       end
 
+      def set_renderer_shadow_map(renderer_handle, enabled: nil, type: nil, auto_update: nil)
+        @adapter.set_renderer_shadow_map(renderer_handle, enabled: enabled, type: type, auto_update: auto_update)
+      end
+
       def set_animation_loop(renderer_handle, callback)
         @adapter.set_animation_loop(renderer_handle, callback)
       end
@@ -287,6 +291,7 @@ module Three
         if object.dirty_field?(:properties)
           @adapter.set_object_name(handle, object.name)
           @adapter.set_object_visible(handle, object.visible)
+          @adapter.set_object_shadow(handle, object.cast_shadow, object.receive_shadow)
         end
 
         if object.dirty_field?(:transform)
@@ -352,6 +357,11 @@ module Three
         else
           @adapter.update_light(handle, object.color.hex, object.intensity)
         end
+        @adapter.update_light_shadow(handle, light_shadow_parameters(object)) if shadow_dirty?(object)
+      end
+
+      def shadow_dirty?(object)
+        object.dirty_fields.key?(:all) || object.dirty_field?(:shadow)
       end
 
       def sync_material(material, handle)
@@ -512,6 +522,17 @@ module Three
         MATERIAL_TEXTURE_PARAMETERS.select { |ruby_name, _threejs_name| material.respond_to?(ruby_name) }
       end
 
+      def light_shadow_parameters(light)
+        parameters = {
+          map_size: light.shadow_map_size,
+          bias: light.shadow_bias,
+          normal_bias: light.shadow_normal_bias,
+          radius: light.shadow_radius
+        }
+        parameters[:camera] = light.shadow_camera if light.respond_to?(:shadow_camera)
+        parameters
+      end
+
       def texture_parameters(texture)
         {
           flip_y: texture.flip_y,
@@ -570,6 +591,13 @@ module Three
 
         def set_clear_color(renderer, color, alpha = 1)
           renderer.call(:setClearColor, color, alpha)
+        end
+
+        def set_renderer_shadow_map(renderer, enabled: nil, type: nil, auto_update: nil)
+          shadow_map = renderer[:shadowMap]
+          shadow_map[:enabled] = enabled unless enabled.nil?
+          shadow_map[:type] = type unless type.nil?
+          shadow_map[:autoUpdate] = auto_update unless auto_update.nil?
         end
 
         def set_animation_loop(renderer, callback)
@@ -765,6 +793,11 @@ module Three
           object[:visible] = visible
         end
 
+        def set_object_shadow(object, cast_shadow, receive_shadow)
+          object[:castShadow] = cast_shadow
+          object[:receiveShadow] = receive_shadow
+        end
+
         def set_object_transform(object, position, quaternion, scale)
           object[:position].call(:set, *position)
           object[:quaternion].call(:set, *quaternion)
@@ -805,6 +838,26 @@ module Three
         def update_hemisphere_light(light, sky_color, ground_color, intensity)
           update_light(light, sky_color, intensity)
           light[:groundColor].call(:setHex, ground_color)
+        end
+
+        def update_light_shadow(light, parameters)
+          shadow = light[:shadow]
+          return unless js_present?(shadow)
+
+          if parameters[:map_size]
+            shadow[:mapSize].call(:set, *parameters[:map_size])
+          end
+          shadow[:bias] = parameters[:bias] unless parameters[:bias].nil?
+          shadow[:normalBias] = parameters[:normal_bias] unless parameters[:normal_bias].nil?
+          shadow[:radius] = parameters[:radius] unless parameters[:radius].nil?
+
+          camera = shadow[:camera]
+          if js_present?(camera) && parameters[:camera]
+            parameters[:camera].each do |key, value|
+              camera[key] = value
+            end
+            camera.call(:updateProjectionMatrix)
+          end
         end
 
         def update_material(material, parameters)

@@ -22,4 +22,9 @@ module Three
   LinearMipMapNearestFilter = 1007
   LinearMipmapLinearFilter = 1008
   LinearMipMapLinearFilter = 1008
+
+  BasicShadowMap = 0
+  PCFShadowMap = 1
+  PCFSoftShadowMap = 2
+  VSMShadowMap = 3
 end

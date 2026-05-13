@@ -25,6 +25,8 @@ class ThreeLightTest < Minitest::Test
     assert_equal "DirectionalLight", light.type
     assert_vector3_in_delta [0, 1, 0], light.position
     assert_equal 2, light.intensity
+    assert_equal [512, 512], light.shadow_map_size
+    assert_equal({ left: -5, right: 5, top: 5, bottom: -5, near: 0.5, far: 500 }, light.shadow_camera)
   end
 
   def test_point_light_accepts_distance_and_decay
@@ -86,12 +88,31 @@ class ThreeLightTest < Minitest::Test
     assert_equal 0x445566, light.ground_color.hex
   end
 
+  def test_marks_dirty_when_shadow_options_change
+    light = Three::DirectionalLight.new
+    light.mark_clean!
+
+    light.shadow_map_size = [1024, 512]
+    light.shadow_bias = -0.0002
+    light.shadow_normal_bias = 0.02
+    light.shadow_radius = 2
+    light.set_shadow_camera(left: -4, right: 4, top: 3, bottom: -3, near: 0.2, far: 30)
+
+    assert light.dirty_field?(:shadow)
+    assert_equal [1024, 512], light.shadow_map_size
+    assert_equal(-0.0002, light.shadow_bias)
+    assert_equal 0.02, light.shadow_normal_bias
+    assert_equal 2, light.shadow_radius
+    assert_equal({ left: -4, right: 4, top: 3, bottom: -3, near: 0.2, far: 30 }, light.shadow_camera)
+  end
+
   def test_point_light_to_h
     light = Three::PointLight.new(0xffffff, 2, 8, 2)
 
     assert_equal "PointLight", light.to_h[:type]
     assert_equal 8, light.to_h[:distance]
     assert_equal 2, light.to_h[:decay]
+    assert_equal [512, 512], light.to_h[:shadow_map_size]
   end
 
   def test_hemisphere_light_to_h

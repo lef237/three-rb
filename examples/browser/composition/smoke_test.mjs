@@ -37,6 +37,8 @@ async function main() {
       controlsEnableDamping: globalThis.__threeRbControls?.enableDamping,
       controlsEnablePan: globalThis.__threeRbControls?.enablePan,
       controlsTarget: globalThis.__threeRbControls?.target?.toArray?.(),
+      shadowMapEnabled: globalThis.__threeRbRenderer?.shadowMap?.enabled,
+      shadowMapType: globalThis.__threeRbRenderer?.shadowMap?.type,
       textureType: globalThis.__threeRbTexture?.isTexture,
       materialTextureType: globalThis.__threeRbLambertMaterial?.map?.isTexture,
       materialTextureWidth: globalThis.__threeRbLambertMaterial?.map?.source?.data?.naturalWidth,
@@ -48,6 +50,13 @@ async function main() {
       sceneChildren: globalThis.__threeRbScene?.children?.length,
       ambientLightType: globalThis.__threeRbAmbientLight?.type,
       directionalLightType: globalThis.__threeRbDirectionalLight?.type,
+      directionalLightCastShadow: globalThis.__threeRbDirectionalLight?.castShadow,
+      directionalShadowMapWidth: globalThis.__threeRbDirectionalLight?.shadow?.mapSize?.width,
+      directionalShadowMapHeight: globalThis.__threeRbDirectionalLight?.shadow?.mapSize?.height,
+      directionalShadowBias: globalThis.__threeRbDirectionalLight?.shadow?.bias,
+      directionalShadowCameraLeft: globalThis.__threeRbDirectionalLight?.shadow?.camera?.left,
+      directionalShadowCameraFar: globalThis.__threeRbDirectionalLight?.shadow?.camera?.far,
+      directionalShadowMapReady: Boolean(globalThis.__threeRbDirectionalLight?.shadow?.map),
       pointLightType: globalThis.__threeRbPointLight?.type,
       pointLightDistance: globalThis.__threeRbPointLight?.distance,
       pointLightDecay: globalThis.__threeRbPointLight?.decay,
@@ -55,8 +64,10 @@ async function main() {
       hemisphereLightGroundColor: globalThis.__threeRbHemisphereLight?.groundColor?.getHex?.(),
       hemisphereLightIntensity: globalThis.__threeRbHemisphereLight?.intensity,
       planeGeometryType: globalThis.__threeRbPlane?.geometry?.type,
+      planeReceiveShadow: globalThis.__threeRbPlane?.receiveShadow,
       rigType: globalThis.__threeRbRig?.type,
       primaryParentType: globalThis.__threeRbPrimaryMesh?.parent?.type,
+      primaryCastShadow: globalThis.__threeRbPrimaryMesh?.castShadow,
       primaryMaterialType: globalThis.__threeRbPrimaryMesh?.material?.type,
       satelliteParentType: globalThis.__threeRbSatelliteMesh?.parent?.type,
       sphereParentType: globalThis.__threeRbSphereMesh?.parent?.type,
@@ -89,6 +100,9 @@ async function main() {
     if (scene.controlsType !== "OrbitControls" || scene.controlsEnableDamping !== true || scene.controlsEnablePan !== false) {
       throw new Error(`expected configured OrbitControls: ${JSON.stringify(scene)}`);
     }
+    if (scene.shadowMapEnabled !== true || scene.shadowMapType !== 1) {
+      throw new Error(`expected enabled PCF shadow mapping: ${JSON.stringify(scene)}`);
+    }
     if (scene.textureType !== true || scene.materialTextureType !== true || scene.materialTextureWidth <= 0) {
       throw new Error(`expected a loaded material texture: ${JSON.stringify(scene)}`);
     }
@@ -101,6 +115,15 @@ async function main() {
     if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight" || scene.pointLightType !== "PointLight" || scene.hemisphereLightType !== "HemisphereLight") {
       throw new Error(`expected ambient, directional, point, and hemisphere lights: ${JSON.stringify(scene)}`);
     }
+    if (scene.directionalLightCastShadow !== true || scene.directionalShadowMapWidth !== 1024 || scene.directionalShadowMapHeight !== 1024) {
+      throw new Error(`expected configured DirectionalLight shadow map: ${JSON.stringify(scene)}`);
+    }
+    if (scene.directionalShadowBias !== -0.0001 || scene.directionalShadowCameraLeft !== -3.2 || scene.directionalShadowCameraFar !== 12) {
+      throw new Error(`expected configured DirectionalLight shadow camera: ${JSON.stringify(scene)}`);
+    }
+    if (scene.directionalShadowMapReady !== true) {
+      throw new Error(`expected rendered DirectionalLight shadow map: ${JSON.stringify(scene)}`);
+    }
     if (scene.pointLightDistance !== 7 || scene.pointLightDecay !== 2) {
       throw new Error(`expected configured PointLight falloff: ${JSON.stringify(scene)}`);
     }
@@ -109,6 +132,9 @@ async function main() {
     }
     if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group" || scene.sphereParentType !== "Group" || scene.phongParentType !== "Group") {
       throw new Error(`expected grouped child meshes: ${JSON.stringify(scene)}`);
+    }
+    if (scene.planeReceiveShadow !== true || scene.primaryCastShadow !== true) {
+      throw new Error(`expected mesh shadow flags: ${JSON.stringify(scene)}`);
     }
     if (scene.primaryMaterialType !== "MeshLambertMaterial") {
       throw new Error(`expected a light-reactive MeshLambertMaterial primary mesh: ${JSON.stringify(scene)}`);

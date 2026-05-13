@@ -23,6 +23,10 @@ begin
 
   key_light = Three::DirectionalLight.new(0xffffff, 1.35)
   key_light.position.set(2.5, 3.0, 4.5)
+  key_light.cast_shadow = true
+  key_light.shadow_map_size = [1024, 1024]
+  key_light.shadow_bias = -0.0001
+  key_light.set_shadow_camera(left: -3.2, right: 3.2, top: 2.4, bottom: -2.4, near: 0.2, far: 12)
   scene.add(key_light)
 
   point_light = Three::PointLight.new(0x77a8ff, 0.8, 7, 2)
@@ -32,9 +36,10 @@ begin
   hemisphere_light = Three::HemisphereLight.new(0xdceeff, 0x1d2a20, 0.28)
   scene.add(hemisphere_light)
 
-  backdrop_material = Three::MeshBasicMaterial.new(color: 0x243141)
+  backdrop_material = Three::MeshLambertMaterial.new(color: 0x243141)
   backdrop = Three::Mesh.new(Three::PlaneGeometry.new(5.8, 3.4, width_segments: 2, height_segments: 2), backdrop_material)
   backdrop.position.z = -1.25
+  backdrop.receive_shadow = true
   scene.add(backdrop)
 
   rig = Three::Group.new
@@ -51,6 +56,7 @@ begin
   primary = Three::Mesh.new(Three::BoxGeometry.new(0.85, 0.85, 0.85), primary_material)
   primary.position.x = -0.55
   primary.position.z = 0.15
+  primary.cast_shadow = true
   rig.add(primary)
 
   satellite_material = Three::MeshNormalMaterial.new(flat_shading: true)
@@ -58,6 +64,7 @@ begin
   satellite.position.x = 1.35
   satellite.position.y = -0.7
   satellite.position.z = 0.45
+  satellite.cast_shadow = true
   rig.add(satellite)
 
   orb_material = Three::MeshStandardMaterial.new(color: 0x77a8ff, roughness: 0.38, metalness: 0.45)
@@ -65,6 +72,7 @@ begin
   orb.position.x = 0.25
   orb.position.y = 0.9
   orb.position.z = 0.35
+  orb.cast_shadow = true
   rig.add(orb)
 
   highlight_material = Three::MeshPhongMaterial.new(
@@ -77,13 +85,16 @@ begin
   highlight.position.x = -1.25
   highlight.position.y = 0.55
   highlight.position.z = 0.55
+  highlight.cast_shadow = true
   rig.add(highlight)
 
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
     antialias: true,
     alpha: false,
-    preserveDrawingBuffer: true
+    preserveDrawingBuffer: true,
+    shadow_map_enabled: true,
+    shadow_map_type: Three::PCFShadowMap
   )
   renderer.set_clear_color(0x0f1419, 1)
 

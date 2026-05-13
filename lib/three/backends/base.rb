@@ -15,6 +15,10 @@ module Three
         raise NotImplementedError
       end
 
+      def set_renderer_shadow_map(_renderer_handle, **_options)
+        raise NotImplementedError
+      end
+
       def traverse_handles(_object, &_block)
         raise NotImplementedError
       end
