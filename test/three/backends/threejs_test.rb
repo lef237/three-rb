@@ -366,6 +366,65 @@ class ThreeThreeJSBackendTest < Minitest::Test
     refute backend.handles.key?(texture.uuid)
   end
 
+  def test_traverse_handles_walks_external_object3d_handle
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    child = { type: :loaded_mesh, children: [{ type: :loaded_child, children: [] }] }
+    external = Three::ExternalObject3D.new({ type: :gltf_scene, children: [child] }, type: "GLTFScene")
+    visited = []
+
+    handle = backend.traverse_handles(external) { |node| visited << node[:type] }
+
+    assert_same external.handle, handle
+    assert_equal %i[gltf_scene loaded_mesh loaded_child], visited
+  end
+
+  def test_dispose_subtree_disposes_external_resources_and_removes_root
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    geometry = { type: :loaded_geometry }
+    texture = { type: :loaded_texture }
+    material = { type: :loaded_material, map: texture }
+    skeleton = { type: :loaded_skeleton }
+    mesh = { type: :loaded_mesh, geometry: geometry, material: material, skeleton: skeleton, children: [] }
+    external = Three::ExternalObject3D.new({ type: :gltf_scene, children: [mesh] }, type: "GLTFScene")
+    scene = Three::Scene.new
+    scene.add(external)
+    scene_handle = backend.sync(scene)
+    adapter.calls.clear
+
+    disposed = backend.dispose_subtree(external, dispose_textures: true)
+
+    assert_same external.handle, disposed
+    refute_includes scene.children, external
+    assert_nil external.parent
+    refute_includes scene_handle[:children], external.handle
+    refute backend.handles.key?(external.uuid)
+    assert_equal [
+      [:dispose, geometry],
+      [:dispose, material],
+      [:dispose, texture],
+      [:dispose, skeleton]
+    ], adapter.calls
+  end
+
+  def test_dispose_subtree_keeps_textures_by_default_at_backend_layer
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    geometry = { type: :loaded_geometry }
+    texture = { type: :loaded_texture }
+    material = { type: :loaded_material, map: texture }
+    mesh = { type: :loaded_mesh, geometry: geometry, material: material, children: [] }
+    external = Three::ExternalObject3D.new({ type: :gltf_scene, children: [mesh] }, type: "GLTFScene")
+
+    backend.dispose_subtree(external)
+
+    assert_equal [
+      [:dispose, geometry],
+      [:dispose, material]
+    ], adapter.calls
+  end
+
   def test_sync_skips_clean_object_updates
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

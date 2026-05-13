@@ -124,7 +124,48 @@ module Three
         handle
       end
 
+      def traverse_handles(object, &block)
+        return enum_for(:traverse_handles, object) unless block
+
+        handle = object3d_handle(object)
+        @adapter.traverse_object3d(handle, block)
+        handle
+      end
+
+      def dispose_subtree(
+        object,
+        remove: true,
+        dispose_geometries: true,
+        dispose_materials: true,
+        dispose_textures: false,
+        dispose_skeletons: true
+      )
+        handle = object3d_handle(object)
+        @adapter.dispose_object3d_subtree(
+          handle,
+          remove: remove,
+          dispose_geometries: dispose_geometries,
+          dispose_materials: dispose_materials,
+          dispose_textures: dispose_textures,
+          dispose_skeletons: dispose_skeletons
+        )
+        object.remove_from_parent if remove && object.respond_to?(:remove_from_parent)
+        release_cached_subtree_handles(
+          object,
+          dispose_geometries: dispose_geometries,
+          dispose_materials: dispose_materials,
+          dispose_textures: dispose_textures
+        )
+        handle
+      end
+
       private
+
+      def object3d_handle(object)
+        raise TypeError, "object must be a Three::Object3D" unless object.is_a?(Object3D)
+
+        sync(object)
+      end
 
       def cache_key(object)
         object.respond_to?(:uuid) ? object.uuid : nil
@@ -364,6 +405,47 @@ module Three
         material_textures(material).each { |texture| dispose(texture) }
       end
 
+      def release_cached_subtree_handles(object, dispose_geometries:, dispose_materials:, dispose_textures:)
+        if object.respond_to?(:traverse)
+          object.traverse do |node|
+            release_cached_object_handles(
+              node,
+              dispose_geometries: dispose_geometries,
+              dispose_materials: dispose_materials,
+              dispose_textures: dispose_textures
+            )
+          end
+        else
+          key = cache_key(object)
+          @handles.delete(key) if key
+        end
+      end
+
+      def release_cached_object_handles(object, dispose_geometries:, dispose_materials:, dispose_textures:)
+        key = cache_key(object)
+        @handles.delete(key) if key
+
+        if object.is_a?(Mesh)
+          release_cached_resource(object.geometry) if dispose_geometries
+          release_cached_material(object.material, dispose_textures: dispose_textures) if dispose_materials
+        end
+
+        return unless object.is_a?(Scene) && dispose_textures
+
+        release_cached_resource(object.background)
+        release_cached_resource(object.environment)
+      end
+
+      def release_cached_material(material, dispose_textures:)
+        release_cached_resource(material)
+        material_textures(material).each { |texture| release_cached_resource(texture) } if dispose_textures
+      end
+
+      def release_cached_resource(resource)
+        key = cache_key(resource)
+        @handles.delete(key) if key
+      end
+
       def material_textures(material)
         return [] unless material.respond_to?(:map)
 
@@ -412,6 +494,32 @@ module Three
       end
 
       class RubyWasmAdapter
+        TEXTURE_SLOTS = %w[
+          map
+          normalMap
+          roughnessMap
+          metalnessMap
+          aoMap
+          emissiveMap
+          alphaMap
+          bumpMap
+          displacementMap
+          envMap
+          lightMap
+          specularMap
+          clearcoatMap
+          clearcoatNormalMap
+          clearcoatRoughnessMap
+          transmissionMap
+          thicknessMap
+          iridescenceMap
+          iridescenceThicknessMap
+          sheenColorMap
+          sheenRoughnessMap
+          specularColorMap
+          specularIntensityMap
+        ].freeze
+
         def initialize(three: nil)
           @three = three || default_three
         end
@@ -698,6 +806,46 @@ module Three
           handle.call(:dispose) if handle.respond_to?(:call)
         end
 
+        def traverse_object3d(object, callback)
+          object.call(:traverse, callback)
+          object
+        end
+
+        def dispose_object3d_subtree(
+          object,
+          remove: true,
+          dispose_geometries: true,
+          dispose_materials: true,
+          dispose_textures: false,
+          dispose_skeletons: true
+        )
+          resources = {
+            geometries: JS.global[:Set].new,
+            materials: JS.global[:Set].new,
+            textures: JS.global[:Set].new,
+            skeletons: JS.global[:Set].new
+          }
+
+          traverse_object3d(object, proc do |node|
+            collect_object3d_resources(
+              node,
+              resources,
+              dispose_geometries: dispose_geometries,
+              dispose_materials: dispose_materials,
+              dispose_textures: dispose_textures,
+              dispose_skeletons: dispose_skeletons
+            )
+          end)
+
+          remove_from_js_parent(object) if remove
+
+          dispose_js_set(resources[:geometries])
+          dispose_js_set(resources[:materials])
+          dispose_js_set(resources[:textures])
+          dispose_js_set(resources[:skeletons])
+          object
+        end
+
         private
 
         def default_three
@@ -759,6 +907,69 @@ module Three
         def js_vector_to_a(vector, length)
           array = vector.call(:toArray)
           length.times.map { |index| array[index].to_f }
+        end
+
+        def collect_object3d_resources(node, resources, dispose_geometries:, dispose_materials:, dispose_textures:, dispose_skeletons:)
+          if dispose_geometries
+            geometry = node[:geometry]
+            resources[:geometries].call(:add, geometry) if js_present?(geometry)
+          end
+
+          if dispose_materials
+            collect_materials(node[:material], resources, dispose_textures: dispose_textures)
+          end
+
+          if dispose_textures
+            collect_texture(node[:background], resources)
+            collect_texture(node[:environment], resources)
+          end
+
+          return unless dispose_skeletons
+
+          skeleton = node[:skeleton]
+          resources[:skeletons].call(:add, skeleton) if js_present?(skeleton)
+        end
+
+        def collect_materials(material, resources, dispose_textures:)
+          return unless js_present?(material)
+
+          if JS.global[:Array].call(:isArray, material) == JS::True
+            material[:length].to_i.times do |index|
+              collect_material(material[index], resources, dispose_textures: dispose_textures)
+            end
+          else
+            collect_material(material, resources, dispose_textures: dispose_textures)
+          end
+        end
+
+        def collect_material(material, resources, dispose_textures:)
+          return unless js_present?(material)
+
+          resources[:materials].call(:add, material)
+          return unless dispose_textures
+
+          TEXTURE_SLOTS.each { |slot| collect_texture(material[slot], resources) }
+        end
+
+        def collect_texture(texture, resources)
+          resources[:textures].call(:add, texture) if js_present?(texture)
+        end
+
+        def dispose_js_set(resources)
+          resources.call(:forEach, proc { |resource| dispose(resource) })
+        end
+
+        def remove_from_js_parent(object)
+          parent = object[:parent]
+          parent.call(:remove, object) if js_present?(parent)
+        end
+
+        def js_present?(object)
+          return false if object.nil?
+          return false if object == JS::Undefined || object == JS::Null
+          return false if object.respond_to?(:typeof) && object.typeof == "undefined"
+
+          true
         end
       end
     end

@@ -29,6 +29,24 @@ Important local files:
 - `test/three/objects/external_object3d_test.rb`
 - `test/three/backends/threejs_test.rb`
 
+## Implementation Status
+
+The recommended design has been implemented for the current loaded-asset MVP:
+
+- `ExternalObject3D#add`, `#remove`, and `#clear` now reject Ruby child mutation.
+- `Three::Backends::ThreeJS#traverse_handles` traverses backend object handles without changing `Object3D#traverse`.
+- `Three::Renderers::ThreeJSRenderer#traverse_handles` exposes the same traversal at renderer scope.
+- `Three::Backends::ThreeJS#dispose_subtree` delegates subtree cleanup to the backend adapter.
+- `Three::Renderers::ThreeJSRenderer#dispose_subtree` provides high-level loaded-asset cleanup and defaults `dispose_textures` to `true`.
+- `RubyWasmAdapter` collects unique geometries, materials, common material texture slots, scene background/environment textures, and skeletons before disposing.
+- `FakeThreeJSAdapter` mirrors this behavior for unit tests.
+- `examples/browser/gltf/smoke_test.mjs` verifies that the Ruby renderer API detaches a loaded glTF root and dispatches geometry/material/texture dispose events.
+
+Remaining work:
+
+- The Ruby material model still exposes only the texture slots currently implemented by Ruby material classes. Broaden Ruby-side ownership helpers as more material texture slots are added.
+- If future APIs need to inspect or edit loaded child objects, design explicit wrapper types instead of changing `Object3D#traverse`.
+
 ## Decision
 
 Keep loaded three.js assets opaque by default.

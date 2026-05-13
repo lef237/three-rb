@@ -1,6 +1,32 @@
 # frozen_string_literal: true
 
 class FakeThreeJSAdapter
+  TEXTURE_SLOTS = %i[
+    map
+    normalMap
+    roughnessMap
+    metalnessMap
+    aoMap
+    emissiveMap
+    alphaMap
+    bumpMap
+    displacementMap
+    envMap
+    lightMap
+    specularMap
+    clearcoatMap
+    clearcoatNormalMap
+    clearcoatRoughnessMap
+    transmissionMap
+    thicknessMap
+    iridescenceMap
+    iridescenceThicknessMap
+    sheenColorMap
+    sheenRoughnessMap
+    specularColorMap
+    specularIntensityMap
+  ].freeze
+
   attr_reader :calls
 
   def initialize
@@ -283,10 +309,12 @@ class FakeThreeJSAdapter
   def add_child(parent, child)
     @calls << [:add_child, parent, child]
     parent[:children] << child unless parent[:children].include?(child)
+    child[:parent] = parent
   end
 
   def clear_children(parent)
     @calls << [:clear_children, parent]
+    parent[:children].each { |child| child.delete(:parent) }
     parent[:children].clear
   end
 
@@ -304,9 +332,91 @@ class FakeThreeJSAdapter
     @calls << [:dispose, handle]
   end
 
+  def traverse_object3d(object, callback)
+    callback.call(object)
+    object.fetch(:children, []).dup.each { |child| traverse_object3d(child, callback) }
+    object
+  end
+
+  def dispose_object3d_subtree(
+    object,
+    remove: true,
+    dispose_geometries: true,
+    dispose_materials: true,
+    dispose_textures: false,
+    dispose_skeletons: true
+  )
+    resources = {
+      geometries: [],
+      materials: [],
+      textures: [],
+      skeletons: []
+    }
+
+    traverse_object3d(object, proc do |node|
+      collect_object3d_resources(
+        node,
+        resources,
+        dispose_geometries: dispose_geometries,
+        dispose_materials: dispose_materials,
+        dispose_textures: dispose_textures,
+        dispose_skeletons: dispose_skeletons
+      )
+    end)
+
+    remove_from_parent(object) if remove
+
+    resources[:geometries].each { |resource| dispose(resource) }
+    resources[:materials].each { |resource| dispose(resource) }
+    resources[:textures].each { |resource| dispose(resource) }
+    resources[:skeletons].each { |resource| dispose(resource) }
+    object
+  end
+
   private
 
   def handle(type, attributes = {})
     { type: type }.merge(attributes)
+  end
+
+  def collect_object3d_resources(node, resources, dispose_geometries:, dispose_materials:, dispose_textures:, dispose_skeletons:)
+    add_unique(resources[:geometries], node[:geometry]) if dispose_geometries && node[:geometry]
+    collect_materials(node[:material], resources, dispose_textures: dispose_textures) if dispose_materials
+
+    if dispose_textures
+      add_unique(resources[:textures], node[:background]) if node[:background]
+      add_unique(resources[:textures], node[:environment]) if node[:environment]
+    end
+
+    add_unique(resources[:skeletons], node[:skeleton]) if dispose_skeletons && node[:skeleton]
+  end
+
+  def collect_materials(material, resources, dispose_textures:)
+    return unless material
+
+    entries = material.is_a?(Array) ? material : [material]
+    entries.each do |entry|
+      add_unique(resources[:materials], entry)
+      collect_material_textures(entry, resources) if dispose_textures
+    end
+  end
+
+  def collect_material_textures(material, resources)
+    TEXTURE_SLOTS.each do |slot|
+      texture = material[slot] || material.dig(:parameters, slot)
+      add_unique(resources[:textures], texture) if texture
+    end
+  end
+
+  def add_unique(resources, resource)
+    resources << resource unless resources.include?(resource)
+  end
+
+  def remove_from_parent(object)
+    parent = object[:parent]
+    return unless parent
+
+    parent[:children].delete(object)
+    object.delete(:parent)
   end
 end

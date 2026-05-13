@@ -12,5 +12,17 @@ module Three
       @type = type
       mark_clean!
     end
+
+    def add(*)
+      raise NotImplementedError, "ExternalObject3D does not support Ruby child mutation yet"
+    end
+
+    def remove(*)
+      raise NotImplementedError, "ExternalObject3D does not support Ruby child mutation yet"
+    end
+
+    def clear
+      raise NotImplementedError, "ExternalObject3D does not support Ruby child mutation yet"
+    end
   end
 end

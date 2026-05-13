@@ -501,14 +501,15 @@ Current implementation status:
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
 - `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial#map` on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
-- `examples/browser/gltf` focuses on `GLTFLoader` and adding a loaded external scene to the Ruby-authored scene graph.
+- `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, and disposing the loaded subtree through the renderer API.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
-- Loaded asset traversal/disposal design is documented in `docs/loaded-assets-design.md`.
-- The next implementation step is broadening resource ownership helpers or adding more external-object ergonomics around loaded assets.
+- `Three::Renderers::ThreeJSRenderer#traverse_handles` and `#dispose_subtree` expose loaded-asset traversal and cleanup without changing Ruby `Object3D#traverse`.
+- Loaded asset traversal/disposal design and implementation status are documented in `docs/loaded-assets-design.md`.
+- The next implementation step is broadening Ruby-side resource ownership helpers as more material texture slots are modeled.
 
 Recommended structure:
 
@@ -614,11 +615,13 @@ Important details:
 - Do not depend on ruby.wasm networking for asset loading; let JavaScript `fetch` and three.js loaders handle it.
 - Avoid loading binary assets into Ruby when a JavaScript loader result can be wrapped.
 - Keep loaded three.js assets opaque by default; see `docs/loaded-assets-design.md` for the `ExternalObject3D` traversal and disposal design.
+- Use `renderer.dispose_subtree(gltf.scene, remove: true)` for high-level loaded-asset cleanup. The renderer defaults to disposing textures; the lower backend API keeps texture disposal opt-in.
 
 Completion criteria:
 
 - Textures can be assigned to materials.
 - glTF models can be added to a scene.
+- Loaded glTF model resources can be explicitly disposed.
 
 ### Phase 8: Renderer Maturity
 
@@ -791,8 +794,8 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Guard `ExternalObject3D` child mutation and add external subtree disposal helpers as described in `docs/loaded-assets-design.md`.
-2. Expand resource ownership helpers beyond single material maps when more texture slots exist.
+1. Expand Ruby-side resource ownership helpers beyond single material maps as more material texture slots are introduced.
+2. Add more addon loaders only when an example or API target needs them.
 3. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open

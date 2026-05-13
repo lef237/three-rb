@@ -14,6 +14,14 @@ module Three
       def dispose(_object, **_options)
         raise NotImplementedError
       end
+
+      def traverse_handles(_object, &_block)
+        raise NotImplementedError
+      end
+
+      def dispose_subtree(_object, **_options)
+        raise NotImplementedError
+      end
     end
   end
 end

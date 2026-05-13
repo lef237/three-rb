@@ -55,6 +55,10 @@ begin
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
   JS.global[:__threeRbGltfScene] = renderer.backend.materialize(model)
   JS.global[:__threeRbGltfFrame] = 0
+  JS.global[:__threeRbDisposeGltf] = proc do
+    renderer.dispose_subtree(model, remove: true, dispose_textures: true)
+    JS.global[:__threeRbGltfDisposed] = true
+  end
 
   frame = 0
   renderer.animation_loop do

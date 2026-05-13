@@ -43,6 +43,32 @@ module Three
         @backend.dispose(object, **options)
         self
       end
+
+      def traverse_handles(object, &block)
+        return enum_for(:traverse_handles, object) unless block
+
+        @backend.traverse_handles(object, &block)
+        self
+      end
+
+      def dispose_subtree(
+        object,
+        remove: true,
+        dispose_geometries: true,
+        dispose_materials: true,
+        dispose_textures: true,
+        dispose_skeletons: true
+      )
+        @backend.dispose_subtree(
+          object,
+          remove: remove,
+          dispose_geometries: dispose_geometries,
+          dispose_materials: dispose_materials,
+          dispose_textures: dispose_textures,
+          dispose_skeletons: dispose_skeletons
+        )
+        self
+      end
     end
   end
 end

@@ -75,4 +75,31 @@ class ThreeThreeJSRendererTest < Minitest::Test
       [:dispose, material_handle]
     ], adapter.calls
   end
+
+  def test_traverse_handles_delegates_to_backend
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+    external = Three::ExternalObject3D.new({ type: :gltf_scene, children: [{ type: :loaded_mesh, children: [] }] }, type: "GLTFScene")
+    visited = []
+
+    assert_same renderer, renderer.traverse_handles(external) { |node| visited << node[:type] }
+    assert_equal %i[gltf_scene loaded_mesh], visited
+  end
+
+  def test_dispose_subtree_defaults_to_texture_cleanup
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+    texture = { type: :loaded_texture }
+    material = { type: :loaded_material, map: texture }
+    mesh = { type: :loaded_mesh, material: material, children: [] }
+    external = Three::ExternalObject3D.new({ type: :gltf_scene, children: [mesh] }, type: "GLTFScene")
+
+    assert_same renderer, renderer.dispose_subtree(external)
+    assert_equal [
+      [:dispose, material],
+      [:dispose, texture]
+    ], adapter.calls
+  end
 end

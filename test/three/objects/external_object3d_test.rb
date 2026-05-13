@@ -22,4 +22,14 @@ class ThreeExternalObject3DTest < Minitest::Test
     assert_includes scene.children, object
     assert object.dirty_field?(:transform)
   end
+
+  def test_rejects_ruby_child_mutation
+    object = Three::ExternalObject3D.new({ type: :gltf_scene }, type: "GLTFScene")
+    child = Three::Object3D.new
+
+    assert_raises(NotImplementedError) { object.add(child) }
+    assert_raises(NotImplementedError) { object.remove(child) }
+    assert_raises(NotImplementedError) { object.clear }
+    assert_empty object.children
+  end
 end

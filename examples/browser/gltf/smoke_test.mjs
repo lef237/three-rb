@@ -52,6 +52,65 @@ async function main() {
       throw new Error(`glTF example animation did not advance: ${JSON.stringify(scene)}`);
     }
 
+    const disposal = await page.evaluate(() => {
+      const root = globalThis.__threeRbGltfScene;
+      const rootScene = globalThis.__threeRbGltfRootScene;
+      const stats = {
+        geometries: 0,
+        materials: 0,
+        textures: 0,
+        geometryDisposeEvents: 0,
+        materialDisposeEvents: 0,
+        textureDisposeEvents: 0
+      };
+
+      root.traverse((object) => {
+        if (object.geometry) {
+          stats.geometries += 1;
+          object.geometry.addEventListener("dispose", () => {
+            stats.geometryDisposeEvents += 1;
+          });
+        }
+
+        const materials = Array.isArray(object.material) ? object.material : [object.material].filter(Boolean);
+        for (const material of materials) {
+          stats.materials += 1;
+          material.addEventListener("dispose", () => {
+            stats.materialDisposeEvents += 1;
+          });
+
+          if (material.map) {
+            stats.textures += 1;
+            material.map.addEventListener("dispose", () => {
+              stats.textureDisposeEvents += 1;
+            });
+          }
+        }
+      });
+
+      globalThis.__threeRbDisposeGltf();
+
+      return {
+        ...stats,
+        disposed: globalThis.__threeRbGltfDisposed,
+        rootParent: root.parent?.type ?? null,
+        rootSceneStillContainsRoot: rootScene.children.includes(root)
+      };
+    });
+
+    if (disposal.disposed !== true || disposal.rootParent !== null || disposal.rootSceneStillContainsRoot) {
+      throw new Error(`dispose_subtree did not detach the glTF root: ${JSON.stringify(disposal)}`);
+    }
+    if (disposal.geometries < 1 || disposal.geometryDisposeEvents !== disposal.geometries) {
+      throw new Error(`dispose_subtree did not dispose loaded geometries: ${JSON.stringify(disposal)}`);
+    }
+    if (disposal.materials < 1 || disposal.materialDisposeEvents !== disposal.materials) {
+      throw new Error(`dispose_subtree did not dispose loaded materials: ${JSON.stringify(disposal)}`);
+    }
+    if (disposal.textureDisposeEvents !== disposal.textures) {
+      throw new Error(`dispose_subtree did not dispose loaded textures: ${JSON.stringify(disposal)}`);
+    }
+
     assertNoDiagnostics(diagnostics);
 
     console.log(`glTF smoke test passed at ${server.url}/examples/browser/gltf/`);
