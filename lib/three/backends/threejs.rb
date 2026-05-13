@@ -13,6 +13,7 @@ require_relative "../lights/point_light"
 require_relative "../materials/mesh_basic_material"
 require_relative "../materials/mesh_lambert_material"
 require_relative "../materials/mesh_normal_material"
+require_relative "../materials/mesh_phong_material"
 require_relative "../materials/mesh_standard_material"
 require_relative "../objects/external_object3d"
 require_relative "../objects/mesh"
@@ -35,8 +36,11 @@ module Three
         light_map: :lightMap,
         metalness_map: :metalnessMap,
         normal_map: :normalMap,
-        roughness_map: :roughnessMap
+        roughness_map: :roughnessMap,
+        specular_map: :specularMap
       }.freeze
+
+      MATERIAL_COLOR_PARAMETERS = %i[color emissive specular].freeze
 
       attr_reader :adapter, :handles
 
@@ -244,6 +248,8 @@ module Three
           @adapter.new_mesh_lambert_material(material_parameters(object))
         when MeshNormalMaterial
           @adapter.new_mesh_normal_material(material_parameters(object))
+        when MeshPhongMaterial
+          @adapter.new_mesh_phong_material(material_parameters(object))
         when MeshStandardMaterial
           @adapter.new_mesh_standard_material(material_parameters(object))
         when Group
@@ -488,6 +494,9 @@ module Three
           side: material.side
         }
         parameters[:color] = material.color.hex if material.respond_to?(:color)
+        parameters[:emissive] = material.emissive.hex if material.respond_to?(:emissive)
+        parameters[:specular] = material.specular.hex if material.respond_to?(:specular)
+        parameters[:shininess] = material.shininess if material.respond_to?(:shininess)
         parameters[:roughness] = material.roughness if material.respond_to?(:roughness)
         parameters[:metalness] = material.metalness if material.respond_to?(:metalness)
         material_texture_parameters(material).each do |ruby_name, threejs_name|
@@ -740,6 +749,10 @@ module Three
           @three[:MeshNormalMaterial].new(stringify_keys(parameters))
         end
 
+        def new_mesh_phong_material(parameters)
+          @three[:MeshPhongMaterial].new(stringify_keys(parameters))
+        end
+
         def new_mesh_standard_material(parameters)
           @three[:MeshStandardMaterial].new(stringify_keys(parameters))
         end
@@ -796,10 +809,8 @@ module Three
 
         def update_material(material, parameters)
           parameters.each do |key, value|
-            if key == :color
-              material[:color].call(:setHex, value)
-            elsif key == :map
-              material[:map] = value
+            if MATERIAL_COLOR_PARAMETERS.include?(key)
+              material[key].call(:setHex, value)
             else
               material[key] = value
             end

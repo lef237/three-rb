@@ -111,6 +111,31 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal true, handle[:parameters][:flatShading]
   end
 
+  def test_materializes_mesh_phong_material
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    specular_map = Three::Texture.new("/specular.png")
+    material = Three::MeshPhongMaterial.new(
+      color: 0x224466,
+      specular: 0xe8f1ff,
+      emissive: 0x111827,
+      shininess: 64,
+      map: Three::Texture.new("/texture.png"),
+      specular_map: specular_map,
+      flat_shading: true
+    )
+
+    handle = backend.materialize(material)
+
+    assert_equal :mesh_phong_material, handle[:type]
+    assert_equal 0x224466, handle[:parameters][:color]
+    assert_equal 0xe8f1ff, handle[:parameters][:specular]
+    assert_equal 0x111827, handle[:parameters][:emissive]
+    assert_equal 64, handle[:parameters][:shininess]
+    assert_equal "/texture.png", handle[:parameters][:map][:source]
+    assert_equal "/specular.png", handle[:parameters][:specularMap][:source]
+    assert_equal true, handle[:parameters][:flatShading]
+  end
+
   def test_materializes_mesh_standard_material
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     normal_map = Three::Texture.new("/normal.png")
@@ -488,6 +513,25 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal :update_material, adapter.calls.last[0]
     assert_equal 0.25, adapter.calls.last[2][:roughness]
     assert_equal 0.85, adapter.calls.last[2][:metalness]
+  end
+
+  def test_sync_updates_dirty_mesh_phong_material_parameters
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    material = Three::MeshPhongMaterial.new(specular: 0x111111, emissive: 0x000000, shininess: 30)
+
+    backend.sync(material)
+    adapter.calls.clear
+
+    material.specular.set_hex(0xf0f6ff)
+    material.emissive.set_hex(0x101820)
+    material.shininess = 92
+    backend.sync(material)
+
+    assert_equal :update_material, adapter.calls.last[0]
+    assert_equal 0xf0f6ff, adapter.calls.last[2][:specular]
+    assert_equal 0x101820, adapter.calls.last[2][:emissive]
+    assert_equal 92, adapter.calls.last[2][:shininess]
   end
 
   def test_sync_updates_dirty_material_texture_even_when_material_is_clean

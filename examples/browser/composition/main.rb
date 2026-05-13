@@ -67,6 +67,18 @@ begin
   orb.position.z = 0.35
   rig.add(orb)
 
+  highlight_material = Three::MeshPhongMaterial.new(
+    color: 0xdce7ff,
+    specular: 0xffffff,
+    shininess: 72,
+    specular_map: primary_texture
+  )
+  highlight = Three::Mesh.new(Three::SphereGeometry.new(0.18, width_segments: 12, height_segments: 8), highlight_material)
+  highlight.position.x = -1.25
+  highlight.position.y = 0.55
+  highlight.position.z = 0.55
+  rig.add(highlight)
+
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
     antialias: true,
@@ -115,11 +127,13 @@ begin
   JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)
   JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)
   JS.global[:__threeRbSphereMesh] = renderer.backend.materialize(orb)
+  JS.global[:__threeRbPhongMesh] = renderer.backend.materialize(highlight)
   JS.global[:__threeRbTexture] = renderer.backend.materialize(primary_texture)
   JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbLambertMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)
   JS.global[:__threeRbStandardMaterial] = renderer.backend.materialize(orb_material)
+  JS.global[:__threeRbPhongMaterial] = renderer.backend.materialize(highlight_material)
   JS.global[:__threeRbMaterialDisposeEvent] = false
   JS.global[:__threeRbTextureDisposeEvent] = false
 
@@ -144,6 +158,7 @@ begin
     satellite.rotation.y -= 0.025
     orb.rotation.x += 0.018
     orb.rotation.y -= 0.013
+    highlight.rotation.y += 0.021
 
     pulse = (Math.sin(frame * 0.045) + 1) / 2.0
     primary_material.color.set_rgb(0.25 + (0.35 * pulse), 0.55 + (0.25 * pulse), 0.42)

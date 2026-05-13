@@ -62,6 +62,12 @@ async function main() {
       sphereParentType: globalThis.__threeRbSphereMesh?.parent?.type,
       sphereGeometryType: globalThis.__threeRbSphereMesh?.geometry?.type,
       sphereMaterialType: globalThis.__threeRbSphereMesh?.material?.type,
+      phongParentType: globalThis.__threeRbPhongMesh?.parent?.type,
+      phongGeometryType: globalThis.__threeRbPhongMesh?.geometry?.type,
+      phongMaterialType: globalThis.__threeRbPhongMesh?.material?.type,
+      phongSpecular: globalThis.__threeRbPhongMaterial?.specular?.getHex?.(),
+      phongShininess: globalThis.__threeRbPhongMaterial?.shininess,
+      phongSpecularMapType: globalThis.__threeRbPhongMaterial?.specularMap?.isTexture,
       satelliteMaterialType: globalThis.__threeRbSatelliteMesh?.material?.type,
       normalMaterialFlatShading: globalThis.__threeRbNormalMaterial?.flatShading,
       standardMaterialRoughness: globalThis.__threeRbStandardMaterial?.roughness,
@@ -101,7 +107,7 @@ async function main() {
     if (scene.hemisphereLightGroundColor !== 0x1d2a20 || scene.hemisphereLightIntensity !== 0.28) {
       throw new Error(`expected configured HemisphereLight: ${JSON.stringify(scene)}`);
     }
-    if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group" || scene.sphereParentType !== "Group") {
+    if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group" || scene.sphereParentType !== "Group" || scene.phongParentType !== "Group") {
       throw new Error(`expected grouped child meshes: ${JSON.stringify(scene)}`);
     }
     if (scene.primaryMaterialType !== "MeshLambertMaterial") {
@@ -112,6 +118,12 @@ async function main() {
     }
     if (scene.sphereMaterialType !== "MeshStandardMaterial" || scene.standardMaterialRoughness !== 0.38 || scene.standardMaterialMetalness !== 0.45) {
       throw new Error(`expected a configured MeshStandardMaterial sphere: ${JSON.stringify(scene)}`);
+    }
+    if (scene.phongGeometryType !== "SphereGeometry" || scene.phongMaterialType !== "MeshPhongMaterial") {
+      throw new Error(`expected a MeshPhongMaterial highlight sphere: ${JSON.stringify(scene)}`);
+    }
+    if (scene.phongSpecular !== 0xffffff || scene.phongShininess !== 72 || scene.phongSpecularMapType !== true) {
+      throw new Error(`expected configured MeshPhongMaterial specular settings: ${JSON.stringify(scene)}`);
     }
     if (scene.satelliteMaterialType !== "MeshNormalMaterial" || scene.normalMaterialFlatShading !== true) {
       throw new Error(`expected a flat-shaded MeshNormalMaterial satellite: ${JSON.stringify(scene)}`);

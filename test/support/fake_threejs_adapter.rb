@@ -239,6 +239,10 @@ class FakeThreeJSAdapter
     handle(:mesh_normal_material, parameters: parameters.dup)
   end
 
+  def new_mesh_phong_material(parameters)
+    handle(:mesh_phong_material, parameters: parameters.dup)
+  end
+
   def new_mesh_standard_material(parameters)
     handle(:mesh_standard_material, parameters: parameters.dup)
   end

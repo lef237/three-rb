@@ -498,7 +498,7 @@ Current implementation status:
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
-- `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
+- `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshPhongMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
 - `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial` base/PBR texture maps on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, and disposing the loaded subtree through the renderer API.
@@ -510,6 +510,7 @@ Current implementation status:
 - `Three::Renderers::ThreeJSRenderer#traverse_handles` and `#dispose_subtree` expose loaded-asset traversal and cleanup without changing Ruby `Object3D#traverse`.
 - Loaded asset traversal/disposal design and implementation status are documented in `docs/loaded-assets-design.md`.
 - `MeshStandardMaterial` supports common Ruby-side PBR texture slots such as `normal_map`, `roughness_map`, and `metalness_map`, and backend resource ownership helpers track all modeled texture slots.
+- `MeshPhongMaterial` supports specular color, emissive color, shininess, and common Phong texture slots including `specular_map`.
 - The next implementation step is adding more material classes or addon loaders only when an example or API target needs them.
 
 Recommended structure:
