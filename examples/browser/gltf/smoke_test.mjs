@@ -21,7 +21,8 @@ async function main() {
     await page.goto(`${server.url}/examples/browser/gltf/`, { waitUntil: "load" });
     await waitForRunning(page, diagnostics);
     await page.waitForFunction(
-      () => globalThis.__threeRbGltfScene?.children?.length > 0,
+      () => globalThis.__threeRbGltfScene?.children?.length > 0 &&
+        globalThis.__threeRbCompressedGltfScene?.children?.length > 0,
       null,
       { timeout: 10_000 }
     );
@@ -42,7 +43,12 @@ async function main() {
       rootChildren: globalThis.__threeRbGltfRootScene?.children?.length,
       gltfType: globalThis.__threeRbGltfScene?.type,
       gltfIsObject3D: globalThis.__threeRbGltfScene?.isObject3D,
-      gltfChildren: globalThis.__threeRbGltfScene?.children?.length
+      gltfChildren: globalThis.__threeRbGltfScene?.children?.length,
+      compressedGltfType: globalThis.__threeRbCompressedGltfScene?.type,
+      compressedGltfIsObject3D: globalThis.__threeRbCompressedGltfScene?.isObject3D,
+      compressedGltfChildren: globalThis.__threeRbCompressedGltfScene?.children?.length,
+      compressedGeometryAttributes: Object.keys(globalThis.__threeRbCompressedGltfScene?.children?.[0]?.geometry?.attributes || {}),
+      compressedDecoderPath: globalThis.__threeRbCompressedGltfDecoderPath
     }));
 
     if (scene.cameraType !== "PerspectiveCamera") {
@@ -50,6 +56,12 @@ async function main() {
     }
     if (scene.gltfIsObject3D !== true || scene.gltfChildren < 1) {
       throw new Error(`expected a loaded glTF Object3D scene: ${JSON.stringify(scene)}`);
+    }
+    if (scene.compressedGltfIsObject3D !== true || scene.compressedGltfChildren < 1) {
+      throw new Error(`expected a Draco-compressed glTF Object3D scene: ${JSON.stringify(scene)}`);
+    }
+    if (!scene.compressedGeometryAttributes.includes("position") || !scene.compressedDecoderPath.endsWith("/draco/gltf/")) {
+      throw new Error(`Draco-compressed glTF geometry was not decoded: ${JSON.stringify(scene)}`);
     }
     if (!scene.renderInfo || scene.renderInfo.triangles < 1) {
       throw new Error(`renderer did not draw the glTF triangle: ${JSON.stringify(scene)}`);
@@ -69,6 +81,7 @@ async function main() {
 
     const disposal = await page.evaluate(() => {
       const root = globalThis.__threeRbGltfScene;
+      const compressedRoot = globalThis.__threeRbCompressedGltfScene;
       const rootScene = globalThis.__threeRbGltfRootScene;
       const stats = {
         geometries: 0,
@@ -79,7 +92,7 @@ async function main() {
         textureDisposeEvents: 0
       };
 
-      root.traverse((object) => {
+      [root, compressedRoot].forEach((loadedRoot) => loadedRoot.traverse((object) => {
         if (object.geometry) {
           stats.geometries += 1;
           object.geometry.addEventListener("dispose", () => {
@@ -101,7 +114,7 @@ async function main() {
             });
           }
         }
-      });
+      }));
 
       globalThis.__threeRbDisposeGltf();
 
@@ -109,11 +122,19 @@ async function main() {
         ...stats,
         disposed: globalThis.__threeRbGltfDisposed,
         rootParent: root.parent?.type ?? null,
-        rootSceneStillContainsRoot: rootScene.children.includes(root)
+        compressedRootParent: compressedRoot.parent?.type ?? null,
+        rootSceneStillContainsRoot: rootScene.children.includes(root),
+        rootSceneStillContainsCompressedRoot: rootScene.children.includes(compressedRoot)
       };
     });
 
-    if (disposal.disposed !== true || disposal.rootParent !== null || disposal.rootSceneStillContainsRoot) {
+    if (
+      disposal.disposed !== true ||
+      disposal.rootParent !== null ||
+      disposal.compressedRootParent !== null ||
+      disposal.rootSceneStillContainsRoot ||
+      disposal.rootSceneStillContainsCompressedRoot
+    ) {
       throw new Error(`dispose_subtree did not detach the glTF root: ${JSON.stringify(disposal)}`);
     }
     if (disposal.geometries < 1 || disposal.geometryDisposeEvents !== disposal.geometries) {

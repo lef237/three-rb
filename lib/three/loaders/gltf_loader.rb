@@ -26,12 +26,18 @@ module Three
     end
 
     class GLTFLoader
-      def initialize(adapter: nil, backend: nil)
+      def initialize(adapter: nil, backend: nil, draco_decoder_path: nil, draco_decoder_config: nil)
         @adapter = adapter || backend&.adapter || Backends::ThreeJS::RubyWasmAdapter.new
+        @draco_decoder_path = draco_decoder_path
+        @draco_decoder_config = draco_decoder_config
       end
 
       def load(source)
-        result = @adapter.load_gltf(source)
+        result = @adapter.load_gltf(
+          source,
+          draco_decoder_path: @draco_decoder_path,
+          draco_decoder_config: @draco_decoder_config
+        )
         result = result.await if result.respond_to?(:await)
         gltf = GLTF.new(result, adapter: @adapter)
         yield gltf if block_given?

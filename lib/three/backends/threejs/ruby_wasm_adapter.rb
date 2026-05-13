@@ -112,8 +112,10 @@ module Three
           texture
         end
 
-        def load_gltf(source)
-          gltf_loader_constructor.new.call(:loadAsync, source)
+        def load_gltf(source, draco_decoder_path: nil, draco_decoder_config: nil)
+          loader = gltf_loader_constructor.new
+          configure_draco_loader(loader, draco_decoder_path, draco_decoder_config) if draco_decoder_path
+          loader.call(:loadAsync, source)
         end
 
         def gltf_animations(gltf)
@@ -604,6 +606,23 @@ module Three
           constructor
         rescue LoadError
           raise RuntimeError, "Three::Loaders::GLTFLoader requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def draco_loader_constructor
+          require "js"
+          constructor = JS.global[:THREE_DRACO_LOADER]
+          raise RuntimeError, "Three::Loaders::GLTFLoader with DRACO requires globalThis.THREE_DRACO_LOADER" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Loaders::GLTFLoader with DRACO requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def configure_draco_loader(loader, decoder_path, decoder_config)
+          draco_loader = draco_loader_constructor.new
+          draco_loader.call(:setDecoderPath, decoder_path)
+          draco_loader.call(:setDecoderConfig, stringify_keys(decoder_config)) if decoder_config
+          loader.call(:setDRACOLoader, draco_loader)
         end
 
         def rgbe_loader_constructor

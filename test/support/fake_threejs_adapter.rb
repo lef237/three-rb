@@ -99,10 +99,12 @@ class FakeThreeJSAdapter
     handle(:rgbe_texture, { source: source }.merge(parameters))
   end
 
-  def load_gltf(source)
+  def load_gltf(source, draco_decoder_path: nil, draco_decoder_config: nil)
     handle(
       :gltf,
       source: source,
+      draco_decoder_path: draco_decoder_path,
+      draco_decoder_config: draco_decoder_config,
       scene: handle(:gltf_scene, children: []),
       animations: [
         handle(:animation_clip, name: "Spin", duration: 1.5)

@@ -34,8 +34,19 @@ begin
 
   gltf = Three::Loaders::GLTFLoader.new(backend: renderer.backend).load("/examples/browser/assets/animated_triangle.gltf")
   model = gltf.scene
+  model.position.x = -0.75
   model.scale.set(1.2, 1.2, 1.2)
   scene.add(model)
+
+  draco_decoder_path = "/node_modules/three/examples/jsm/libs/draco/gltf/"
+  compressed_gltf = Three::Loaders::GLTFLoader.new(
+    backend: renderer.backend,
+    draco_decoder_path: draco_decoder_path
+  ).load("/examples/browser/assets/compressed_triangle.gltf")
+  compressed_model = compressed_gltf.scene
+  compressed_model.position.x = 1.05
+  compressed_model.scale.set(0.82, 0.82, 0.82)
+  scene.add(compressed_model)
 
   clock = Three::Clock.new
   mixer = Three::AnimationMixer.new(model, backend: renderer.backend)
@@ -59,6 +70,8 @@ begin
   JS.global[:__threeRbGltfRootScene] = renderer.backend.materialize(scene)
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
   JS.global[:__threeRbGltfScene] = renderer.backend.materialize(model)
+  JS.global[:__threeRbCompressedGltfScene] = renderer.backend.materialize(compressed_model)
+  JS.global[:__threeRbCompressedGltfDecoderPath] = draco_decoder_path
   JS.global[:__threeRbGltfAnimations] = gltf.animations.length
   JS.global[:__threeRbGltfAnimationName] = gltf.animations.first&.name
   JS.global[:__threeRbGltfAnimationDuration] = gltf.animations.first&.duration
@@ -70,6 +83,7 @@ begin
     mixer.stop_all_action
     mixer.uncache_root
     renderer.dispose_subtree(model, remove: true, dispose_textures: true)
+    renderer.dispose_subtree(compressed_model, remove: true, dispose_textures: true)
     JS.global[:__threeRbGltfDisposed] = true
   end
 

@@ -501,7 +501,7 @@ Current implementation status:
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, directional shadow mapping, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshPhongMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
 - `examples/browser/textures` focuses on `TextureLoader`, `RGBELoader`, repeat/wrap/filter/UV-transform settings, `MeshPhysicalMaterial` standard/physical texture maps, and an HDR environment texture on a textured cube.
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
-- `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, playing loaded animation clips through `AnimationMixer`, and disposing the loaded subtree through the renderer API.
+- `examples/browser/gltf` focuses on `GLTFLoader`, optional `DRACOLoader` decoder configuration for compressed geometry, adding loaded external scenes to the Ruby-authored scene graph, playing loaded animation clips through `AnimationMixer`, and disposing loaded subtrees through the renderer API.
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
 - `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
 - `examples/browser/primitives` focuses on `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
@@ -517,6 +517,7 @@ Current implementation status:
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
 - `Three::Renderers::ThreeJSRenderer#traverse_handles` and `#dispose_subtree` expose loaded-asset traversal and cleanup without changing Ruby `Object3D#traverse`.
 - Loaded asset traversal/disposal design and implementation status are documented in `docs/loaded-assets-design.md`.
+- `Three::Loaders::GLTFLoader` can configure a JavaScript `DRACOLoader` through `draco_decoder_path:` and optional `draco_decoder_config:`. This keeps compressed glTF support in the existing delegated-loader boundary instead of adding a Ruby decoder.
 - `MeshStandardMaterial` supports common Ruby-side PBR texture slots such as `normal_map`, `roughness_map`, and `metalness_map`, and backend resource ownership helpers track all modeled texture slots.
 - `MeshPhysicalMaterial` extends `MeshStandardMaterial` with anisotropy, clearcoat, transmission, iridescence, sheen, dispersion, specular, attenuation parameters, physical texture slots, backend sync, JSON export/load, and browser smoke coverage.
 - `MeshPhongMaterial` supports specular color, emissive color, shininess, and common Phong texture slots including `specular_map`.
@@ -524,7 +525,8 @@ Current implementation status:
 - The Three.js backend internals are split into materialization, synchronization, parameter conversion, resource management, and ruby.wasm adapter files so renderer additions do not keep growing one monolithic backend file.
 - `MeshPhysicalMaterial` was prioritized before additional addon loaders because it extends the existing material, texture-slot, JSON, disposal, and browser-smoke boundaries without adding new decoder or renderer-pipeline constraints.
 - `RGBELoader`/`RGBETexture` was prioritized after `MeshPhysicalMaterial` because HDR environment maps directly improve PBR and physical-material scenes while reusing the existing texture, scene environment, JSON, and browser-smoke boundaries.
-- The next implementation step is adding more material classes or addon loaders only when an example or API target needs them; based on current coverage, `DRACOLoader` should wait until a compressed glTF fixture is introduced, while postprocessing should wait for a dedicated render-pipeline example.
+- `DRACOLoader` was prioritized before postprocessing because a compressed glTF fixture can verify it through the existing GLTFLoader, ExternalObject3D, loaded-asset disposal, and browser-smoke paths with a small API addition. Postprocessing should wait for a dedicated render-pipeline example because it introduces composer/pass ownership decisions.
+- The next implementation step is adding more material classes or addon loaders only when an example or API target needs them; based on current coverage, postprocessing should wait for a dedicated render-pipeline example and KTX2 should wait until texture-compression fixture coverage is needed.
 
 Recommended structure:
 
@@ -620,6 +622,7 @@ Implemented delegate loaders so far:
 2. `CubeTextureLoader`
 3. `RGBELoader`
 4. `GLTFLoader`
+5. `DRACOLoader` through `GLTFLoader#draco_decoder_path`
 
 Loader priority:
 
@@ -840,7 +843,7 @@ The MVP is complete when:
 ## Next Tasks
 
 1. Prefer feature work that has visible user value, reuses the current Three.js backend boundary, and can be verified by deterministic browser smoke tests.
-2. Add `DRACOLoader` only with a compressed glTF fixture, or postprocessing only with a dedicated render-pipeline example; otherwise add the next material class or addon loader only when a concrete example or API target needs it.
+2. Add postprocessing only with a dedicated render-pipeline example; add KTX2 or other decoder loaders only with fixtures that require them.
 3. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable.
 4. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
 5. Keep reviewing low-risk dependency updates after checking their CI results.

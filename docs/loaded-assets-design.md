@@ -12,7 +12,7 @@ Repository state when this decision was written:
   - `3bc389d Add CubeTexture loader`
   - `9b6307c Add renderer disposal helper`
 - Current implementation:
-  - `Three::Loaders::GLTFLoader` delegates to JavaScript `GLTFLoader#loadAsync`.
+  - `Three::Loaders::GLTFLoader` delegates to JavaScript `GLTFLoader#loadAsync` and can attach JavaScript `DRACOLoader` when `draco_decoder_path:` is configured.
   - `Three::Loaders::GLTF#scene` is a `Three::ExternalObject3D`.
   - `Three::ExternalObject3D` stores a loaded JavaScript `Object3D` handle.
   - `Three::Backends::ThreeJS#materialize` returns that handle directly for `ExternalObject3D`.
@@ -40,7 +40,7 @@ The recommended design has been implemented for the current loaded-asset MVP:
 - `Three::Renderers::ThreeJSRenderer#dispose_subtree` provides high-level loaded-asset cleanup and defaults `dispose_textures` to `true`.
 - `RubyWasmAdapter` collects unique geometries, materials, common material texture slots, scene background/environment textures, and skeletons before disposing.
 - `FakeThreeJSAdapter` mirrors this behavior for unit tests.
-- `examples/browser/gltf/smoke_test.mjs` verifies that the Ruby renderer API detaches a loaded glTF root and dispatches geometry/material/texture dispose events.
+- `examples/browser/gltf/smoke_test.mjs` verifies that the Ruby renderer API decodes a Draco-compressed glTF fixture, detaches loaded glTF roots, and dispatches geometry/material/texture dispose events.
 
 Remaining work:
 

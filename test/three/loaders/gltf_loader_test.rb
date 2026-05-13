@@ -27,4 +27,18 @@ class ThreeGLTFLoaderTest < Minitest::Test
 
     assert_same gltf, yielded
   end
+
+  def test_load_can_configure_draco_decoder
+    adapter = FakeThreeJSAdapter.new
+
+    gltf = Three::Loaders::GLTFLoader.new(
+      adapter: adapter,
+      draco_decoder_path: "/node_modules/three/examples/jsm/libs/draco/gltf/",
+      draco_decoder_config: { type: "wasm" }
+    ).load("/compressed.gltf")
+
+    assert_equal "/compressed.gltf", gltf.handle[:source]
+    assert_equal "/node_modules/three/examples/jsm/libs/draco/gltf/", gltf.handle[:draco_decoder_path]
+    assert_equal({ type: "wasm" }, gltf.handle[:draco_decoder_config])
+  end
 end
