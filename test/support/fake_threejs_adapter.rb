@@ -15,6 +15,10 @@ class FakeThreeJSAdapter
     @calls << [:set_renderer_size, renderer, width, height]
   end
 
+  def set_clear_color(renderer, color, alpha = 1)
+    @calls << [:set_clear_color, renderer, color, alpha]
+  end
+
   def set_animation_loop(renderer, callback)
     @calls << [:set_animation_loop, renderer, callback]
   end

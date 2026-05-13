@@ -496,8 +496,9 @@ Current implementation status:
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
 - The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, generic `BufferGeometry`, `BufferAttribute`, and `MeshBasicMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
-- `examples/browser/cube` loads ruby.wasm and three.js in the browser, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
-- The next implementation step is an automated browser smoke test for the cube example.
+- `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
+- `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
+- The next implementation step is running the smoke test in CI and tightening `RubyWasmAdapter` based on real-browser failures.
 
 Recommended structure:
 
@@ -769,7 +770,7 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add an automated browser smoke test for `examples/browser/cube`.
+1. Run the browser smoke test in CI with Playwright browsers installed.
 2. Verify the ruby.wasm bridge in a real browser and tighten `RubyWasmAdapter` where needed.
 3. Add dirty tracking so the backend can avoid full scene syncing on every render.
 
@@ -778,9 +779,9 @@ The MVP is complete when:
 Before implementation begins, decide:
 
 - Whether to start with `minitest` or `rspec`.
-- Whether browser examples should use local npm installs or CDN imports.
+- Browser examples should use pnpm-managed local browser dependencies for ruby.wasm and three.js, avoiding CDN runtime drift and browser ORB failures.
 - Whether camelCase aliases should exist from the first release or be added later.
 - Whether geometry arrays should use `numo-narray` or start with standard `Array`.
 - Whether the published gem name should be `three.rb`, `three-rb`, or `three`.
 
-Current recommendation: use `minitest`, CDN imports, defer camelCase aliases, start with standard `Array`, and publish as `three.rb`.
+Current recommendation: use `minitest`, pnpm-managed browser dependencies, defer camelCase aliases, start with standard `Array`, and publish as `three.rb`.

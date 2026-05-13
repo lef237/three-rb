@@ -18,6 +18,11 @@ module Three
         self
       end
 
+      def set_clear_color(color, alpha = 1)
+        @backend.set_clear_color(@handle, color, alpha)
+        self
+      end
+
       def animation_loop(&block)
         @backend.set_animation_loop(@handle, block)
         self

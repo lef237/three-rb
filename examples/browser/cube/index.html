@@ -91,28 +91,50 @@
     <script type="importmap">
       {
         "imports": {
-          "three": "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js"
+          "@bjorn3/browser_wasi_shim": "/node_modules/@bjorn3/browser_wasi_shim/dist/index.js",
+          "@ruby/wasm-wasi/browser": "/node_modules/@ruby/wasm-wasi/dist/esm/browser.js",
+          "three": "/node_modules/three/build/three.module.js"
         }
       }
     </script>
     <script type="module">
-      globalThis.__threeReady = import("three").then((module) => {
-        globalThis.THREE = module;
-        return module;
+      const status = document.querySelector("#status");
+      const statusDot = document.querySelector("#status-dot");
+
+      globalThis.__threeRbSetStatus = (message, state) => {
+        if (status) status.textContent = message;
+        if (statusDot) statusDot.dataset.state = state;
+      };
+
+      globalThis.__threeRbBootFailed = (message) => {
+        globalThis.__threeRbSetStatus(message, "error");
+      };
+
+      globalThis.addEventListener("error", (event) => {
+        globalThis.__threeRbBootFailed(event.message || "Browser error");
       });
+
+      globalThis.addEventListener("unhandledrejection", (event) => {
+        const reason = event.reason;
+        globalThis.__threeRbBootFailed(reason && reason.message ? reason.message : "Ruby boot failed");
+      });
+
+      globalThis.setTimeout(() => {
+        if (status && status.textContent === "Loading ruby.wasm") {
+          status.textContent = "Still loading ruby.wasm";
+        }
+      }, 15000);
+
+      globalThis.__threeRbSetStatus("Loading ruby.wasm", "loading");
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@2.9.4/dist/browser.script.iife.js"></script>
-    <script type="text/ruby" data-eval="async">
-      require "js/require_remote/relative_shim"
-      require_relative "main"
-    </script>
+    <script type="module" src="./boot.mjs"></script>
   </head>
   <body>
     <main class="viewport" id="viewport">
-      <canvas id="scene"></canvas>
+      <canvas id="scene" data-testid="scene-canvas"></canvas>
       <div class="hud" aria-live="polite">
         <span class="status-dot" id="status-dot"></span>
-        <span id="status">Loading ruby.wasm</span>
+        <span id="status" data-testid="status">Loading ruby.wasm</span>
       </div>
     </main>
   </body>

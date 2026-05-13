@@ -26,6 +26,10 @@ module Three
         @adapter.set_renderer_size(renderer_handle, width, height)
       end
 
+      def set_clear_color(renderer_handle, color, alpha = 1)
+        @adapter.set_clear_color(renderer_handle, color, alpha)
+      end
+
       def set_animation_loop(renderer_handle, callback)
         @adapter.set_animation_loop(renderer_handle, callback)
       end
@@ -165,8 +169,8 @@ module Three
         end
 
         def new_webgl_renderer(options = {})
-          parameters = {}
-          parameters[:canvas] = resolve_canvas(options[:canvas]) if options[:canvas]
+          parameters = stringify_keys(options)
+          parameters["canvas"] = resolve_canvas(options[:canvas] || options["canvas"]) if options[:canvas] || options["canvas"]
           @three[:WebGLRenderer].new(parameters)
         end
 
@@ -174,12 +178,24 @@ module Three
           renderer.call(:setSize, width, height)
         end
 
+        def set_clear_color(renderer, color, alpha = 1)
+          renderer.call(:setClearColor, color, alpha)
+        end
+
         def set_animation_loop(renderer, callback)
           renderer.call(:setAnimationLoop, callback)
         end
 
         def render(renderer, scene, camera)
-          renderer.call(:render, scene, camera)
+          render_helper = JS.global[:__threeRbRender]
+          if render_helper.typeof == "function"
+            JS.global[:__threeRbCurrentRenderer] = renderer
+            JS.global[:__threeRbCurrentScene] = scene
+            JS.global[:__threeRbCurrentCamera] = camera
+            JS.global.call(:__threeRbRender)
+          else
+            renderer.call(:render, scene, camera)
+          end
         end
 
         def new_scene
@@ -232,7 +248,7 @@ module Three
         end
 
         def new_mesh_basic_material(parameters)
-          @three[:MeshBasicMaterial].new(parameters)
+          @three[:MeshBasicMaterial].new(stringify_keys(parameters))
         end
 
         def set_object_name(object, name)
@@ -259,7 +275,13 @@ module Three
         end
 
         def update_material(material, parameters)
-          parameters.each { |key, value| material[key] = value }
+          parameters.each do |key, value|
+            if key == :color
+              material[:color].call(:setHex, value)
+            else
+              material[key] = value
+            end
+          end
           material[:needsUpdate] = true
         end
 
@@ -295,6 +317,12 @@ module Three
             else JS.global[:Array]
             end
           constructor.new(array)
+        end
+
+        def stringify_keys(hash)
+          hash.each_with_object({}) do |(key, value), result|
+            result[key.to_s] = value
+          end
         end
       end
     end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "json"
 
 class ThreeBrowserCubeExampleTest < Minitest::Test
   ROOT = File.expand_path("../../..", __dir__)
@@ -10,15 +11,18 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_path_exists File.join(EXAMPLE_DIR, "index.html")
     assert_path_exists File.join(EXAMPLE_DIR, "main.rb")
     assert_path_exists File.join(EXAMPLE_DIR, "README.md")
+    assert_path_exists File.join(EXAMPLE_DIR, "smoke_test.mjs")
   end
 
   def test_index_loads_pinned_browser_dependencies
     html = File.read(File.join(EXAMPLE_DIR, "index.html"))
 
-    assert_includes html, "three@0.184.0"
-    assert_includes html, "@ruby/3.4-wasm-wasi@2.9.4"
-    assert_includes html, "data-eval=\"async\""
-    assert_includes html, "globalThis.THREE"
+    assert_includes html, "/node_modules/three/build/three.module.js"
+    assert_includes html, "/node_modules/@bjorn3/browser_wasi_shim/dist/index.js"
+    assert_includes html, "/node_modules/@ruby/wasm-wasi/dist/esm/browser.js"
+    assert_includes html, "./boot.mjs"
+    assert_includes html, "data-testid=\"status\""
+    assert_includes html, "data-testid=\"scene-canvas\""
   end
 
   def test_main_uses_three_rb_renderer
@@ -28,5 +32,18 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::Renderers::ThreeJSRenderer"
     assert_includes ruby, "renderer.animation_loop"
     assert_includes ruby, "renderer.render(scene, camera)"
+    assert_includes ruby, "preserveDrawingBuffer: true"
+  end
+
+  def test_package_script_runs_browser_smoke_test
+    package = JSON.parse(File.read(File.join(ROOT, "package.json")))
+
+    assert_match(/\Apnpm@/, package.fetch("packageManager"))
+    assert_equal "0.4.2", package.fetch("dependencies").fetch("@bjorn3/browser_wasi_shim")
+    assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/3.4-wasm-wasi")
+    assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/wasm-wasi")
+    assert_equal "0.184.0", package.fetch("dependencies").fetch("three")
+    assert_equal "node examples/browser/cube/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cube")
+    assert_includes package.fetch("devDependencies"), "playwright"
   end
 end

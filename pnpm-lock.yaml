@@ -1,0 +1,86 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@bjorn3/browser_wasi_shim':
+        specifier: 0.4.2
+        version: 0.4.2
+      '@ruby/3.4-wasm-wasi':
+        specifier: 2.9.4-2026-05-11-a
+        version: 2.9.4-2026-05-11-a
+      '@ruby/wasm-wasi':
+        specifier: 2.9.4-2026-05-11-a
+        version: 2.9.4-2026-05-11-a
+      three:
+        specifier: 0.184.0
+        version: 0.184.0
+    devDependencies:
+      playwright:
+        specifier: ^1.60.0
+        version: 1.60.0
+
+packages:
+
+  '@bjorn3/browser_wasi_shim@0.4.2':
+    resolution: {integrity: sha512-/iHkCVUG3VbcbmEHn5iIUpIrh7a7WPiwZ3sHy4HZKZzBdSadwdddYDZAII2zBvQYV0Lfi8naZngPCN7WPHI/hA==}
+
+  '@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a':
+    resolution: {integrity: sha512-qI32iuHxb1onVbbbfnZHOI109P13ZpvQf4KEMk4XyzVIDKYNHzJzwvRcZm6uPjtv9ekLeJBSSeqqImRP/sDNqQ==}
+
+  '@ruby/wasm-wasi@2.9.4-2026-05-11-a':
+    resolution: {integrity: sha512-DpS1BJFYldhSmy1gGa0GwD4cYw8qTu6FblQq6JVF0VVh+3ONPcvMGPHpVvwPeMve4tEsMkM6hOyTO8HshTcQ8Q==}
+
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
+  playwright-core@1.60.0:
+    resolution: {integrity: sha512-9bW6zvX/m0lEbgTKJ6YppOKx8H3VOPBMOCFh2irXFOT4BbHgrx5hPjwJYLT40Lu+4qtD36qKc/Hn56StUW57IA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.60.0:
+    resolution: {integrity: sha512-hheHdokM8cdqCb0lcE3s+zT4t4W+vvjpGxsZlDnikarzx8tSzMebh3UiFtgqwFwnTnjYQcsyMF8ei2mCO/tpeA==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  three@0.184.0:
+    resolution: {integrity: sha512-wtTRjG92pM5eUg/KuUnHsqSAlPM296brTOcLgMRqEeylYTh/CdtvKUvCyyCQTzFuStieWxvZb8mVTMvdPyUpxg==}
+
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+snapshots:
+
+  '@bjorn3/browser_wasi_shim@0.4.2': {}
+
+  '@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a':
+    dependencies:
+      '@ruby/wasm-wasi': 2.9.4-2026-05-11-a
+
+  '@ruby/wasm-wasi@2.9.4-2026-05-11-a':
+    dependencies:
+      '@bjorn3/browser_wasi_shim': 0.4.2
+      tslib: 2.8.1
+
+  fsevents@2.3.2:
+    optional: true
+
+  playwright-core@1.60.0: {}
+
+  playwright@1.60.0:
+    dependencies:
+      playwright-core: 1.60.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
+  three@0.184.0: {}
+
+  tslib@2.8.1: {}
