@@ -78,3 +78,4 @@ pnpm test:browser
 ## Documents
 
 - [Implementation Plan](docs/implementation-plan.md)
+- [Loaded Asset Traversal and Disposal Design](docs/loaded-assets-design.md)

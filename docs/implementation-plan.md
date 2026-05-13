@@ -507,6 +507,7 @@ Current implementation status:
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
+- Loaded asset traversal/disposal design is documented in `docs/loaded-assets-design.md`.
 - The next implementation step is broadening resource ownership helpers or adding more external-object ergonomics around loaded assets.
 
 Recommended structure:
@@ -612,6 +613,7 @@ Important details:
 
 - Do not depend on ruby.wasm networking for asset loading; let JavaScript `fetch` and three.js loaders handle it.
 - Avoid loading binary assets into Ruby when a JavaScript loader result can be wrapped.
+- Keep loaded three.js assets opaque by default; see `docs/loaded-assets-design.md` for the `ExternalObject3D` traversal and disposal design.
 
 Completion criteria:
 
@@ -789,8 +791,8 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Expand resource ownership helpers beyond single material maps when more texture slots exist.
-2. Add external-object ergonomics for loaded assets, such as traversal adapters or disposal helpers.
+1. Guard `ExternalObject3D` child mutation and add external subtree disposal helpers as described in `docs/loaded-assets-design.md`.
+2. Expand resource ownership helpers beyond single material maps when more texture slots exist.
 3. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open
