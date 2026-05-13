@@ -96,4 +96,21 @@ class ThreeVector3Test < Minitest::Test
     refute a.equals?(b)
     assert a.equals?(b, epsilon: 0.01)
   end
+
+  def test_apply_quaternion
+    quaternion = Three::Quaternion.new.set_from_axis_angle(Three::Vector3.new(0, 1, 0), Math::PI / 2)
+    vector = Three::Vector3.new(1, 0, 0)
+
+    vector.apply_quaternion(quaternion)
+
+    assert_vector3_in_delta [0, 0, -1], vector
+  end
+
+  def test_matrix_array_helpers
+    matrix = Three::Matrix4.new.make_translation(1, 2, 3)
+    vector = Three::Vector3.new.set_from_matrix_position(matrix)
+
+    assert_equal [1, 2, 3], vector.to_a
+    assert_equal [nil, 1, 2, 3], vector.to_array([nil], 1)
+  end
 end

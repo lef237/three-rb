@@ -210,6 +210,71 @@ module Three
       dx * dx + dy * dy + dz * dz
     end
 
+    def apply_matrix4(matrix)
+      elements = matrix.elements
+      x = @x
+      y = @y
+      z = @z
+      w = 1.0 / (elements[3] * x + elements[7] * y + elements[11] * z + elements[15])
+
+      @x = (elements[0] * x + elements[4] * y + elements[8] * z + elements[12]) * w
+      @y = (elements[1] * x + elements[5] * y + elements[9] * z + elements[13]) * w
+      @z = (elements[2] * x + elements[6] * y + elements[10] * z + elements[14]) * w
+      self
+    end
+
+    def apply_quaternion(quaternion)
+      vx = @x
+      vy = @y
+      vz = @z
+      qx = quaternion.x
+      qy = quaternion.y
+      qz = quaternion.z
+      qw = quaternion.w
+
+      tx = 2 * (qy * vz - qz * vy)
+      ty = 2 * (qz * vx - qx * vz)
+      tz = 2 * (qx * vy - qy * vx)
+
+      @x = vx + qw * tx + qy * tz - qz * ty
+      @y = vy + qw * ty + qz * tx - qx * tz
+      @z = vz + qw * tz + qx * ty - qy * tx
+      self
+    end
+
+    def set_from_matrix_position(matrix)
+      elements = matrix.elements
+      @x = elements[12]
+      @y = elements[13]
+      @z = elements[14]
+      self
+    end
+
+    def set_from_matrix_scale(matrix)
+      sx = set_from_matrix_column(matrix, 0).length
+      sy = set_from_matrix_column(matrix, 1).length
+      sz = set_from_matrix_column(matrix, 2).length
+      set(sx, sy, sz)
+    end
+
+    def set_from_matrix_column(matrix, index)
+      from_array(matrix.elements, index * 4)
+    end
+
+    def from_array(array, offset = 0)
+      @x = array[offset]
+      @y = array[offset + 1]
+      @z = array[offset + 2]
+      self
+    end
+
+    def to_array(array = [], offset = 0)
+      array[offset] = @x
+      array[offset + 1] = @y
+      array[offset + 2] = @z
+      array
+    end
+
     def equals?(vector, epsilon: 0.0)
       (@x - vector.x).abs <= epsilon &&
         (@y - vector.y).abs <= epsilon &&
