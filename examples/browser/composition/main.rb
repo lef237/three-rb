@@ -62,6 +62,15 @@ begin
   )
   renderer.set_clear_color(0x0f1419, 1)
 
+  controls = Three::Controls::OrbitControls.new(
+    camera,
+    renderer: renderer,
+    enable_damping: true,
+    damping_factor: 0.08,
+    enable_pan: false
+  )
+  controls.target.set(0, 0, 0)
+
   resize = proc do
     width = [viewport[:clientWidth].to_i, 1].max
     height = [viewport[:clientHeight].to_i, 1].max
@@ -81,6 +90,7 @@ begin
   renderer.render(scene, camera)
 
   JS.global[:__threeRbRenderer] = renderer.handle
+  JS.global[:__threeRbControls] = controls.handle
   JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
   JS.global[:__threeRbAmbientLight] = renderer.backend.materialize(ambient_light)
@@ -110,6 +120,7 @@ begin
     primary_material.color.set_rgb(0.25 + (0.35 * pulse), 0.55 + (0.25 * pulse), 0.42)
 
     JS.global[:__threeRbCompositionFrame] = frame
+    controls.update
     renderer.render(scene, camera)
   end
 

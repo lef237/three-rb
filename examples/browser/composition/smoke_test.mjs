@@ -28,6 +28,10 @@ async function main() {
       frame: globalThis.__threeRbCompositionFrame,
       renderInfo: globalThis.__threeRbRenderer?.info?.render,
       cameraType: globalThis.__threeRbCamera?.type,
+      controlsType: globalThis.__threeRbControls?.constructor?.name,
+      controlsEnableDamping: globalThis.__threeRbControls?.enableDamping,
+      controlsEnablePan: globalThis.__threeRbControls?.enablePan,
+      controlsTarget: globalThis.__threeRbControls?.target?.toArray?.(),
       sceneChildren: globalThis.__threeRbScene?.children?.length,
       ambientLightType: globalThis.__threeRbAmbientLight?.type,
       directionalLightType: globalThis.__threeRbDirectionalLight?.type,
@@ -50,6 +54,9 @@ async function main() {
     if (scene.cameraType !== "OrthographicCamera") {
       throw new Error(`expected an OrthographicCamera composition view: ${JSON.stringify(scene)}`);
     }
+    if (scene.controlsType !== "OrbitControls" || scene.controlsEnableDamping !== true || scene.controlsEnablePan !== false) {
+      throw new Error(`expected configured OrbitControls: ${JSON.stringify(scene)}`);
+    }
     if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight") {
       throw new Error(`expected ambient and directional lights: ${JSON.stringify(scene)}`);
     }
@@ -71,6 +78,17 @@ async function main() {
     if (!scene.frame || scene.currentMaterialColor === scene.initialMaterialColor) {
       throw new Error(`material color did not change after animation frames: ${JSON.stringify(scene)}`);
     }
+
+    const beforeDrag = await page.evaluate(() => globalThis.__threeRbCamera?.position?.toArray?.());
+    await page.mouse.move(480, 270);
+    await page.mouse.down();
+    await page.mouse.move(620, 300, { steps: 12 });
+    await page.mouse.up();
+    await page.waitForTimeout(500);
+    const afterDrag = await page.evaluate(() => globalThis.__threeRbCamera?.position?.toArray?.());
+    if (!cameraPositionChanged(beforeDrag, afterDrag)) {
+      throw new Error(`OrbitControls drag did not move the camera: ${JSON.stringify({ beforeDrag, afterDrag })}`);
+    }
     assertNoDiagnostics(diagnostics);
 
     console.log(`composition smoke test passed at ${server.url}/examples/browser/composition/`);
@@ -84,3 +102,9 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+function cameraPositionChanged(before, after) {
+  if (!Array.isArray(before) || !Array.isArray(after)) return false;
+
+  return before.some((value, index) => Math.abs(value - after[index]) > 0.001);
+}

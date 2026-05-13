@@ -35,6 +35,13 @@ class ThreeThreeJSRendererTest < Minitest::Test
     assert_equal [:set_clear_color, renderer.handle, 0x101418, 1], adapter.calls.last
   end
 
+  def test_dom_element_delegates_to_backend
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+
+    assert_equal :dom_element, renderer.dom_element[:type]
+  end
+
   def test_render_updates_matrices_and_delegates
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

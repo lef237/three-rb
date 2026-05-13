@@ -18,6 +18,10 @@ module Three
         self
       end
 
+      def dom_element
+        @backend.renderer_dom_element(@handle)
+      end
+
       def set_clear_color(color, alpha = 1)
         @backend.set_clear_color(@handle, color, alpha)
         self

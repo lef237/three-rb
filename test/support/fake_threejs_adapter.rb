@@ -8,7 +8,11 @@ class FakeThreeJSAdapter
   end
 
   def new_webgl_renderer(options = {})
-    handle(:renderer, options: options)
+    handle(:renderer, options: options, dom_element: handle(:dom_element))
+  end
+
+  def renderer_dom_element(renderer)
+    renderer[:dom_element]
   end
 
   def set_renderer_size(renderer, width, height)
@@ -25,6 +29,36 @@ class FakeThreeJSAdapter
 
   def render(renderer, scene, camera)
     @calls << [:render, renderer, scene, camera]
+  end
+
+  def new_orbit_controls(camera, dom_element)
+    handle(:orbit_controls, camera: camera, dom_element: dom_element, target: [0, 0, 0])
+  end
+
+  def set_control_property(control, name, value)
+    @calls << [:set_control_property, control, name, value]
+    control[name.to_sym] = value
+  end
+
+  def set_orbit_controls_target(control, target)
+    @calls << [:set_orbit_controls_target, control, target]
+    control[:target] = target
+  end
+
+  def update_controls(control)
+    @calls << [:update_controls, control]
+  end
+
+  def dispose_controls(control)
+    @calls << [:dispose_controls, control]
+  end
+
+  def object_transform(object)
+    [
+      object[:position] || [0, 0, 0],
+      object[:quaternion] || [0, 0, 0, 1],
+      object[:scale] || [1, 1, 1]
+    ]
   end
 
   def new_scene

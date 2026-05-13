@@ -30,6 +30,10 @@ module Three
         @adapter.new_webgl_renderer({ canvas: canvas }.merge(options))
       end
 
+      def renderer_dom_element(renderer_handle)
+        @adapter.renderer_dom_element(renderer_handle)
+      end
+
       def set_renderer_size(renderer_handle, width, height)
         @adapter.set_renderer_size(renderer_handle, width, height)
       end
@@ -46,6 +50,36 @@ module Three
         scene_handle = sync(scene)
         camera_handle = sync(camera)
         @adapter.render(renderer_handle, scene_handle, camera_handle)
+      end
+
+      def create_orbit_controls(camera, dom_element = nil)
+        @adapter.new_orbit_controls(camera, dom_element)
+      end
+
+      def set_control_property(control_handle, name, value)
+        @adapter.set_control_property(control_handle, name, value)
+      end
+
+      def set_orbit_controls_target(control_handle, target)
+        @adapter.set_orbit_controls_target(control_handle, target)
+      end
+
+      def update_controls(control_handle)
+        @adapter.update_controls(control_handle)
+      end
+
+      def dispose_controls(control_handle)
+        @adapter.dispose_controls(control_handle)
+      end
+
+      def sync_object_transform_from_handle(object)
+        handle = materialize(object)
+        position, quaternion, scale = @adapter.object_transform(handle)
+        object.position.set(*position)
+        object.quaternion.set(*quaternion)
+        object.scale.set(*scale)
+        object.mark_clean!(:transform) if object.respond_to?(:mark_clean!)
+        object
       end
 
       def materialize(object)
@@ -307,6 +341,10 @@ module Three
           @three[:WebGLRenderer].new(parameters)
         end
 
+        def renderer_dom_element(renderer)
+          renderer[:domElement]
+        end
+
         def set_renderer_size(renderer, width, height)
           renderer.call(:setSize, width, height)
         end
@@ -329,6 +367,35 @@ module Three
           else
             renderer.call(:render, scene, camera)
           end
+        end
+
+        def new_orbit_controls(camera, dom_element)
+          constructor = orbit_controls_constructor
+          dom_element ? constructor.new(camera, dom_element) : constructor.new(camera)
+        end
+
+        def set_control_property(control, name, value)
+          control[name] = value
+        end
+
+        def set_orbit_controls_target(control, target)
+          control[:target].call(:set, *target)
+        end
+
+        def update_controls(control)
+          control.call(:update)
+        end
+
+        def dispose_controls(control)
+          control.call(:dispose)
+        end
+
+        def object_transform(object)
+          [
+            js_vector_to_a(object[:position], 3),
+            js_vector_to_a(object[:quaternion], 4),
+            js_vector_to_a(object[:scale], 3)
+          ]
         end
 
         def new_scene
@@ -499,6 +566,16 @@ module Three
           raise RuntimeError, "Three::Backends::ThreeJS requires ruby.wasm's js gem or an injected adapter"
         end
 
+        def orbit_controls_constructor
+          require "js"
+          constructor = JS.global[:THREE_ORBIT_CONTROLS]
+          raise RuntimeError, "Three::Controls::OrbitControls requires globalThis.THREE_ORBIT_CONTROLS" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Controls::OrbitControls requires ruby.wasm's js gem or an injected adapter"
+        end
+
         def resolve_canvas(canvas)
           return canvas unless canvas.is_a?(String)
 
@@ -520,6 +597,11 @@ module Three
           hash.each_with_object({}) do |(key, value), result|
             result[key.to_s] = value
           end
+        end
+
+        def js_vector_to_a(vector, length)
+          array = vector.call(:toArray)
+          length.times.map { |index| array[index].to_f }
         end
       end
     end

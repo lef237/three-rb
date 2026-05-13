@@ -1,5 +1,6 @@
 import { DefaultRubyVM } from "@ruby/wasm-wasi/browser";
 import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 export async function bootRubyExample({ main, clearColor }) {
   const setStatus = globalThis.__threeRbSetStatus || (() => {});
@@ -8,6 +9,7 @@ export async function bootRubyExample({ main, clearColor }) {
   try {
     setStatus("Loading ruby.wasm", "loading");
     globalThis.THREE = THREE;
+    globalThis.THREE_ORBIT_CONTROLS = OrbitControls;
     globalThis.__threeReady = Promise.resolve(THREE);
     globalThis.__threeRbRenderCount = 0;
     globalThis.__threeRbRenderFrameCount = 0;

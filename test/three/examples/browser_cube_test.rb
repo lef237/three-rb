@@ -26,6 +26,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     html = File.read(File.join(EXAMPLE_DIR, "index.html"))
 
     assert_includes html, "/node_modules/three/build/three.module.js"
+    assert_includes html, "/node_modules/three/examples/jsm/"
     assert_includes html, "/node_modules/@bjorn3/browser_wasi_shim/dist/index.js"
     assert_includes html, "/node_modules/@ruby/wasm-wasi/dist/esm/browser.js"
     assert_includes html, "./boot.mjs"
@@ -49,6 +50,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::PlaneGeometry"
     assert_includes ruby, "Three::SphereGeometry"
     assert_includes ruby, "Three::MeshNormalMaterial"
+    assert_includes ruby, "Three::Controls::OrbitControls"
     assert_includes ruby, "Three::Group"
     assert_includes ruby, "rig.add(primary)"
     assert_includes ruby, "rig.add(satellite)"
