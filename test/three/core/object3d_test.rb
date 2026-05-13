@@ -90,6 +90,16 @@ class ThreeObject3DTest < Minitest::Test
     assert_vector3_in_delta [5, 7, 9], child.get_world_position
   end
 
+  def test_update_matrix_world_does_not_mark_clean_object_dirty
+    object = Three::Object3D.new
+    object.update_matrix_world
+    object.mark_clean!
+
+    object.update_matrix_world
+
+    refute object.dirty?
+  end
+
   def test_rotation_and_quaternion_stay_in_sync
     object = Three::Object3D.new
 

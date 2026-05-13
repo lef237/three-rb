@@ -50,6 +50,12 @@ pnpm exec playwright install chromium
 pnpm test:browser
 ```
 
+Run the optional 1000 individual Mesh sync benchmark:
+
+```sh
+pnpm benchmark:browser:mesh-sync
+```
+
 ## Development
 
 Install dependencies:

@@ -168,7 +168,6 @@ module Three
     def update_matrix
       @matrix.compose(@position, @quaternion, @scale)
       @matrix_world_needs_update = true
-      mark_dirty!(:transform)
       self
     end
 

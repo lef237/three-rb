@@ -9,7 +9,8 @@
     "test:browser:composition": "node examples/browser/composition/smoke_test.mjs",
     "test:browser:textures": "node examples/browser/textures/smoke_test.mjs",
     "test:browser:cubemap": "node examples/browser/cubemap/smoke_test.mjs",
-    "test:browser:gltf": "node examples/browser/gltf/smoke_test.mjs"
+    "test:browser:gltf": "node examples/browser/gltf/smoke_test.mjs",
+    "benchmark:browser:mesh-sync": "node benchmarks/browser/mesh_sync/run.mjs"
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "0.4.2",

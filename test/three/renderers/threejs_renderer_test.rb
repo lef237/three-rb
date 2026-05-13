@@ -74,6 +74,23 @@ class ThreeThreeJSRendererTest < Minitest::Test
     assert_vector3_in_delta [1, 2, 3], mesh.get_world_position
   end
 
+  def test_render_does_not_resync_clean_transforms
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+    scene = Three::Scene.new
+    camera = Three::PerspectiveCamera.new
+    mesh = Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new)
+    scene.add(mesh)
+
+    renderer.render(scene, camera)
+    adapter.calls.clear
+    renderer.render(scene, camera)
+
+    assert_equal :render, adapter.calls.last[0]
+    refute adapter.calls.any? { |call| call[0] == :set_object_transform }
+  end
+
   def test_dispose_delegates_to_backend
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

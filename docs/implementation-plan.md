@@ -700,6 +700,7 @@ Do not over-optimize before the API exists, but avoid structural mistakes.
 - Avoid large numbers of tiny Ruby-to-JavaScript property calls.
 - Use dirty flags and sync only changed objects.
 - Do not immediately reflect `position.x = ...` to JS; batch transform updates before rendering.
+- Keep `update_matrix_world` separate from backend dirty tracking. Rendering may recompute world matrices every frame, but clean transforms should stay clean unless user-facing transform state changes.
 - Require explicit `needs_update!` calls for large geometry changes.
 
 Initial benchmarks:
@@ -707,7 +708,7 @@ Initial benchmarks:
 - 1 cube animation
 - 100 cubes with transform sync
 - 1000 cubes through `InstancedMesh`
-- 1000 individual cubes with transform sync
+- 1000 individual cubes with transform sync (`pnpm benchmark:browser:mesh-sync`)
 - 1 mesh with 100k vertices
 - 10 textures
 - 1 glTF model
