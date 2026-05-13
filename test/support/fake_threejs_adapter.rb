@@ -152,6 +152,10 @@ class FakeThreeJSAdapter
     handle(:mesh, geometry: geometry, material: material, children: [])
   end
 
+  def new_instanced_mesh(geometry, material, count)
+    handle(:instanced_mesh, geometry: geometry, material: material, count: count, capacity: count, instance_matrices: Array.new(count), children: [])
+  end
+
   def set_mesh_geometry(mesh, geometry)
     @calls << [:set_mesh_geometry, mesh, geometry]
     mesh[:geometry] = geometry
@@ -160,6 +164,23 @@ class FakeThreeJSAdapter
   def set_mesh_material(mesh, material)
     @calls << [:set_mesh_material, mesh, material]
     mesh[:material] = material
+  end
+
+  def set_instanced_mesh_count(mesh, count)
+    @calls << [:set_instanced_mesh_count, mesh, count]
+    raise ArgumentError, "count cannot exceed capacity" if count > mesh[:capacity]
+
+    mesh[:count] = count
+  end
+
+  def set_instanced_mesh_matrix_at(mesh, index, elements)
+    @calls << [:set_instanced_mesh_matrix_at, mesh, index, elements]
+    mesh[:instance_matrices][index] = elements.dup
+  end
+
+  def set_instanced_mesh_instance_matrix_needs_update(mesh, value)
+    @calls << [:set_instanced_mesh_instance_matrix_needs_update, mesh, value]
+    mesh[:instance_matrix_needs_update] = value
   end
 
   def new_box_geometry(width, height, depth, width_segments, height_segments, depth_segments)

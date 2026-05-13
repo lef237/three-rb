@@ -642,12 +642,20 @@ Candidates:
 - Postprocessing wrappers
 - WebGPU renderer wrapper
 
+Current instancing direction:
+
+- Prefer `Three::InstancedMesh` for large repeated geometry before optimizing thousands of individual `Mesh` objects.
+- Keep Ruby as the source of truth for instance matrices and batch them into three.js with `setMatrixAt` during dirty sync.
+- Treat the initial `InstancedMesh` API as matrix-only: `capacity`, `count`, `set_matrix_at`, `get_matrix_at`, and `instance_matrix_needs_update!`. `capacity` is fixed at construction because three.js allocates the instance matrix buffer then; `count` may be lowered within that capacity to render fewer active instances.
+- Browser verification should include a 1000-count instanced scene so Phase 8 measures a realistic high-volume path, not only small object graphs.
+
 Completion criteria:
 
 - A basic lighting scene works.
 - Directional shadow mapping can be enabled and verified in a browser smoke test.
 - Material and texture disposal does not leak resources.
-- Synchronizing around 1000 meshes remains interactive.
+- Synchronizing 1000 repeated meshes through `InstancedMesh` remains interactive.
+- A later benchmark should separately measure 1000 individual `Mesh` transform sync to decide whether backend batching is needed there too.
 
 ### Phase 9: Native Renderer Evaluation
 
@@ -698,7 +706,8 @@ Initial benchmarks:
 
 - 1 cube animation
 - 100 cubes with transform sync
-- 1000 cubes with transform sync
+- 1000 cubes through `InstancedMesh`
+- 1000 individual cubes with transform sync
 - 1 mesh with 100k vertices
 - 10 textures
 - 1 glTF model

@@ -16,6 +16,7 @@ require_relative "../materials/mesh_normal_material"
 require_relative "../materials/mesh_phong_material"
 require_relative "../materials/mesh_standard_material"
 require_relative "../objects/external_object3d"
+require_relative "../objects/instanced_mesh"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
 require_relative "../textures/cube_texture"
@@ -201,6 +202,8 @@ module Three
           @adapter.new_perspective_camera(object.fov, object.aspect, object.near, object.far)
         when Scene
           @adapter.new_scene
+        when InstancedMesh
+          @adapter.new_instanced_mesh(materialize(object.geometry), materialize(object.material), object.count)
         when Mesh
           @adapter.new_mesh(materialize(object.geometry), materialize(object.material))
         when CubeTexture
@@ -304,7 +307,9 @@ module Three
 
         sync_light(object, handle) if object.is_a?(Light) && object.dirty_field?(:light)
 
-        if object.is_a?(Mesh)
+        if object.is_a?(InstancedMesh)
+          sync_instanced_mesh(object, handle)
+        elsif object.is_a?(Mesh)
           geometry_handle = sync(object.geometry)
           material_handle = sync(object.material) if object.material.respond_to?(:uuid)
 
@@ -326,6 +331,24 @@ module Three
 
         object.mark_clean! if object.respond_to?(:mark_clean!)
         handle
+      end
+
+      def sync_instanced_mesh(object, handle)
+        geometry_handle = sync(object.geometry)
+        material_handle = sync(object.material) if object.material.respond_to?(:uuid)
+
+        if object.dirty_field?(:mesh)
+          @adapter.set_mesh_geometry(handle, geometry_handle)
+          @adapter.set_mesh_material(handle, material_handle) if material_handle
+          @adapter.set_instanced_mesh_count(handle, object.count)
+        end
+
+        return unless object.dirty_field?(:instances)
+
+        object.instance_matrices.each_with_index do |matrix, index|
+          @adapter.set_instanced_mesh_matrix_at(handle, index, matrix.to_a)
+        end
+        @adapter.set_instanced_mesh_instance_matrix_needs_update(handle, true)
       end
 
       def sync_scene(scene, handle)
@@ -712,12 +735,30 @@ module Three
           @three[:Mesh].new(geometry, material)
         end
 
+        def new_instanced_mesh(geometry, material, count)
+          @three[:InstancedMesh].new(geometry, material, count)
+        end
+
         def set_mesh_geometry(mesh, geometry)
           mesh[:geometry] = geometry
         end
 
         def set_mesh_material(mesh, material)
           mesh[:material] = material
+        end
+
+        def set_instanced_mesh_count(mesh, count)
+          mesh[:count] = count
+        end
+
+        def set_instanced_mesh_matrix_at(mesh, index, elements)
+          matrix = @three[:Matrix4].new
+          matrix.call(:fromArray, js_array(elements))
+          mesh.call(:setMatrixAt, index, matrix)
+        end
+
+        def set_instanced_mesh_instance_matrix_needs_update(mesh, value)
+          mesh[:instanceMatrix][:needsUpdate] = value
         end
 
         def new_box_geometry(width, height, depth, width_segments, height_segments, depth_segments)

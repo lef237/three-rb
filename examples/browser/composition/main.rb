@@ -88,6 +88,21 @@ begin
   highlight.cast_shadow = true
   rig.add(highlight)
 
+  instance_count = 1000
+  instance_columns = 50
+  instanced_material = Three::MeshLambertMaterial.new(color: 0x88d8ff, opacity: 0.42, transparent: true)
+  instanced_field = Three::InstancedMesh.new(Three::BoxGeometry.new(0.032, 0.032, 0.032), instanced_material, instance_count)
+  instance_matrix = Three::Matrix4.new
+  instance_count.times do |index|
+    column = index % instance_columns
+    row = index / instance_columns
+    x = (column - ((instance_columns - 1) / 2.0)) * 0.11
+    y = (row - ((instance_count / instance_columns - 1) / 2.0)) * 0.12
+    z = -0.85 - ((index % 7) * 0.012)
+    instanced_field.set_matrix_at(index, instance_matrix.make_translation(x, y, z))
+  end
+  scene.add(instanced_field)
+
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
     antialias: true,
@@ -139,6 +154,8 @@ begin
   JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)
   JS.global[:__threeRbSphereMesh] = renderer.backend.materialize(orb)
   JS.global[:__threeRbPhongMesh] = renderer.backend.materialize(highlight)
+  JS.global[:__threeRbInstancedMesh] = renderer.backend.materialize(instanced_field)
+  JS.global[:__threeRbInstancedMaterial] = renderer.backend.materialize(instanced_material)
   JS.global[:__threeRbTexture] = renderer.backend.materialize(primary_texture)
   JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbLambertMaterial] = renderer.backend.materialize(primary_material)
@@ -170,6 +187,7 @@ begin
     orb.rotation.x += 0.018
     orb.rotation.y -= 0.013
     highlight.rotation.y += 0.021
+    instanced_field.rotation.z -= 0.0015
 
     pulse = (Math.sin(frame * 0.045) + 1) / 2.0
     primary_material.color.set_rgb(0.25 + (0.35 * pulse), 0.55 + (0.25 * pulse), 0.42)

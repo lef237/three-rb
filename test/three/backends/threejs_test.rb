@@ -19,6 +19,47 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 0x00ff00, handle[:children].first[:material][:parameters][:color]
   end
 
+  def test_syncs_instanced_mesh_matrices
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    mesh = Three::InstancedMesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new(color: 0x88ccff), 2)
+    first_matrix = Three::Matrix4.new.make_translation(1, 0, 0)
+    second_matrix = Three::Matrix4.new.make_translation(0, 2, 0)
+
+    mesh.set_matrix_at(0, first_matrix)
+    mesh.set_matrix_at(1, second_matrix)
+
+    handle = backend.sync(mesh)
+
+    assert_equal :instanced_mesh, handle[:type]
+    assert_equal 2, handle[:count]
+    assert_equal first_matrix.to_a, handle[:instance_matrices][0]
+    assert_equal second_matrix.to_a, handle[:instance_matrices][1]
+    assert_equal true, handle[:instance_matrix_needs_update]
+    refute mesh.dirty?
+  end
+
+  def test_syncs_instanced_mesh_count_and_dirty_matrix_updates
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    mesh = Three::InstancedMesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new, 2)
+    handle = backend.sync(mesh)
+
+    adapter.calls.clear
+    mesh.count = 1
+    matrix = Three::Matrix4.new.make_translation(0, 0, 3)
+    mesh.set_matrix_at(0, matrix)
+    backend.sync(mesh)
+
+    assert_same handle, backend.materialize(mesh)
+    assert_equal 1, handle[:count]
+    assert_equal 2, handle[:capacity]
+    assert_equal matrix.to_a, handle[:instance_matrices][0]
+    assert adapter.calls.any? { |call| call == [:set_instanced_mesh_count, handle, 1] }
+    assert adapter.calls.any? { |call| call == [:set_instanced_mesh_matrix_at, handle, 0, matrix.to_a] }
+    refute mesh.dirty?
+  end
+
   def test_materializes_external_object3d_without_rebuilding_handle
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

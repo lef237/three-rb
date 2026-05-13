@@ -79,6 +79,18 @@ async function main() {
       phongSpecular: globalThis.__threeRbPhongMaterial?.specular?.getHex?.(),
       phongShininess: globalThis.__threeRbPhongMaterial?.shininess,
       phongSpecularMapType: globalThis.__threeRbPhongMaterial?.specularMap?.isTexture,
+      instancedType: globalThis.__threeRbInstancedMesh?.type,
+      instancedIsInstancedMesh: globalThis.__threeRbInstancedMesh?.isInstancedMesh,
+      instancedCount: globalThis.__threeRbInstancedMesh?.count,
+      instancedMaterialType: globalThis.__threeRbInstancedMaterial?.type,
+      instancedMaterialTransparent: globalThis.__threeRbInstancedMaterial?.transparent,
+      instancedMatrixNeedsUpdate: globalThis.__threeRbInstancedMesh?.instanceMatrix?.needsUpdate,
+      instancedLastMatrix: (() => {
+        if (!globalThis.__threeRbInstancedMesh || !globalThis.THREE?.Matrix4) return undefined;
+        const matrix = new globalThis.THREE.Matrix4();
+        globalThis.__threeRbInstancedMesh.getMatrixAt(999, matrix);
+        return matrix.toArray();
+      })(),
       satelliteMaterialType: globalThis.__threeRbSatelliteMesh?.material?.type,
       normalMaterialFlatShading: globalThis.__threeRbNormalMaterial?.flatShading,
       standardMaterialRoughness: globalThis.__threeRbStandardMaterial?.roughness,
@@ -151,6 +163,15 @@ async function main() {
     if (scene.phongSpecular !== 0xffffff || scene.phongShininess !== 72 || scene.phongSpecularMapType !== true) {
       throw new Error(`expected configured MeshPhongMaterial specular settings: ${JSON.stringify(scene)}`);
     }
+    if (scene.instancedIsInstancedMesh !== true || scene.instancedCount !== 1000) {
+      throw new Error(`expected a 1000-count InstancedMesh: ${JSON.stringify(scene)}`);
+    }
+    if (scene.instancedMaterialType !== "MeshLambertMaterial" || scene.instancedMaterialTransparent !== true) {
+      throw new Error(`expected a transparent MeshLambertMaterial on InstancedMesh: ${JSON.stringify(scene)}`);
+    }
+    if (!Array.isArray(scene.instancedLastMatrix) || Math.abs(scene.instancedLastMatrix[12] - 2.695) > 0.001 || Math.abs(scene.instancedLastMatrix[13] - 1.14) > 0.001) {
+      throw new Error(`expected InstancedMesh matrix data to sync: ${JSON.stringify(scene)}`);
+    }
     if (scene.satelliteMaterialType !== "MeshNormalMaterial" || scene.normalMaterialFlatShading !== true) {
       throw new Error(`expected a flat-shaded MeshNormalMaterial satellite: ${JSON.stringify(scene)}`);
     }
@@ -160,7 +181,7 @@ async function main() {
     if (scene.materialHandleCachedAfterDispose !== false || scene.textureHandleCachedAfterDispose !== false) {
       throw new Error(`expected disposed material and texture handles to leave the backend cache: ${JSON.stringify(scene)}`);
     }
-    if (!scene.renderInfo || scene.renderInfo.triangles < 200) {
+    if (!scene.renderInfo || scene.renderInfo.triangles < 10000) {
       throw new Error(`renderer did not draw the composition triangles: ${JSON.stringify(scene)}`);
     }
     if (!scene.frame || scene.currentMaterialColor === scene.initialMaterialColor) {
