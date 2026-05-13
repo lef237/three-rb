@@ -7,6 +7,7 @@ require_relative "../math/quaternion"
 require_relative "../math/vector3"
 require_relative "../dirty"
 require_relative "event_dispatcher"
+require_relative "layers"
 
 module Three
   class Object3D < EventDispatcher
@@ -23,6 +24,7 @@ module Three
     end
 
     attr_reader :id, :uuid, :parent, :children
+    attr_reader :layers
     attr_reader :position, :rotation, :quaternion, :scale
     attr_reader :matrix, :matrix_world
     attr_reader :name, :type, :up, :visible, :cast_shadow, :receive_shadow
@@ -38,6 +40,7 @@ module Three
       @type = "Object3D"
       @parent = nil
       @children = []
+      @layers = Layers.new
       @up = DEFAULT_UP.clone
 
       @position = Vector3.new
@@ -56,6 +59,7 @@ module Three
 
       bind_rotation_and_quaternion
       bind_transform_changes
+      bind_layer_changes
       mark_dirty!
     end
 
@@ -254,6 +258,7 @@ module Three
         type: @type,
         name: @name,
         matrix: @matrix.to_a,
+        layers: @layers.mask,
         visible: @visible,
         cast_shadow: @cast_shadow,
         receive_shadow: @receive_shadow,
@@ -317,6 +322,10 @@ module Three
           mark_dirty!(:transform)
         end
       end
+    end
+
+    def bind_layer_changes
+      @layers.on_change { mark_dirty!(:properties) }
     end
   end
 end

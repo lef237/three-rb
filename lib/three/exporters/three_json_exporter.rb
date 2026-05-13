@@ -48,6 +48,7 @@ module Three
           type: object.type,
           name: object.name,
           visible: object.visible,
+          layers: object.layers.mask,
           cast_shadow: object.cast_shadow,
           receive_shadow: object.receive_shadow,
           matrix_auto_update: object.matrix_auto_update,

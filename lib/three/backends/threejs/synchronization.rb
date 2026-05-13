@@ -13,6 +13,7 @@ module Three
             @adapter.set_object_name(handle, object.name)
             @adapter.set_object_visible(handle, object.visible)
             @adapter.set_object_shadow(handle, object.cast_shadow, object.receive_shadow)
+            @adapter.set_object_layers(handle, object.layers.mask)
           end
 
           if object.dirty_field?(:transform)

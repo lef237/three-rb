@@ -509,6 +509,7 @@ Current implementation status:
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
+- `Three::Clock` and `Three::Layers` are implemented; `Object3D#layers` is serialized and synchronized to Three.js `layers.mask`.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
 - `Three::Renderers::ThreeJSRenderer#traverse_handles` and `#dispose_subtree` expose loaded-asset traversal and cleanup without changing Ruby `Object3D#traverse`.
 - Loaded asset traversal/disposal design and implementation status are documented in `docs/loaded-assets-design.md`.

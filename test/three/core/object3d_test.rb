@@ -157,4 +157,15 @@ class ThreeObject3DTest < Minitest::Test
     assert_equal true, object.to_h[:cast_shadow]
     assert_equal true, object.to_h[:receive_shadow]
   end
+
+  def test_layers_mark_properties_dirty
+    object = Three::Object3D.new
+    object.mark_clean!
+
+    object.layers.enable(3)
+
+    assert_equal 0b1001, object.layers.mask
+    assert object.dirty_field?(:properties)
+    assert_equal 0b1001, object.to_h[:layers]
+  end
 end

@@ -444,8 +444,26 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal "node", handle[:name]
     assert_equal true, handle[:cast_shadow]
     assert_equal true, handle[:receive_shadow]
+    assert_equal 1, handle[:layers]
     assert_equal [1, 2, 3], handle[:position]
     assert_equal [2, 2, 2], handle[:scale]
+  end
+
+  def test_sync_updates_object_layers_only_after_change
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    object = Three::Object3D.new
+
+    handle = backend.sync(object)
+    adapter.calls.clear
+    backend.sync(object)
+
+    assert_empty adapter.calls
+
+    object.layers.set(4)
+    backend.sync(object)
+
+    assert_equal [:set_object_layers, handle, 1 << 4], adapter.calls.last
   end
 
   def test_sync_updates_directional_light_shadow

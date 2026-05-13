@@ -210,6 +210,11 @@ class FakeThreeJSAdapter
     mesh[:material] = material
   end
 
+  def set_object_layers(object, mask)
+    @calls << [:set_object_layers, object, mask]
+    object[:layers] = mask
+  end
+
   def set_instanced_mesh_count(mesh, count)
     @calls << [:set_instanced_mesh_count, mesh, count]
     raise ArgumentError, "count cannot exceed capacity" if count > mesh[:capacity]

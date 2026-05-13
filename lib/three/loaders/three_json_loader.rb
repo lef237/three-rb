@@ -294,6 +294,7 @@ module Three
       def apply_object_properties(object, entry)
         object.name = value(entry, :name) if has_value?(entry, :name)
         object.visible = value(entry, :visible) if has_value?(entry, :visible)
+        object.layers.mask = value(entry, :layers) if has_value?(entry, :layers)
         object.cast_shadow = value(entry, :cast_shadow) if has_value?(entry, :cast_shadow)
         object.receive_shadow = value(entry, :receive_shadow) if has_value?(entry, :receive_shadow)
         object.matrix_auto_update = value(entry, :matrix_auto_update) if has_value?(entry, :matrix_auto_update)

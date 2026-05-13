@@ -14,6 +14,7 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     second = Three::Mesh.new(geometry, material)
     first.position.set(1, 2, 3)
     second.scale.set(2, 2, 2)
+    second.layers.set(2)
     scene.add(first, second)
 
     exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
@@ -24,6 +25,7 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal 2, exported[:object][:children].length
     assert_equal [1, 2, 3], exported[:object][:children][0][:position]
     assert_equal [2, 2, 2], exported[:object][:children][1][:scale]
+    assert_equal 1 << 2, exported[:object][:children][1][:layers]
 
     assert_equal [geometry.uuid], exported[:geometries].map { |entry| entry[:uuid] }
     assert_equal [material.uuid], exported[:materials].map { |entry| entry[:uuid] }

@@ -12,6 +12,7 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     second = Three::Mesh.new(geometry, material)
     first.position.set(1, 2, 3)
     second.scale.set(2, 2, 2)
+    second.layers.set(2)
     scene.add(first, second)
 
     loaded = Three::Loaders::ThreeJSONLoader.new.parse(scene.to_json)
@@ -27,6 +28,7 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert_equal [2, 3], loaded.children[0].material.map.repeat.to_a
     assert_equal [1, 2, 3], loaded.children[0].position.to_a
     assert_equal [2, 2, 2], loaded.children[1].scale.to_a
+    assert_equal 1 << 2, loaded.children[1].layers.mask
     assert_same loaded.children[0].geometry, loaded.children[1].geometry
     assert_same loaded.children[0].material, loaded.children[1].material
     assert_same loaded.children[0].material.map, loaded.children[1].material.map

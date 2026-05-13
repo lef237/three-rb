@@ -211,6 +211,10 @@ module Three
           set_object_material(mesh, material)
         end
 
+        def set_object_layers(object, mask)
+          object[:layers][:mask] = mask if js_present?(object[:layers])
+        end
+
         def set_instanced_mesh_count(mesh, count)
           mesh[:count] = count
         end
