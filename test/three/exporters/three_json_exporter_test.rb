@@ -104,6 +104,52 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal "PointsMaterial", exported[:materials][1][:type]
   end
 
+  def test_exports_mesh_physical_material_resources
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/texture.png")
+    anisotropy_map = Three::Texture.new("/anisotropy.png")
+    clearcoat_map = Three::Texture.new("/clearcoat.png")
+    specular_color_map = Three::Texture.new("/specular-color.png")
+    material = Three::MeshPhysicalMaterial.new(
+      color: 0x99ccff,
+      roughness: 0.35,
+      metalness: 0.1,
+      anisotropy: 0.4,
+      anisotropy_rotation: 0.2,
+      anisotropy_map: anisotropy_map,
+      clearcoat: 0.8,
+      clearcoat_roughness: 0.25,
+      clearcoat_map: clearcoat_map,
+      transmission: 0.2,
+      thickness: 0.1,
+      dispersion: 0.05,
+      specular_intensity: 0.7,
+      specular_color: 0xf0f6ff,
+      specular_color_map: specular_color_map,
+      map: texture
+    )
+    scene.add(Three::Mesh.new(Three::BoxGeometry.new, material))
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+    material_data = exported[:materials].first
+
+    assert_equal "MeshPhysicalMaterial", material_data[:type]
+    assert_equal 0x99ccff, material_data[:color]
+    assert_equal 0.4, material_data[:anisotropy]
+    assert_equal 0.2, material_data[:anisotropy_rotation]
+    assert_equal anisotropy_map.uuid, material_data[:anisotropy_map]
+    assert_equal 0.8, material_data[:clearcoat]
+    assert_equal 0.25, material_data[:clearcoat_roughness]
+    assert_equal clearcoat_map.uuid, material_data[:clearcoat_map]
+    assert_equal 0.2, material_data[:transmission]
+    assert_equal 0.1, material_data[:thickness]
+    assert_equal 0.05, material_data[:dispersion]
+    assert_equal 0.7, material_data[:specular_intensity]
+    assert_equal 0xf0f6ff, material_data[:specular_color]
+    assert_equal specular_color_map.uuid, material_data[:specular_color_map]
+    assert_equal [texture.uuid, anisotropy_map.uuid, clearcoat_map.uuid, specular_color_map.uuid], exported[:textures].map { |entry| entry[:uuid] }
+  end
+
   def test_object3d_to_json_uses_exporter_format
     scene = Three::Scene.new
     scene.add(Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new))

@@ -44,7 +44,7 @@ The recommended design has been implemented for the current loaded-asset MVP:
 
 Remaining work:
 
-- The Ruby material model exposes common `MeshStandardMaterial` PBR texture slots. Broaden ownership helpers further if additional material classes introduce new texture slots.
+- The Ruby material model exposes common `MeshStandardMaterial` PBR texture slots and `MeshPhysicalMaterial` physical texture slots, including anisotropy and clearcoat maps. Broaden ownership helpers further if additional material classes introduce new texture slots.
 - If future APIs need to inspect or edit loaded child objects, design explicit wrapper types instead of changing `Object3D#traverse`.
 
 ## Decision
@@ -250,6 +250,7 @@ Disposal should collect unique resources before disposing:
     - `envMap`
     - `lightMap`
     - `specularMap`
+    - `anisotropyMap`
     - `clearcoatMap`
     - `clearcoatNormalMap`
     - `clearcoatRoughnessMap`

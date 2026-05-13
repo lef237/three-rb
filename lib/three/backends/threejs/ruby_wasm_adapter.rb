@@ -17,6 +17,7 @@ module Three
           envMap
           lightMap
           specularMap
+          anisotropyMap
           clearcoatMap
           clearcoatNormalMap
           clearcoatRoughnessMap
@@ -366,6 +367,10 @@ module Three
 
         def new_mesh_phong_material(parameters)
           @three[:MeshPhongMaterial].new(stringify_keys(parameters))
+        end
+
+        def new_mesh_physical_material(parameters)
+          @three[:MeshPhysicalMaterial].new(stringify_keys(parameters))
         end
 
         def new_mesh_standard_material(parameters)

@@ -40,8 +40,17 @@ async function main() {
       materialMapType: globalThis.__threeRbTexturedMesh?.material?.map?.isTexture,
       materialRoughnessMapType: globalThis.__threeRbTextureMaterial?.roughnessMap?.isTexture,
       materialMetalnessMapType: globalThis.__threeRbTextureMaterial?.metalnessMap?.isTexture,
+      materialAnisotropyMapType: globalThis.__threeRbTextureMaterial?.anisotropyMap?.isTexture,
+      materialClearcoatMapType: globalThis.__threeRbTextureMaterial?.clearcoatMap?.isTexture,
       materialRoughness: globalThis.__threeRbTextureMaterial?.roughness,
       materialMetalness: globalThis.__threeRbTextureMaterial?.metalness,
+      materialAnisotropy: globalThis.__threeRbTextureMaterial?.anisotropy,
+      materialAnisotropyRotation: globalThis.__threeRbTextureMaterial?.anisotropyRotation,
+      materialClearcoat: globalThis.__threeRbTextureMaterial?.clearcoat,
+      materialClearcoatRoughness: globalThis.__threeRbTextureMaterial?.clearcoatRoughness,
+      materialIor: globalThis.__threeRbTextureMaterial?.ior,
+      materialSpecularIntensity: globalThis.__threeRbTextureMaterial?.specularIntensity,
+      materialSpecularColor: globalThis.__threeRbTextureMaterial?.specularColor?.getHex?.(),
       textureType: globalThis.__threeRbTextureExampleTexture?.isTexture,
       textureWidth: globalThis.__threeRbTextureExampleTexture?.source?.data?.naturalWidth,
       textureWrapS: globalThis.__threeRbTextureExampleTexture?.wrapS,
@@ -61,14 +70,23 @@ async function main() {
     if (scene.meshType !== "Mesh" || scene.geometryType !== "BoxGeometry") {
       throw new Error(`expected a textured box mesh: ${JSON.stringify(scene)}`);
     }
-    if (scene.materialType !== "MeshStandardMaterial" || scene.materialMapType !== true) {
-      throw new Error(`expected MeshStandardMaterial with a texture map: ${JSON.stringify(scene)}`);
+    if (scene.materialType !== "MeshPhysicalMaterial" || scene.materialMapType !== true) {
+      throw new Error(`expected MeshPhysicalMaterial with a texture map: ${JSON.stringify(scene)}`);
     }
-    if (scene.materialRoughnessMapType !== true || scene.materialMetalnessMapType !== true) {
-      throw new Error(`expected MeshStandardMaterial with PBR texture maps: ${JSON.stringify(scene)}`);
+    if (scene.materialRoughnessMapType !== true || scene.materialMetalnessMapType !== true || scene.materialAnisotropyMapType !== true || scene.materialClearcoatMapType !== true) {
+      throw new Error(`expected MeshPhysicalMaterial with PBR and physical texture maps: ${JSON.stringify(scene)}`);
     }
     if (scene.materialRoughness !== 0.42 || scene.materialMetalness !== 0.08) {
       throw new Error(`expected configured PBR material values: ${JSON.stringify(scene)}`);
+    }
+    if (scene.materialAnisotropy !== 0.25 || scene.materialAnisotropyRotation !== 0.15) {
+      throw new Error(`expected configured anisotropy material values: ${JSON.stringify(scene)}`);
+    }
+    if (scene.materialClearcoat !== 0.65 || scene.materialClearcoatRoughness !== 0.18 || scene.materialIor !== 1.45) {
+      throw new Error(`expected configured physical material values: ${JSON.stringify(scene)}`);
+    }
+    if (scene.materialSpecularIntensity !== 0.75 || scene.materialSpecularColor !== 0xe8f1ff) {
+      throw new Error(`expected configured physical specular values: ${JSON.stringify(scene)}`);
     }
     if (scene.textureType !== true || scene.textureWidth <= 0) {
       throw new Error(`expected a loaded texture: ${JSON.stringify(scene)}`);

@@ -131,8 +131,11 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "texture.repeat.set(4, 3)"
     assert_includes ruby, "texture.center.set(0.5, 0.5)"
     assert_includes ruby, "texture.rotation = 0.35"
-    assert_includes ruby, "Three::MeshStandardMaterial"
+    assert_includes ruby, "Three::MeshPhysicalMaterial"
     assert_includes ruby, "map: texture"
+    assert_includes ruby, "anisotropy_map: texture"
+    assert_includes ruby, "clearcoat_map: texture"
+    assert_includes ruby, "specular_intensity:"
     assert_includes ruby, "renderer.animation_loop"
   end
 

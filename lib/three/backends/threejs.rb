@@ -16,6 +16,7 @@ require_relative "../materials/mesh_lambert_material"
 require_relative "../materials/mesh_normal_material"
 require_relative "../materials/mesh_phong_material"
 require_relative "../materials/mesh_standard_material"
+require_relative "../materials/mesh_physical_material"
 require_relative "../materials/points_material"
 require_relative "../objects/external_object3d"
 require_relative "../objects/instanced_mesh"
@@ -42,10 +43,22 @@ module Three
         metalness_map: :metalnessMap,
         normal_map: :normalMap,
         roughness_map: :roughnessMap,
-        specular_map: :specularMap
+        specular_map: :specularMap,
+        anisotropy_map: :anisotropyMap,
+        clearcoat_map: :clearcoatMap,
+        clearcoat_normal_map: :clearcoatNormalMap,
+        clearcoat_roughness_map: :clearcoatRoughnessMap,
+        transmission_map: :transmissionMap,
+        thickness_map: :thicknessMap,
+        iridescence_map: :iridescenceMap,
+        iridescence_thickness_map: :iridescenceThicknessMap,
+        sheen_color_map: :sheenColorMap,
+        sheen_roughness_map: :sheenRoughnessMap,
+        specular_color_map: :specularColorMap,
+        specular_intensity_map: :specularIntensityMap
       }.freeze
 
-      MATERIAL_COLOR_PARAMETERS = %i[color emissive specular].freeze
+      MATERIAL_COLOR_PARAMETERS = %i[color emissive specular attenuationColor sheenColor specularColor].freeze
 
       attr_reader :adapter, :handles
 

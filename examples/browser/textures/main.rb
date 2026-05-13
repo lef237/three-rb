@@ -34,13 +34,22 @@ begin
   texture.center.set(0.5, 0.5)
   texture.rotation = 0.35
 
-  material = Three::MeshStandardMaterial.new(
+  material = Three::MeshPhysicalMaterial.new(
     color: 0xffffff,
     roughness: 0.42,
     metalness: 0.08,
+    anisotropy: 0.25,
+    anisotropy_rotation: 0.15,
+    clearcoat: 0.65,
+    clearcoat_roughness: 0.18,
+    ior: 1.45,
+    specular_intensity: 0.75,
+    specular_color: 0xe8f1ff,
     map: texture,
     roughness_map: texture,
-    metalness_map: texture
+    metalness_map: texture,
+    anisotropy_map: texture,
+    clearcoat_map: texture
   )
   mesh = Three::Mesh.new(Three::BoxGeometry.new(1.8, 1.15, 0.32), material)
   mesh.rotation.x = -0.25

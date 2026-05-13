@@ -75,6 +75,8 @@ module Three
             @adapter.new_mesh_normal_material(material_parameters(object))
           when MeshPhongMaterial
             @adapter.new_mesh_phong_material(material_parameters(object))
+          when MeshPhysicalMaterial
+            @adapter.new_mesh_physical_material(material_parameters(object))
           when MeshStandardMaterial
             @adapter.new_mesh_standard_material(material_parameters(object))
           when PointsMaterial

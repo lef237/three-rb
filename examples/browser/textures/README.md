@@ -1,6 +1,6 @@
 # Browser Textures Example
 
-This example renders a Ruby-authored textured cube through ruby.wasm and the JavaScript three.js renderer. It focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial#map`.
+This example renders a Ruby-authored textured cube through ruby.wasm and the JavaScript three.js renderer. It focuses on `TextureLoader`, repeat/wrap/filter settings, `MeshPhysicalMaterial`, and standard plus physical material texture maps.
 
 Install browser dependencies and serve the repository root over HTTP:
 
@@ -32,4 +32,4 @@ Run the browser smoke test:
 pnpm test:browser:textures
 ```
 
-The smoke test serves the repository root, waits for the Ruby scene to reach `Running`, samples the WebGL canvas for nonblank pixels, verifies the textured mesh, and checks that repeat/wrap/filter settings reach the three.js texture.
+The smoke test serves the repository root, waits for the Ruby scene to reach `Running`, samples the WebGL canvas for nonblank pixels, verifies the textured mesh and physical material parameters, and checks that repeat/wrap/filter settings reach the three.js texture.

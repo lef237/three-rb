@@ -136,6 +136,8 @@ module Three
           MeshNormalMaterial.new(parameters)
         when "MeshPhongMaterial"
           MeshPhongMaterial.new(parameters)
+        when "MeshPhysicalMaterial"
+          MeshPhysicalMaterial.new(parameters)
         when "MeshStandardMaterial"
           MeshStandardMaterial.new(parameters)
         when "PointsMaterial"
@@ -160,6 +162,25 @@ module Three
           shininess
           roughness
           metalness
+          anisotropy
+          anisotropy_rotation
+          clearcoat
+          clearcoat_roughness
+          transmission
+          thickness
+          ior
+          reflectivity
+          iridescence
+          iridescence_ior
+          iridescence_thickness_range
+          sheen
+          sheen_color
+          sheen_roughness
+          dispersion
+          specular_intensity
+          specular_color
+          attenuation_distance
+          attenuation_color
           wireframe
           wireframe_linewidth
           linewidth
@@ -196,6 +217,18 @@ module Three
           normal_map
           roughness_map
           specular_map
+          anisotropy_map
+          clearcoat_map
+          clearcoat_normal_map
+          clearcoat_roughness_map
+          transmission_map
+          thickness_map
+          iridescence_map
+          iridescence_thickness_map
+          sheen_color_map
+          sheen_roughness_map
+          specular_color_map
+          specular_intensity_map
         ].select { |slot| has_value?(entry, slot) }
       end
 

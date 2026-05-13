@@ -262,6 +262,69 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal true, handle[:parameters][:flatShading]
   end
 
+  def test_materializes_mesh_physical_material
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    anisotropy_map = Three::Texture.new("/anisotropy.png")
+    clearcoat_map = Three::Texture.new("/clearcoat.png")
+    transmission_map = Three::Texture.new("/transmission.png")
+    material = Three::MeshPhysicalMaterial.new(
+      color: 0x99ccff,
+      roughness: 0.35,
+      metalness: 0.1,
+      anisotropy: 0.4,
+      anisotropy_rotation: 0.2,
+      anisotropy_map: anisotropy_map,
+      clearcoat: 0.8,
+      clearcoat_roughness: 0.25,
+      clearcoat_map: clearcoat_map,
+      transmission: 0.45,
+      transmission_map: transmission_map,
+      thickness: 0.2,
+      ior: 1.45,
+      reflectivity: 0.35,
+      iridescence: 0.2,
+      iridescence_ior: 1.15,
+      iridescence_thickness_range: [120, 360],
+      sheen: 0.3,
+      sheen_color: 0x223344,
+      sheen_roughness: 0.65,
+      dispersion: 0.1,
+      specular_intensity: 0.7,
+      specular_color: 0xf0f6ff,
+      attenuation_distance: 5,
+      attenuation_color: 0x88aaff
+    )
+
+    handle = backend.materialize(material)
+
+    assert_equal :mesh_physical_material, handle[:type]
+    assert_equal 0x99ccff, handle[:parameters][:color]
+    assert_equal 0.35, handle[:parameters][:roughness]
+    assert_equal 0.1, handle[:parameters][:metalness]
+    assert_equal 0.4, handle[:parameters][:anisotropy]
+    assert_equal 0.2, handle[:parameters][:anisotropyRotation]
+    assert_equal "/anisotropy.png", handle[:parameters][:anisotropyMap][:source]
+    assert_equal 0.8, handle[:parameters][:clearcoat]
+    assert_equal 0.25, handle[:parameters][:clearcoatRoughness]
+    assert_equal "/clearcoat.png", handle[:parameters][:clearcoatMap][:source]
+    assert_equal 0.45, handle[:parameters][:transmission]
+    assert_equal "/transmission.png", handle[:parameters][:transmissionMap][:source]
+    assert_equal 0.2, handle[:parameters][:thickness]
+    assert_in_delta 1.3255813953488373, handle[:parameters][:ior]
+    assert_equal 0.35, handle[:parameters][:reflectivity]
+    assert_equal 0.2, handle[:parameters][:iridescence]
+    assert_equal 1.15, handle[:parameters][:iridescenceIOR]
+    assert_equal [120, 360], handle[:parameters][:iridescenceThicknessRange]
+    assert_equal 0.3, handle[:parameters][:sheen]
+    assert_equal 0x223344, handle[:parameters][:sheenColor]
+    assert_equal 0.65, handle[:parameters][:sheenRoughness]
+    assert_equal 0.1, handle[:parameters][:dispersion]
+    assert_equal 0.7, handle[:parameters][:specularIntensity]
+    assert_equal 0xf0f6ff, handle[:parameters][:specularColor]
+    assert_equal 5, handle[:parameters][:attenuationDistance]
+    assert_equal 0x88aaff, handle[:parameters][:attenuationColor]
+  end
+
   def test_materializes_texture
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     texture = Three::Texture.new(
@@ -782,6 +845,23 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal :update_material, adapter.calls.last[0]
     assert_equal 0.25, adapter.calls.last[2][:roughness]
     assert_equal 0.85, adapter.calls.last[2][:metalness]
+  end
+
+  def test_sync_updates_dirty_mesh_physical_material_parameters
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    material = Three::MeshPhysicalMaterial.new(clearcoat: 0.1, specular_color: 0xffffff)
+
+    backend.sync(material)
+    adapter.calls.clear
+
+    material.clearcoat = 0.6
+    material.specular_color.set_hex(0x88aaff)
+    backend.sync(material)
+
+    assert_equal :update_material, adapter.calls.last[0]
+    assert_equal 0.6, adapter.calls.last[2][:clearcoat]
+    assert_equal 0x88aaff, adapter.calls.last[2][:specularColor]
   end
 
   def test_sync_updates_dirty_mesh_phong_material_parameters

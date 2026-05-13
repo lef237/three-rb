@@ -20,6 +20,27 @@ module Three
           parameters[:shininess] = material.shininess if material.respond_to?(:shininess)
           parameters[:roughness] = material.roughness if material.respond_to?(:roughness)
           parameters[:metalness] = material.metalness if material.respond_to?(:metalness)
+          parameters[:anisotropy] = material.anisotropy if material.respond_to?(:anisotropy)
+          parameters[:anisotropyRotation] = material.anisotropy_rotation if material.respond_to?(:anisotropy_rotation)
+          parameters[:clearcoat] = material.clearcoat if material.respond_to?(:clearcoat)
+          parameters[:clearcoatRoughness] = material.clearcoat_roughness if material.respond_to?(:clearcoat_roughness)
+          parameters[:transmission] = material.transmission if material.respond_to?(:transmission)
+          parameters[:thickness] = material.thickness if material.respond_to?(:thickness)
+          parameters[:ior] = material.ior if material.respond_to?(:ior)
+          parameters[:reflectivity] = material.reflectivity if material.respond_to?(:reflectivity)
+          parameters[:iridescence] = material.iridescence if material.respond_to?(:iridescence)
+          parameters[:iridescenceIOR] = material.iridescence_ior if material.respond_to?(:iridescence_ior)
+          if material.respond_to?(:iridescence_thickness_range) && material.iridescence_thickness_range
+            parameters[:iridescenceThicknessRange] = material.iridescence_thickness_range.dup
+          end
+          parameters[:sheen] = material.sheen if material.respond_to?(:sheen)
+          parameters[:sheenColor] = material.sheen_color.hex if material.respond_to?(:sheen_color)
+          parameters[:sheenRoughness] = material.sheen_roughness if material.respond_to?(:sheen_roughness)
+          parameters[:dispersion] = material.dispersion if material.respond_to?(:dispersion)
+          parameters[:specularIntensity] = material.specular_intensity if material.respond_to?(:specular_intensity)
+          parameters[:specularColor] = material.specular_color.hex if material.respond_to?(:specular_color)
+          parameters[:attenuationDistance] = material.attenuation_distance if material.respond_to?(:attenuation_distance) && material.attenuation_distance
+          parameters[:attenuationColor] = material.attenuation_color.hex if material.respond_to?(:attenuation_color)
           parameters[:linewidth] = material.linewidth if material.respond_to?(:linewidth)
           parameters[:linecap] = material.linecap if material.respond_to?(:linecap)
           parameters[:linejoin] = material.linejoin if material.respond_to?(:linejoin)

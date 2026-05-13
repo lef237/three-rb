@@ -123,4 +123,69 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     refute loaded_points.material.size_attenuation
     assert_same loaded_line.geometry, loaded_points.geometry
   end
+
+  def test_parse_reconstructs_mesh_physical_material
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/texture.png")
+    anisotropy_map = Three::Texture.new("/anisotropy.png")
+    clearcoat_map = Three::Texture.new("/clearcoat.png")
+    material = Three::MeshPhysicalMaterial.new(
+      color: 0x99ccff,
+      roughness: 0.35,
+      metalness: 0.1,
+      anisotropy: 0.4,
+      anisotropy_rotation: 0.2,
+      anisotropy_map: anisotropy_map,
+      clearcoat: 0.8,
+      clearcoat_roughness: 0.25,
+      clearcoat_map: clearcoat_map,
+      transmission: 0.2,
+      thickness: 0.1,
+      ior: 1.45,
+      reflectivity: 0.35,
+      iridescence: 0.2,
+      iridescence_ior: 1.15,
+      iridescence_thickness_range: [120, 360],
+      sheen: 0.3,
+      sheen_color: 0x223344,
+      sheen_roughness: 0.65,
+      dispersion: 0.1,
+      specular_intensity: 0.7,
+      specular_color: 0xf0f6ff,
+      attenuation_distance: 5,
+      attenuation_color: 0x88aaff,
+      map: texture
+    )
+    scene.add(Three::Mesh.new(Three::BoxGeometry.new, material))
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(Three::Exporters::ThreeJSONExporter.new.export(scene))
+    loaded_material = loaded.children.first.material
+
+    assert_instance_of Three::MeshPhysicalMaterial, loaded_material
+    assert_equal 0x99ccff, loaded_material.color.hex
+    assert_equal 0.35, loaded_material.roughness
+    assert_equal 0.1, loaded_material.metalness
+    assert_equal 0.4, loaded_material.anisotropy
+    assert_equal 0.2, loaded_material.anisotropy_rotation
+    assert_equal "/anisotropy.png", loaded_material.anisotropy_map.source
+    assert_equal 0.8, loaded_material.clearcoat
+    assert_equal 0.25, loaded_material.clearcoat_roughness
+    assert_equal "/clearcoat.png", loaded_material.clearcoat_map.source
+    assert_equal 0.2, loaded_material.transmission
+    assert_equal 0.1, loaded_material.thickness
+    assert_in_delta 1.3255813953488373, loaded_material.ior
+    assert_equal 0.35, loaded_material.reflectivity
+    assert_equal 0.2, loaded_material.iridescence
+    assert_equal 1.15, loaded_material.iridescence_ior
+    assert_equal [120, 360], loaded_material.iridescence_thickness_range
+    assert_equal 0.3, loaded_material.sheen
+    assert_equal 0x223344, loaded_material.sheen_color.hex
+    assert_equal 0.65, loaded_material.sheen_roughness
+    assert_equal 0.1, loaded_material.dispersion
+    assert_equal 0.7, loaded_material.specular_intensity
+    assert_equal 0xf0f6ff, loaded_material.specular_color.hex
+    assert_equal 5, loaded_material.attenuation_distance
+    assert_equal 0x88aaff, loaded_material.attenuation_color.hex
+    assert_equal "/texture.png", loaded_material.map.source
+  end
 end

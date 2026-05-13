@@ -14,6 +14,7 @@ class FakeThreeJSAdapter
     envMap
     lightMap
     specularMap
+    anisotropyMap
     clearcoatMap
     clearcoatNormalMap
     clearcoatRoughnessMap
@@ -408,6 +409,10 @@ class FakeThreeJSAdapter
 
   def new_mesh_phong_material(parameters)
     handle(:mesh_phong_material, parameters: parameters.dup)
+  end
+
+  def new_mesh_physical_material(parameters)
+    handle(:mesh_physical_material, parameters: parameters.dup)
   end
 
   def new_mesh_standard_material(parameters)
