@@ -52,4 +52,4 @@ jobs:
         run: bundle exec rake test
 
       - name: Run browser smoke test
-        run: pnpm test:browser:cube
+        run: pnpm test:browser

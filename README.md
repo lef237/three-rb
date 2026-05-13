@@ -25,7 +25,7 @@ Browser rendering is being wired through `Three::Renderers::ThreeJSRenderer`, wh
 
 ## Browser Example
 
-Install browser dependencies, serve the repository root, and open the cube example:
+Install browser dependencies, serve the repository root, and open one of the browser examples:
 
 ```sh
 pnpm install
@@ -34,16 +34,17 @@ ruby -run -e httpd . -p 8000
 
 ```text
 http://localhost:8000/examples/browser/cube/
+http://localhost:8000/examples/browser/composition/
 ```
 
 The example loads pnpm-managed browser packages from `node_modules/`: `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`, `@ruby/wasm-wasi@2.9.4-2026-05-11-a`, and `three@0.184.0`.
 
-Run the optional browser smoke test:
+Run the optional browser smoke tests:
 
 ```sh
 pnpm install
 pnpm exec playwright install chromium
-pnpm test:browser:cube
+pnpm test:browser
 ```
 
 ## Development
@@ -68,7 +69,7 @@ pnpm install --frozen-lockfile --ignore-scripts
 pnpm audit --audit-level moderate
 pnpm audit signatures
 pnpm exec playwright install chromium
-pnpm test:browser:cube
+pnpm test:browser
 ```
 
 ## Documents
