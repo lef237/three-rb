@@ -13,6 +13,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   SERIALIZATION_EXAMPLE_DIR = File.join(ROOT, "examples/browser/serialization")
   PICKING_EXAMPLE_DIR = File.join(ROOT, "examples/browser/picking")
   PRIMITIVES_EXAMPLE_DIR = File.join(ROOT, "examples/browser/primitives")
+  POSTPROCESSING_EXAMPLE_DIR = File.join(ROOT, "examples/browser/postprocessing")
 
   def test_browser_cube_example_files_exist
     assert_path_exists File.join(EXAMPLE_DIR, "index.html")
@@ -71,6 +72,13 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_path_exists File.join(PRIMITIVES_EXAMPLE_DIR, "main.rb")
     assert_path_exists File.join(PRIMITIVES_EXAMPLE_DIR, "README.md")
     assert_path_exists File.join(PRIMITIVES_EXAMPLE_DIR, "smoke_test.mjs")
+  end
+
+  def test_browser_postprocessing_example_files_exist
+    assert_path_exists File.join(POSTPROCESSING_EXAMPLE_DIR, "index.html")
+    assert_path_exists File.join(POSTPROCESSING_EXAMPLE_DIR, "main.rb")
+    assert_path_exists File.join(POSTPROCESSING_EXAMPLE_DIR, "README.md")
+    assert_path_exists File.join(POSTPROCESSING_EXAMPLE_DIR, "smoke_test.mjs")
   end
 
   def test_index_loads_pinned_browser_dependencies
@@ -197,6 +205,20 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::Float32BufferAttribute"
   end
 
+  def test_postprocessing_example_exercises_composer_and_bloom_pipeline
+    ruby = File.read(File.join(POSTPROCESSING_EXAMPLE_DIR, "main.rb"))
+
+    assert_includes ruby, "Three::Postprocessing::EffectComposer"
+    assert_includes ruby, "Three::Postprocessing::RenderPass"
+    assert_includes ruby, "Three::Postprocessing::UnrealBloomPass"
+    assert_includes ruby, "composer.add_pass(render_pass)"
+    assert_includes ruby, "composer.add_pass(bloom_pass)"
+    assert_includes ruby, "composer.set_size(width, height)"
+    assert_includes ruby, "composer.render(scene, camera)"
+    assert_includes ruby, "bloom_pass.strength ="
+    assert_includes ruby, "preserveDrawingBuffer: true"
+  end
+
   def test_package_script_runs_browser_smoke_test
     package = JSON.parse(File.read(File.join(ROOT, "package.json")))
 
@@ -205,7 +227,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/3.4-wasm-wasi")
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/wasm-wasi")
     assert_equal "0.184.0", package.fetch("dependencies").fetch("three")
-    assert_equal "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives", package.fetch("scripts").fetch("test:browser")
+    assert_equal "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing", package.fetch("scripts").fetch("test:browser")
     assert_equal "node examples/browser/cube/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cube")
     assert_equal "node examples/browser/composition/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:composition")
     assert_equal "node examples/browser/textures/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:textures")
@@ -214,6 +236,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "node examples/browser/serialization/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:serialization")
     assert_equal "node examples/browser/picking/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:picking")
     assert_equal "node examples/browser/primitives/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:primitives")
+    assert_equal "node examples/browser/postprocessing/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:postprocessing")
     assert_includes package.fetch("devDependencies"), "playwright"
   end
 end

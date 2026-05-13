@@ -61,6 +61,9 @@ require_relative "three/animation/animation_mixer"
 require_relative "three/renderers/renderer"
 require_relative "three/renderers/threejs_renderer"
 require_relative "three/controls/orbit_controls"
+require_relative "three/postprocessing/effect_composer"
+require_relative "three/postprocessing/render_pass"
+require_relative "three/postprocessing/unreal_bloom_pass"
 require_relative "three/exporters/three_json_exporter"
 
 module Three

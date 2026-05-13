@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@11.1.1",
   "scripts": {
-    "test:browser": "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives",
+    "test:browser": "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing",
     "test:browser:cube": "node examples/browser/cube/smoke_test.mjs",
     "test:browser:composition": "node examples/browser/composition/smoke_test.mjs",
     "test:browser:textures": "node examples/browser/textures/smoke_test.mjs",
@@ -13,6 +13,7 @@
     "test:browser:serialization": "node examples/browser/serialization/smoke_test.mjs",
     "test:browser:picking": "node examples/browser/picking/smoke_test.mjs",
     "test:browser:primitives": "node examples/browser/primitives/smoke_test.mjs",
+    "test:browser:postprocessing": "node examples/browser/postprocessing/smoke_test.mjs",
     "benchmark:browser": "pnpm benchmark:browser:mesh-sync && pnpm benchmark:browser:instanced-mesh-sync",
     "benchmark:browser:mesh-sync": "node benchmarks/browser/mesh_sync/run.mjs",
     "benchmark:browser:instanced-mesh-sync": "node benchmarks/browser/instanced_mesh_sync/run.mjs"

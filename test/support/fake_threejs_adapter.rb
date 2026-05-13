@@ -68,6 +68,50 @@ class FakeThreeJSAdapter
     @calls << [:render, renderer, scene, camera]
   end
 
+  def new_effect_composer(renderer)
+    handle(:effect_composer, renderer: renderer, passes: [], size: nil)
+  end
+
+  def effect_composer_add_pass(composer, pass)
+    @calls << [:effect_composer_add_pass, composer, pass]
+    composer[:passes] << pass
+  end
+
+  def effect_composer_set_size(composer, width, height)
+    @calls << [:effect_composer_set_size, composer, width, height]
+    composer[:size] = [width, height]
+  end
+
+  def effect_composer_render(composer)
+    @calls << [:effect_composer_render, composer]
+    composer[:rendered] = true
+  end
+
+  def dispose_effect_composer(composer)
+    @calls << [:dispose_effect_composer, composer]
+    composer[:disposed] = true
+  end
+
+  def new_render_pass(scene, camera)
+    handle(:render_pass, scene: scene, camera: camera, enabled: true)
+  end
+
+  def new_unreal_bloom_pass(resolution, strength, radius, threshold)
+    handle(
+      :unreal_bloom_pass,
+      resolution: resolution.dup,
+      strength: strength,
+      radius: radius,
+      threshold: threshold,
+      enabled: true
+    )
+  end
+
+  def set_postprocessing_pass_property(pass, name, value)
+    @calls << [:set_postprocessing_pass_property, pass, name, value]
+    pass[name.to_sym] = value
+  end
+
   def new_orbit_controls(camera, dom_element)
     handle(:orbit_controls, camera: camera, dom_element: dom_element, target: [0, 0, 0])
   end

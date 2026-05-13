@@ -76,6 +76,44 @@ module Three
           end
         end
 
+        def new_effect_composer(renderer)
+          effect_composer_constructor.new(renderer)
+        end
+
+        def effect_composer_add_pass(composer, pass)
+          composer.call(:addPass, pass)
+        end
+
+        def effect_composer_set_size(composer, width, height)
+          composer.call(:setSize, width, height)
+        end
+
+        def effect_composer_render(composer)
+          render_helper = JS.global[:__threeRbRenderComposer]
+          if render_helper.typeof == "function"
+            JS.global[:__threeRbCurrentComposer] = composer
+            JS.global.call(:__threeRbRenderComposer)
+          else
+            composer.call(:render)
+          end
+        end
+
+        def dispose_effect_composer(composer)
+          composer.call(:dispose)
+        end
+
+        def new_render_pass(scene, camera)
+          render_pass_constructor.new(scene, camera)
+        end
+
+        def new_unreal_bloom_pass(resolution, strength, radius, threshold)
+          unreal_bloom_pass_constructor.new(@three[:Vector2].new(*resolution), strength, radius, threshold)
+        end
+
+        def set_postprocessing_pass_property(pass, name, value)
+          pass[name] = value
+        end
+
         def new_orbit_controls(camera, dom_element)
           constructor = orbit_controls_constructor
           dom_element ? constructor.new(camera, dom_element) : constructor.new(camera)
@@ -596,6 +634,36 @@ module Three
           constructor
         rescue LoadError
           raise RuntimeError, "Three::Controls::OrbitControls requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def effect_composer_constructor
+          require "js"
+          constructor = JS.global[:THREE_EFFECT_COMPOSER]
+          raise RuntimeError, "Three::Postprocessing::EffectComposer requires globalThis.THREE_EFFECT_COMPOSER" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Postprocessing::EffectComposer requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def render_pass_constructor
+          require "js"
+          constructor = JS.global[:THREE_RENDER_PASS]
+          raise RuntimeError, "Three::Postprocessing::RenderPass requires globalThis.THREE_RENDER_PASS" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Postprocessing::RenderPass requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def unreal_bloom_pass_constructor
+          require "js"
+          constructor = JS.global[:THREE_UNREAL_BLOOM_PASS]
+          raise RuntimeError, "Three::Postprocessing::UnrealBloomPass requires globalThis.THREE_UNREAL_BLOOM_PASS" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Postprocessing::UnrealBloomPass requires ruby.wasm's js gem or an injected adapter"
         end
 
         def gltf_loader_constructor

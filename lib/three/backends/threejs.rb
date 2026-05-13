@@ -100,6 +100,40 @@ module Three
         @adapter.render(renderer_handle, scene_handle, camera_handle)
       end
 
+      def create_effect_composer(renderer_handle)
+        @adapter.new_effect_composer(renderer_handle)
+      end
+
+      def add_effect_composer_pass(composer_handle, pass_handle)
+        @adapter.effect_composer_add_pass(composer_handle, pass_handle)
+      end
+
+      def set_effect_composer_size(composer_handle, width, height)
+        @adapter.effect_composer_set_size(composer_handle, width, height)
+      end
+
+      def render_effect_composer(composer_handle, scene = nil, camera = nil)
+        sync(scene) if scene
+        sync(camera) if camera
+        @adapter.effect_composer_render(composer_handle)
+      end
+
+      def dispose_effect_composer(composer_handle)
+        @adapter.dispose_effect_composer(composer_handle)
+      end
+
+      def create_render_pass(scene, camera)
+        @adapter.new_render_pass(sync(scene), sync(camera))
+      end
+
+      def create_unreal_bloom_pass(resolution, strength, radius, threshold)
+        @adapter.new_unreal_bloom_pass(resolution, strength, radius, threshold)
+      end
+
+      def set_postprocessing_pass_property(pass_handle, name, value)
+        @adapter.set_postprocessing_pass_property(pass_handle, name, value)
+      end
+
       def create_orbit_controls(camera, dom_element = nil)
         @adapter.new_orbit_controls(camera, dom_element)
       end

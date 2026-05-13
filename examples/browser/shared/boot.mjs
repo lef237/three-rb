@@ -4,6 +4,9 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 
 export async function bootRubyExample({ main, clearColor }) {
   const setStatus = globalThis.__threeRbSetStatus || (() => {});
@@ -16,6 +19,9 @@ export async function bootRubyExample({ main, clearColor }) {
     globalThis.THREE_DRACO_LOADER = DRACOLoader;
     globalThis.THREE_RGBE_LOADER = HDRLoader;
     globalThis.THREE_ORBIT_CONTROLS = OrbitControls;
+    globalThis.THREE_EFFECT_COMPOSER = EffectComposer;
+    globalThis.THREE_RENDER_PASS = RenderPass;
+    globalThis.THREE_UNREAL_BLOOM_PASS = UnrealBloomPass;
     globalThis.__threeReady = Promise.resolve(THREE);
     globalThis.__threeRbRenderCount = 0;
     globalThis.__threeRbRenderFrameCount = 0;
@@ -28,6 +34,14 @@ export async function bootRubyExample({ main, clearColor }) {
         globalThis.__threeRbRenderFrameCount += 1;
         renderer.setClearColor(clearColor, 1);
         renderer.render(scene, camera);
+      });
+    };
+    globalThis.__threeRbRenderComposer = () => {
+      globalThis.__threeRbRenderCount += 1;
+      const composer = globalThis.__threeRbCurrentComposer;
+      globalThis.requestAnimationFrame(() => {
+        globalThis.__threeRbRenderFrameCount += 1;
+        composer.render();
       });
     };
 

@@ -505,6 +505,7 @@ Current implementation status:
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
 - `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
 - `examples/browser/primitives` focuses on `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
+- `examples/browser/postprocessing` focuses on an explicit render pipeline using `Three::Postprocessing::EffectComposer`, `RenderPass`, `UnrealBloomPass`, composer sizing, and pass property updates.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
@@ -525,8 +526,9 @@ Current implementation status:
 - The Three.js backend internals are split into materialization, synchronization, parameter conversion, resource management, and ruby.wasm adapter files so renderer additions do not keep growing one monolithic backend file.
 - `MeshPhysicalMaterial` was prioritized before additional addon loaders because it extends the existing material, texture-slot, JSON, disposal, and browser-smoke boundaries without adding new decoder or renderer-pipeline constraints.
 - `RGBELoader`/`RGBETexture` was prioritized after `MeshPhysicalMaterial` because HDR environment maps directly improve PBR and physical-material scenes while reusing the existing texture, scene environment, JSON, and browser-smoke boundaries.
-- `DRACOLoader` was prioritized before postprocessing because a compressed glTF fixture can verify it through the existing GLTFLoader, ExternalObject3D, loaded-asset disposal, and browser-smoke paths with a small API addition. Postprocessing should wait for a dedicated render-pipeline example because it introduces composer/pass ownership decisions.
-- The next implementation step is adding more material classes or addon loaders only when an example or API target needs them; based on current coverage, postprocessing should wait for a dedicated render-pipeline example and KTX2 should wait until texture-compression fixture coverage is needed.
+- `DRACOLoader` was prioritized before postprocessing because a compressed glTF fixture can verify it through the existing GLTFLoader, ExternalObject3D, loaded-asset disposal, and browser-smoke paths with a small API addition.
+- Postprocessing was prioritized after `DRACOLoader` because the core render, material, texture, glTF, and interaction paths now have enough coverage to justify a dedicated render-pipeline example. The first wrapper set intentionally stays small: `EffectComposer`, `RenderPass`, and `UnrealBloomPass`.
+- The next implementation step is adding more material classes, postprocessing passes, render targets, or addon loaders only when an example or API target needs them; KTX2 should wait until texture-compression fixture coverage is needed.
 
 Recommended structure:
 
@@ -663,7 +665,7 @@ Candidates:
 - Shadows
 - Instancing
 - Raycaster
-- Postprocessing wrappers
+- Additional postprocessing wrappers
 - WebGPU renderer wrapper
 
 Current instancing direction:
@@ -689,6 +691,7 @@ Completion criteria:
 - Synchronizing 1000 repeated meshes through `InstancedMesh` remains interactive.
 - A benchmark separately measures 1000 individual `Mesh` transform sync to decide whether backend batching is needed there too.
 - Pointer picking can identify Ruby-authored meshes through `Three::Raycaster`.
+- A Ruby-authored scene can render through an explicit `EffectComposer` pipeline with a render pass and bloom pass.
 
 ### Phase 9: Native Renderer Evaluation
 
@@ -843,7 +846,7 @@ The MVP is complete when:
 ## Next Tasks
 
 1. Prefer feature work that has visible user value, reuses the current Three.js backend boundary, and can be verified by deterministic browser smoke tests.
-2. Add postprocessing only with a dedicated render-pipeline example; add KTX2 or other decoder loaders only with fixtures that require them.
+2. Expand postprocessing beyond `RenderPass`/`UnrealBloomPass` only when a dedicated example requires a new pass or render-target API; add KTX2 or other decoder loaders only with fixtures that require them.
 3. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable.
 4. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
 5. Keep reviewing low-risk dependency updates after checking their CI results.
