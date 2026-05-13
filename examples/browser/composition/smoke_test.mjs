@@ -29,9 +29,12 @@ async function main() {
       renderInfo: globalThis.__threeRbRenderer?.info?.render,
       cameraType: globalThis.__threeRbCamera?.type,
       sceneChildren: globalThis.__threeRbScene?.children?.length,
+      ambientLightType: globalThis.__threeRbAmbientLight?.type,
+      directionalLightType: globalThis.__threeRbDirectionalLight?.type,
       planeGeometryType: globalThis.__threeRbPlane?.geometry?.type,
       rigType: globalThis.__threeRbRig?.type,
       primaryParentType: globalThis.__threeRbPrimaryMesh?.parent?.type,
+      primaryMaterialType: globalThis.__threeRbPrimaryMesh?.material?.type,
       satelliteParentType: globalThis.__threeRbSatelliteMesh?.parent?.type,
       sphereParentType: globalThis.__threeRbSphereMesh?.parent?.type,
       sphereGeometryType: globalThis.__threeRbSphereMesh?.geometry?.type,
@@ -47,8 +50,14 @@ async function main() {
     if (scene.cameraType !== "OrthographicCamera") {
       throw new Error(`expected an OrthographicCamera composition view: ${JSON.stringify(scene)}`);
     }
+    if (scene.ambientLightType !== "AmbientLight" || scene.directionalLightType !== "DirectionalLight") {
+      throw new Error(`expected ambient and directional lights: ${JSON.stringify(scene)}`);
+    }
     if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group" || scene.sphereParentType !== "Group") {
       throw new Error(`expected grouped child meshes: ${JSON.stringify(scene)}`);
+    }
+    if (scene.primaryMaterialType !== "MeshLambertMaterial") {
+      throw new Error(`expected a light-reactive MeshLambertMaterial primary mesh: ${JSON.stringify(scene)}`);
     }
     if (scene.sphereGeometryType !== "SphereGeometry") {
       throw new Error(`expected a SphereGeometry child mesh: ${JSON.stringify(scene)}`);

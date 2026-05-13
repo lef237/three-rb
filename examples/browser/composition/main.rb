@@ -18,6 +18,13 @@ begin
   camera = Three::OrthographicCamera.new(-3, 3, 1.8, -1.8, near: 0.1, far: 100)
   camera.position.z = 5
 
+  ambient_light = Three::AmbientLight.new(0xffffff, 0.45)
+  scene.add(ambient_light)
+
+  key_light = Three::DirectionalLight.new(0xffffff, 1.35)
+  key_light.position.set(2.5, 3.0, 4.5)
+  scene.add(key_light)
+
   backdrop_material = Three::MeshBasicMaterial.new(color: 0x243141)
   backdrop = Three::Mesh.new(Three::PlaneGeometry.new(5.8, 3.4, width_segments: 2, height_segments: 2), backdrop_material)
   backdrop.position.z = -1.25
@@ -27,7 +34,7 @@ begin
   rig.name = "composition-rig"
   scene.add(rig)
 
-  primary_material = Three::MeshBasicMaterial.new(color: 0x61d394)
+  primary_material = Three::MeshLambertMaterial.new(color: 0x61d394)
   primary = Three::Mesh.new(Three::BoxGeometry.new(0.85, 0.85, 0.85), primary_material)
   primary.position.x = -0.55
   primary.position.z = 0.15
@@ -76,12 +83,15 @@ begin
   JS.global[:__threeRbRenderer] = renderer.handle
   JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
+  JS.global[:__threeRbAmbientLight] = renderer.backend.materialize(ambient_light)
+  JS.global[:__threeRbDirectionalLight] = renderer.backend.materialize(key_light)
   JS.global[:__threeRbPlane] = renderer.backend.materialize(backdrop)
   JS.global[:__threeRbRig] = renderer.backend.materialize(rig)
   JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)
   JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)
   JS.global[:__threeRbSphereMesh] = renderer.backend.materialize(orb)
   JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
+  JS.global[:__threeRbLambertMaterial] = renderer.backend.materialize(primary_material)
   JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)
   JS.global[:__threeRbInitialMaterialColor] = primary_material.color.hex
   JS.global[:__threeRbCompositionFrame] = 0

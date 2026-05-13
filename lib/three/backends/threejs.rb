@@ -6,7 +6,10 @@ require_relative "../core/buffer_geometry"
 require_relative "../geometries/box_geometry"
 require_relative "../geometries/plane_geometry"
 require_relative "../geometries/sphere_geometry"
+require_relative "../lights/ambient_light"
+require_relative "../lights/directional_light"
 require_relative "../materials/mesh_basic_material"
+require_relative "../materials/mesh_lambert_material"
 require_relative "../materials/mesh_normal_material"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
@@ -93,6 +96,10 @@ module Three
           @adapter.new_scene
         when Mesh
           @adapter.new_mesh(materialize(object.geometry), materialize(object.material))
+        when AmbientLight
+          @adapter.new_ambient_light(object.color.hex, object.intensity)
+        when DirectionalLight
+          @adapter.new_directional_light(object.color.hex, object.intensity)
         when BoxGeometry
           parameters = object.parameters
           @adapter.new_box_geometry(
@@ -126,6 +133,8 @@ module Three
           build_buffer_geometry(object)
         when MeshBasicMaterial
           @adapter.new_mesh_basic_material(material_parameters(object))
+        when MeshLambertMaterial
+          @adapter.new_mesh_lambert_material(material_parameters(object))
         when MeshNormalMaterial
           @adapter.new_mesh_normal_material(material_parameters(object))
         when Group
@@ -169,6 +178,8 @@ module Three
           sync_camera(object, handle)
         end
 
+        sync_light(object, handle) if object.is_a?(Light) && object.dirty_field?(:light)
+
         if object.is_a?(Mesh)
           geometry_handle = sync(object.geometry)
           material_handle = sync(object.material) if object.material.respond_to?(:uuid)
@@ -200,6 +211,10 @@ module Three
         when PerspectiveCamera
           @adapter.update_perspective_camera(handle, object.fov, object.aspect, object.near, object.far, object.zoom)
         end
+      end
+
+      def sync_light(object, handle)
+        @adapter.update_light(handle, object.color.hex, object.intensity)
       end
 
       def sync_material(material, handle)
@@ -336,6 +351,14 @@ module Three
           @three[:OrthographicCamera].new(left, right, top, bottom, near, far)
         end
 
+        def new_ambient_light(color, intensity)
+          @three[:AmbientLight].new(color, intensity)
+        end
+
+        def new_directional_light(color, intensity)
+          @three[:DirectionalLight].new(color, intensity)
+        end
+
         def new_mesh(geometry, material)
           @three[:Mesh].new(geometry, material)
         end
@@ -397,6 +420,10 @@ module Three
           @three[:MeshBasicMaterial].new(stringify_keys(parameters))
         end
 
+        def new_mesh_lambert_material(parameters)
+          @three[:MeshLambertMaterial].new(stringify_keys(parameters))
+        end
+
         def new_mesh_normal_material(parameters)
           @three[:MeshNormalMaterial].new(stringify_keys(parameters))
         end
@@ -433,6 +460,11 @@ module Three
           camera[:far] = far
           camera[:zoom] = zoom
           camera.call(:updateProjectionMatrix)
+        end
+
+        def update_light(light, color, intensity)
+          light[:color].call(:setHex, color)
+          light[:intensity] = intensity
         end
 
         def update_material(material, parameters)

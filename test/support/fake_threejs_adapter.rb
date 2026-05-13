@@ -47,6 +47,14 @@ class FakeThreeJSAdapter
     handle(:orthographic_camera, left: left, right: right, top: top, bottom: bottom, near: near, far: far, children: [])
   end
 
+  def new_ambient_light(color, intensity)
+    handle(:ambient_light, color: color, intensity: intensity, children: [])
+  end
+
+  def new_directional_light(color, intensity)
+    handle(:directional_light, color: color, intensity: intensity, children: [])
+  end
+
   def new_mesh(geometry, material)
     handle(:mesh, geometry: geometry, material: material, children: [])
   end
@@ -138,6 +146,10 @@ class FakeThreeJSAdapter
     handle(:mesh_basic_material, parameters: parameters.dup)
   end
 
+  def new_mesh_lambert_material(parameters)
+    handle(:mesh_lambert_material, parameters: parameters.dup)
+  end
+
   def new_mesh_normal_material(parameters)
     handle(:mesh_normal_material, parameters: parameters.dup)
   end
@@ -177,6 +189,12 @@ class FakeThreeJSAdapter
     camera[:near] = near
     camera[:far] = far
     camera[:zoom] = zoom
+  end
+
+  def update_light(light, color, intensity)
+    @calls << [:update_light, light, color, intensity]
+    light[:color] = color
+    light[:intensity] = intensity
   end
 
   def update_material(material, parameters)

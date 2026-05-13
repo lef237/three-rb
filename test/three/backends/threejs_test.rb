@@ -84,6 +84,17 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal true, handle[:parameters][:wireframe]
   end
 
+  def test_materializes_mesh_lambert_material
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    material = Three::MeshLambertMaterial.new(color: 0x224466, flat_shading: true)
+
+    handle = backend.materialize(material)
+
+    assert_equal :mesh_lambert_material, handle[:type]
+    assert_equal 0x224466, handle[:parameters][:color]
+    assert_equal true, handle[:parameters][:flatShading]
+  end
+
   def test_materializes_orthographic_camera
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     camera = Three::OrthographicCamera.new(-2, 2, 1, -1, near: 0.5, far: 50)
@@ -97,6 +108,20 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal(-1, handle[:bottom])
     assert_equal 0.5, handle[:near]
     assert_equal 50, handle[:far]
+  end
+
+  def test_materializes_lights
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+
+    ambient = backend.materialize(Three::AmbientLight.new(0x112233, 0.5))
+    directional = backend.materialize(Three::DirectionalLight.new(0xffffff, 1.25))
+
+    assert_equal :ambient_light, ambient[:type]
+    assert_equal 0x112233, ambient[:color]
+    assert_equal 0.5, ambient[:intensity]
+    assert_equal :directional_light, directional[:type]
+    assert_equal 0xffffff, directional[:color]
+    assert_equal 1.25, directional[:intensity]
   end
 
   def test_sync_updates_object_transform
@@ -191,6 +216,24 @@ class ThreeThreeJSBackendTest < Minitest::Test
     backend.sync(camera)
 
     assert_equal [:update_orthographic_camera, handle, -2, 2, 1, -1, 0.5, 50, 2], adapter.calls.last
+  end
+
+  def test_sync_updates_dirty_light_only_after_change
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    light = Three::DirectionalLight.new(0xffffff, 1)
+
+    handle = backend.sync(light)
+    adapter.calls.clear
+    backend.sync(light)
+
+    assert_empty adapter.calls
+
+    light.color.set_hex(0x224466)
+    light.intensity = 0.75
+    backend.sync(light)
+
+    assert_equal [:update_light, handle, 0x224466, 0.75], adapter.calls.last
   end
 
   def test_sync_updates_dirty_buffer_attribute_only_after_change

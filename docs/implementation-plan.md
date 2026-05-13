@@ -494,15 +494,15 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, and `MeshNormalMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `AmbientLight`, `DirectionalLight`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `MeshLambertMaterial`, and `MeshNormalMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
-- `examples/browser/composition` renders an `OrthographicCamera` view with `PlaneGeometry`, `SphereGeometry`, grouped meshes, `MeshNormalMaterial`, and a material color update through the same renderer path.
+- `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `MeshLambertMaterial`, `MeshNormalMaterial`, and a material color update through the same renderer path.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
-- The next implementation step is adding the first renderer-adjacent object family, likely `AmbientLight` and `DirectionalLight`, once material behavior needs lighting.
+- The next implementation step is adding a small interaction wrapper such as `OrbitControls`, or starting asset loading with `TextureLoader`.
 
 Recommended structure:
 
@@ -517,8 +517,11 @@ Initial bridge responsibilities:
 - Ruby `Scene` -> JS `THREE.Scene`
 - Ruby `PerspectiveCamera` -> JS `THREE.PerspectiveCamera`
 - Ruby `OrthographicCamera` -> JS `THREE.OrthographicCamera`
+- Ruby `AmbientLight` -> JS `THREE.AmbientLight`
+- Ruby `DirectionalLight` -> JS `THREE.DirectionalLight`
 - Ruby `BoxGeometry` -> JS `THREE.BufferGeometry` or JS `THREE.BoxGeometry`
 - Ruby `MeshBasicMaterial` -> JS `THREE.MeshBasicMaterial`
+- Ruby `MeshLambertMaterial` -> JS `THREE.MeshLambertMaterial`
 - Ruby `Mesh` -> JS `THREE.Mesh`
 - Ruby `Object3D` transform -> JS object transform
 - `animation_loop` -> `requestAnimationFrame`
@@ -775,8 +778,8 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add the next renderer-adjacent object family, likely `AmbientLight` and `DirectionalLight`, once material behavior needs lighting.
-2. Add a light-reactive material such as `MeshLambertMaterial` after basic lights exist.
+1. Add `OrbitControls` as a thin wrapper around the three.js addon for interactive examples.
+2. Add `TextureLoader` and texture assignment for practical material examples.
 3. Keep reviewing low-risk dependency updates after checking their CI results.
 
 ## Decisions Still Open
