@@ -11,6 +11,7 @@ const mimeTypes = new Map([
   [".rb", "text/plain; charset=utf-8"],
   [".css", "text/css; charset=utf-8"],
   [".svg", "image/svg+xml"],
+  [".gltf", "model/gltf+json"],
   [".wasm", "application/wasm"]
 ]);
 

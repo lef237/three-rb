@@ -14,6 +14,7 @@ require_relative "../materials/mesh_basic_material"
 require_relative "../materials/mesh_lambert_material"
 require_relative "../materials/mesh_normal_material"
 require_relative "../materials/mesh_standard_material"
+require_relative "../objects/external_object3d"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
 require_relative "../textures/cube_texture"
@@ -192,6 +193,8 @@ module Three
           @adapter.new_mesh_standard_material(material_parameters(object))
         when Group
           @adapter.new_group
+        when ExternalObject3D
+          object.handle
         when Object3D
           @adapter.new_object3d
         else
@@ -464,6 +467,10 @@ module Three
           texture
         end
 
+        def load_gltf(source)
+          gltf_loader_constructor.new.call(:loadAsync, source)
+        end
+
         def update_texture(texture, parameters)
           texture[:flipY] = parameters[:flip_y] unless parameters[:flip_y].nil?
           texture[:wrapS] = parameters[:wrap_s] unless parameters[:wrap_s].nil?
@@ -708,6 +715,16 @@ module Three
           constructor
         rescue LoadError
           raise RuntimeError, "Three::Controls::OrbitControls requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def gltf_loader_constructor
+          require "js"
+          constructor = JS.global[:THREE_GLTF_LOADER]
+          raise RuntimeError, "Three::Loaders::GLTFLoader requires globalThis.THREE_GLTF_LOADER" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Loaders::GLTFLoader requires ruby.wasm's js gem or an injected adapter"
         end
 
         def resolve_canvas(canvas)

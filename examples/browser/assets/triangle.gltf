@@ -1,0 +1,67 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "three.rb smoke asset"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "nodes": [0]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "RubyTriangle",
+      "mesh": 0
+    }
+  ],
+  "meshes": [
+    {
+      "name": "RubyTriangleMesh",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "material": 0
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "RubyTriangleMaterial",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.35, 0.78, 1.0, 1.0],
+        "metallicFactor": 0.0,
+        "roughnessFactor": 0.45
+      },
+      "doubleSided": true
+    }
+  ],
+  "buffers": [
+    {
+      "uri": "data:application/octet-stream;base64,AAAAAAAAgD8AAAAAAACAvwAAgL8AAAAAAACAPwAAgL8AAAAA",
+      "byteLength": 36
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 36,
+      "target": 34962
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "byteOffset": 0,
+      "componentType": 5126,
+      "count": 3,
+      "type": "VEC3",
+      "min": [-1.0, -1.0, 0.0],
+      "max": [1.0, 1.0, 0.0]
+    }
+  ]
+}

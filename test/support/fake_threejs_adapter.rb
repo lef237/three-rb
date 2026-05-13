@@ -43,6 +43,10 @@ class FakeThreeJSAdapter
     handle(:cube_texture, { sources: sources.dup }.merge(parameters))
   end
 
+  def load_gltf(source)
+    handle(:gltf, source: source, scene: handle(:gltf_scene, children: []))
+  end
+
   def update_texture(texture, parameters)
     @calls << [:update_texture, texture, parameters]
     texture.merge!(parameters)

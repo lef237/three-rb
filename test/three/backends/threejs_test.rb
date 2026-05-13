@@ -19,6 +19,20 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 0x00ff00, handle[:children].first[:material][:parameters][:color]
   end
 
+  def test_materializes_external_object3d_without_rebuilding_handle
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    external_handle = { type: :gltf_scene, children: [{ type: :loaded_mesh }] }
+    external = Three::ExternalObject3D.new(external_handle, type: "GLTFScene")
+
+    scene.add(external)
+    handle = backend.sync(scene)
+
+    assert_same external_handle, handle[:children].first
+    assert_equal [{ type: :loaded_mesh }], external_handle[:children]
+  end
+
   def test_reuses_cached_handles
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     scene = Three::Scene.new
