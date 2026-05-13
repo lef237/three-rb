@@ -258,6 +258,19 @@ module Three
       self
     end
 
+    def apply_matrix3(matrix)
+      elements = matrix.elements
+      x = @x
+      y = @y
+      z = @z
+
+      @x = elements[0] * x + elements[3] * y + elements[6] * z
+      @y = elements[1] * x + elements[4] * y + elements[7] * z
+      @z = elements[2] * x + elements[5] * y + elements[8] * z
+      changed!
+      self
+    end
+
     def apply_quaternion(quaternion)
       vx = @x
       vy = @y
@@ -296,6 +309,10 @@ module Three
 
     def set_from_matrix_column(matrix, index)
       from_array(matrix.elements, index * 4)
+    end
+
+    def set_from_matrix3_column(matrix, index)
+      from_array(matrix.elements, index * 3)
     end
 
     def from_array(array, offset = 0)

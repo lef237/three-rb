@@ -509,6 +509,7 @@ Current implementation status:
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
+- `Three::Matrix3` is implemented with inverse/transpose, normal-matrix, and UV-transform helpers; `Vector3` can apply `Matrix3` values.
 - `Three::Clock` and `Three::Layers` are implemented; `Object3D#layers` is serialized and synchronized to Three.js `layers.mask`.
 - glTF animation is prioritized ahead of broader postprocessing or additional loader expansion because it builds directly on the existing `GLTFLoader`, `ExternalObject3D`, and browser smoke infrastructure while providing a visible user-facing capability with bounded backend API surface.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.

@@ -106,11 +106,36 @@ class ThreeVector3Test < Minitest::Test
     assert_vector3_in_delta [0, 0, -1], vector
   end
 
+  def test_apply_matrix3
+    matrix = Three::Matrix3.new.set(
+      1, 2, 3,
+      4, 5, 6,
+      7, 8, 9
+    )
+    vector = Three::Vector3.new(1, 1, 1)
+
+    assert_same vector, vector.apply_matrix3(matrix)
+    assert_vector3_in_delta [6, 15, 24], vector
+  end
+
   def test_matrix_array_helpers
     matrix = Three::Matrix4.new.make_translation(1, 2, 3)
     vector = Three::Vector3.new.set_from_matrix_position(matrix)
 
     assert_equal [1, 2, 3], vector.to_a
     assert_equal [nil, 1, 2, 3], vector.to_array([nil], 1)
+  end
+
+  def test_set_from_matrix3_column
+    matrix = Three::Matrix3.new.set(
+      1, 2, 3,
+      4, 5, 6,
+      7, 8, 9
+    )
+    vector = Three::Vector3.new
+
+    vector.set_from_matrix3_column(matrix, 1)
+
+    assert_vector3_in_delta [2, 5, 8], vector
   end
 end
