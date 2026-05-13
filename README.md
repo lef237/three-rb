@@ -140,6 +140,7 @@ bundle exec rake release:preflight
 ## Documents
 
 - [Implementation Plan](docs/implementation-plan.md)
+- [Next Work](docs/next-work.md)
 - [Loaded Asset Traversal and Disposal Design](docs/loaded-assets-design.md)
 - [Release Readiness](docs/release-readiness.md)
 - [Publishing](docs/publishing.md)

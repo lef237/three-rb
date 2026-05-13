@@ -13,18 +13,30 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes readme, "bundle exec rake release:gem_smoke"
     assert_includes readme, "bundle exec rake release:preflight"
     assert_includes readme, "docs/release-readiness.md"
+    assert_includes readme, "docs/next-work.md"
     assert_includes readme, "docs/publishing.md"
   end
 
-  def test_changelog_and_release_readiness_docs_are_packaged
+  def test_changelog_and_release_docs_are_packaged
     spec = Gem::Specification.load(File.join(ROOT, "three.rb.gemspec"))
 
     assert_path_exists File.join(ROOT, "CHANGELOG.md")
+    assert_path_exists File.join(ROOT, "docs/next-work.md")
     assert_path_exists File.join(ROOT, "docs/release-readiness.md")
     assert_path_exists File.join(ROOT, "docs/publishing.md")
     assert_includes spec.files, "CHANGELOG.md"
+    assert_includes spec.files, "docs/next-work.md"
     assert_includes spec.files, "docs/release-readiness.md"
     assert_includes spec.files, "docs/publishing.md"
+  end
+
+  def test_next_work_records_resume_point
+    next_work = File.read(File.join(ROOT, "docs/next-work.md"))
+
+    assert_includes next_work, "Add saved fixture regression coverage"
+    assert_includes next_work, "Three::Exporters::ThreeJSONExporter"
+    assert_includes next_work, "Three::Loaders::ThreeJSONLoader"
+    assert_includes next_work, "Do not start Phase 9 native renderer work yet"
   end
 
   def test_gemspec_has_public_metadata

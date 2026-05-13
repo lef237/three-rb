@@ -61,7 +61,7 @@ The release is acceptable when:
 Before expanding feature scope, prefer:
 
 1. Keep release checks fast and deterministic.
-2. Add fixture-based JSON export/load regression tests if the format changes.
+2. Add fixture-based JSON export/load regression tests; see `docs/next-work.md`.
 3. Improve public docs around installation, browser boot, and unsupported APIs.
 4. Add new material classes, postprocessing passes, render targets, or loaders only when a dedicated example and smoke test need them.
 5. Treat KTX2, WebGPU, WebXR, and native rendering as post-0.1 planning items.
