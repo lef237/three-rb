@@ -494,18 +494,19 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `MeshLambertMaterial`, `MeshStandardMaterial`, and `MeshNormalMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `MeshLambertMaterial`, `MeshStandardMaterial`, and `MeshNormalMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
 - `examples/browser/textures` focuses on `TextureLoader`, repeat/wrap/filter settings, and `MeshStandardMaterial#map` on a textured cube.
+- `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
 - `Three::Renderers::ThreeJSRenderer#dispose` exposes backend disposal and can explicitly dispose a material's mapped textures with `dispose_textures: true`.
-- The next implementation step is adding more loader coverage or expanding resource ownership helpers.
+- The next implementation step is adding a minimal addon loader wrapper, likely starting with `GLTFLoader`.
 
 Recommended structure:
 
@@ -587,11 +588,15 @@ The goal is to handle external assets needed for practical scenes.
 
 Initial loaders should delegate to JavaScript loaders.
 
-Loader priority:
+Implemented delegate loaders so far:
 
 1. `TextureLoader`
-2. `GLTFLoader`
-3. `CubeTextureLoader`
+2. `CubeTextureLoader`
+
+Loader priority:
+
+1. `GLTFLoader`
+2. Additional three.js addon loaders as examples require them.
 
 Ruby API:
 
@@ -783,7 +788,7 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add more loader coverage, starting with `CubeTextureLoader` or a minimal `GLTFLoader` wrapper.
+1. Add more loader coverage with a minimal `GLTFLoader` wrapper.
 2. Expand resource ownership helpers beyond single material maps when more texture slots exist.
 3. Keep reviewing low-risk dependency updates after checking their CI results.
 

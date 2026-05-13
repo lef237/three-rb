@@ -143,6 +143,30 @@ class ThreeThreeJSBackendTest < Minitest::Test
     refute texture.dirty?
   end
 
+  def test_materializes_cube_texture
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    sources = %w[/px.png /nx.png /py.png /ny.png /pz.png /nz.png]
+    texture = Three::CubeTexture.new(
+      sources,
+      flip_y: false,
+      wrap_s: Three::ClampToEdgeWrapping,
+      wrap_t: Three::ClampToEdgeWrapping,
+      mag_filter: Three::LinearFilter,
+      min_filter: Three::LinearMipmapLinearFilter
+    )
+
+    handle = backend.materialize(texture)
+
+    assert_equal :cube_texture, handle[:type]
+    assert_equal sources, handle[:sources]
+    assert_equal false, handle[:flip_y]
+    assert_equal Three::ClampToEdgeWrapping, handle[:wrap_s]
+    assert_equal Three::ClampToEdgeWrapping, handle[:wrap_t]
+    assert_equal Three::LinearFilter, handle[:mag_filter]
+    assert_equal Three::LinearMipmapLinearFilter, handle[:min_filter]
+    refute texture.dirty?
+  end
+
   def test_sync_updates_dirty_texture_only_after_change
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)
@@ -160,6 +184,45 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal :update_texture, adapter.calls.last[0]
     assert_same handle, adapter.calls.last[1]
     assert_equal [4, 5], adapter.calls.last[2][:repeat]
+    refute texture.dirty?
+  end
+
+  def test_sync_scene_background_and_environment
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    background = Three::CubeTexture.new(%w[/px.png /nx.png /py.png /ny.png /pz.png /nz.png])
+    environment = Three::CubeTexture.new(%w[/epx.png /enx.png /epy.png /eny.png /epz.png /enz.png])
+
+    scene.background = background
+    scene.environment = environment
+    handle = backend.sync(scene)
+
+    assert_equal :scene, handle[:type]
+    assert_equal :cube_texture, handle[:background][:type]
+    assert_equal :cube_texture, handle[:environment][:type]
+    assert adapter.calls.any? { |call| call == [:set_scene_background, handle, handle[:background]] }
+    assert adapter.calls.any? { |call| call == [:set_scene_environment, handle, handle[:environment]] }
+    refute scene.dirty?
+  end
+
+  def test_sync_updates_dirty_scene_background_texture
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    texture = Three::CubeTexture.new(%w[/px.png /nx.png /py.png /ny.png /pz.png /nz.png])
+
+    scene.background = texture
+    handle = backend.sync(scene)
+    adapter.calls.clear
+
+    texture.wrap_s = Three::RepeatWrapping
+    backend.sync(scene)
+
+    assert_equal :update_texture, adapter.calls[0][0]
+    assert_same handle[:background], adapter.calls[0][1]
+    assert_equal Three::RepeatWrapping, adapter.calls[0][2][:wrap_s]
+    assert adapter.calls.any? { |call| call == [:set_scene_background, handle, handle[:background]] }
     refute texture.dirty?
   end
 

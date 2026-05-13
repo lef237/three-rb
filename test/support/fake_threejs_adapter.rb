@@ -39,6 +39,10 @@ class FakeThreeJSAdapter
     handle(:texture, { source: source }.merge(parameters))
   end
 
+  def load_cube_texture(sources, parameters = {})
+    handle(:cube_texture, { sources: sources.dup }.merge(parameters))
+  end
+
   def update_texture(texture, parameters)
     @calls << [:update_texture, texture, parameters]
     texture.merge!(parameters)
@@ -280,6 +284,16 @@ class FakeThreeJSAdapter
   def clear_children(parent)
     @calls << [:clear_children, parent]
     parent[:children].clear
+  end
+
+  def set_scene_background(scene, background)
+    @calls << [:set_scene_background, scene, background]
+    scene[:background] = background
+  end
+
+  def set_scene_environment(scene, environment)
+    @calls << [:set_scene_environment, scene, environment]
+    scene[:environment] = environment
   end
 
   def dispose(handle)

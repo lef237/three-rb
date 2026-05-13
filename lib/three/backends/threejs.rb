@@ -16,6 +16,7 @@ require_relative "../materials/mesh_normal_material"
 require_relative "../materials/mesh_standard_material"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
+require_relative "../textures/cube_texture"
 require_relative "../textures/texture"
 require_relative "base"
 
@@ -138,6 +139,8 @@ module Three
           @adapter.new_scene
         when Mesh
           @adapter.new_mesh(materialize(object.geometry), materialize(object.material))
+        when CubeTexture
+          @adapter.load_cube_texture(object.sources, texture_parameters(object))
         when Texture
           @adapter.load_texture(object.source, texture_parameters(object))
         when AmbientLight
@@ -215,6 +218,8 @@ module Three
       end
 
       def sync_object3d(object, handle)
+        sync_scene(object, handle) if object.is_a?(Scene) && (object.dirty_field?(:scene) || scene_resource_dirty?(object))
+
         if object.dirty_field?(:properties)
           @adapter.set_object_name(handle, object.name)
           @adapter.set_object_visible(handle, object.visible)
@@ -252,6 +257,17 @@ module Three
 
         object.mark_clean! if object.respond_to?(:mark_clean!)
         handle
+      end
+
+      def sync_scene(scene, handle)
+        @adapter.set_scene_background(handle, scene.background ? sync(scene.background) : nil)
+        @adapter.set_scene_environment(handle, scene.environment ? sync(scene.environment) : nil)
+      end
+
+      def scene_resource_dirty?(scene)
+        [scene.background, scene.environment].compact.any? do |resource|
+          resource.respond_to?(:dirty?) && resource.dirty?
+        end
       end
 
       def sync_camera(object, handle)
@@ -438,6 +454,12 @@ module Three
 
         def load_texture(source, parameters = {})
           texture = @three[:TextureLoader].new.call(:load, source)
+          update_texture(texture, parameters)
+          texture
+        end
+
+        def load_cube_texture(sources, parameters = {})
+          texture = @three[:CubeTextureLoader].new.call(:load, js_array(sources))
           update_texture(texture, parameters)
           texture
         end
@@ -657,6 +679,14 @@ module Three
           parent.call(:clear)
         end
 
+        def set_scene_background(scene, background)
+          scene[:background] = background
+        end
+
+        def set_scene_environment(scene, environment)
+          scene[:environment] = environment
+        end
+
         def dispose(handle)
           handle.call(:dispose) if handle.respond_to?(:call)
         end
@@ -695,6 +725,12 @@ module Three
             else JS.global[:Array]
             end
           constructor.new(array)
+        end
+
+        def js_array(values)
+          array = JS.global[:Array].new
+          values.each { |value| array.call(:push, value) }
+          array
         end
 
         def stringify_keys(hash)
