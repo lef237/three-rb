@@ -84,6 +84,21 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal true, handle[:parameters][:wireframe]
   end
 
+  def test_materializes_orthographic_camera
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    camera = Three::OrthographicCamera.new(-2, 2, 1, -1, near: 0.5, far: 50)
+
+    handle = backend.materialize(camera)
+
+    assert_equal :orthographic_camera, handle[:type]
+    assert_equal(-2, handle[:left])
+    assert_equal 2, handle[:right]
+    assert_equal 1, handle[:top]
+    assert_equal(-1, handle[:bottom])
+    assert_equal 0.5, handle[:near]
+    assert_equal 50, handle[:far]
+  end
+
   def test_sync_updates_object_transform
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     object = Three::Object3D.new
@@ -159,6 +174,23 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
     assert_equal :update_material, adapter.calls.last[0]
     assert_equal 0x00ff00, adapter.calls.last[2][:color]
+  end
+
+  def test_sync_updates_dirty_orthographic_camera_only_after_change
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    camera = Three::OrthographicCamera.new(-2, 2, 1, -1, near: 0.5, far: 50)
+
+    handle = backend.sync(camera)
+    adapter.calls.clear
+    backend.sync(camera)
+
+    assert_empty adapter.calls
+
+    camera.zoom = 2
+    backend.sync(camera)
+
+    assert_equal [:update_orthographic_camera, handle, -2, 2, 1, -1, 0.5, 50, 2], adapter.calls.last
   end
 
   def test_sync_updates_dirty_buffer_attribute_only_after_change

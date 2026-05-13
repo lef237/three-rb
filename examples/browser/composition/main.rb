@@ -15,7 +15,7 @@ begin
   status[:textContent] = "Starting Ruby scene"
 
   scene = Three::Scene.new
-  camera = Three::PerspectiveCamera.new(62, aspect: 1.0, near: 0.1, far: 100)
+  camera = Three::OrthographicCamera.new(-3, 3, 1.8, -1.8, near: 0.1, far: 100)
   camera.position.z = 5
 
   backdrop_material = Three::MeshBasicMaterial.new(color: 0x243141)
@@ -58,8 +58,13 @@ begin
   resize = proc do
     width = [viewport[:clientWidth].to_i, 1].max
     height = [viewport[:clientHeight].to_i, 1].max
+    view_height = 3.8
+    view_width = view_height * width.to_f / height
 
-    camera.aspect = width.to_f / height
+    camera.left = -view_width / 2
+    camera.right = view_width / 2
+    camera.top = view_height / 2
+    camera.bottom = -view_height / 2
     camera.update_projection_matrix
     renderer.set_size(width, height)
   end

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative "../cameras/orthographic_camera"
 require_relative "../cameras/perspective_camera"
 require_relative "../core/buffer_geometry"
 require_relative "../geometries/box_geometry"
@@ -84,6 +85,8 @@ module Three
 
       def build_handle(object)
         case object
+        when OrthographicCamera
+          @adapter.new_orthographic_camera(object.left, object.right, object.top, object.bottom, object.near, object.far)
         when PerspectiveCamera
           @adapter.new_perspective_camera(object.fov, object.aspect, object.near, object.far)
         when Scene
@@ -162,8 +165,8 @@ module Three
           @adapter.set_object_transform(handle, object.position.to_a, object.quaternion.to_a, object.scale.to_a)
         end
 
-        if object.is_a?(PerspectiveCamera) && object.dirty_field?(:camera)
-          @adapter.update_perspective_camera(handle, object.fov, object.aspect, object.near, object.far, object.zoom)
+        if object.dirty_field?(:camera)
+          sync_camera(object, handle)
         end
 
         if object.is_a?(Mesh)
@@ -188,6 +191,15 @@ module Three
 
         object.mark_clean! if object.respond_to?(:mark_clean!)
         handle
+      end
+
+      def sync_camera(object, handle)
+        case object
+        when OrthographicCamera
+          @adapter.update_orthographic_camera(handle, object.left, object.right, object.top, object.bottom, object.near, object.far, object.zoom)
+        when PerspectiveCamera
+          @adapter.update_perspective_camera(handle, object.fov, object.aspect, object.near, object.far, object.zoom)
+        end
       end
 
       def sync_material(material, handle)
@@ -320,6 +332,10 @@ module Three
           @three[:PerspectiveCamera].new(fov, aspect, near, far)
         end
 
+        def new_orthographic_camera(left, right, top, bottom, near, far)
+          @three[:OrthographicCamera].new(left, right, top, bottom, near, far)
+        end
+
         def new_mesh(geometry, material)
           @three[:Mesh].new(geometry, material)
         end
@@ -402,6 +418,17 @@ module Three
         def update_perspective_camera(camera, fov, aspect, near, far, zoom)
           camera[:fov] = fov
           camera[:aspect] = aspect
+          camera[:near] = near
+          camera[:far] = far
+          camera[:zoom] = zoom
+          camera.call(:updateProjectionMatrix)
+        end
+
+        def update_orthographic_camera(camera, left, right, top, bottom, near, far, zoom)
+          camera[:left] = left
+          camera[:right] = right
+          camera[:top] = top
+          camera[:bottom] = bottom
           camera[:near] = near
           camera[:far] = far
           camera[:zoom] = zoom

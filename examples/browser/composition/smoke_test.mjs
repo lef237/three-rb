@@ -61,6 +61,7 @@ async function main() {
     const scene = await page.evaluate(() => ({
       frame: globalThis.__threeRbCompositionFrame,
       renderInfo: globalThis.__threeRbRenderer?.info?.render,
+      cameraType: globalThis.__threeRbCamera?.type,
       sceneChildren: globalThis.__threeRbScene?.children?.length,
       planeGeometryType: globalThis.__threeRbPlane?.geometry?.type,
       rigType: globalThis.__threeRbRig?.type,
@@ -76,6 +77,9 @@ async function main() {
 
     if (scene.planeGeometryType !== "PlaneGeometry") {
       throw new Error(`expected a PlaneGeometry backdrop: ${JSON.stringify(scene)}`);
+    }
+    if (scene.cameraType !== "OrthographicCamera") {
+      throw new Error(`expected an OrthographicCamera composition view: ${JSON.stringify(scene)}`);
     }
     if (scene.rigType !== "Group" || scene.primaryParentType !== "Group" || scene.satelliteParentType !== "Group" || scene.sphereParentType !== "Group") {
       throw new Error(`expected grouped child meshes: ${JSON.stringify(scene)}`);

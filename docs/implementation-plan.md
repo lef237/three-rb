@@ -494,14 +494,14 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, and `MeshNormalMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, and `MeshNormalMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
-- `examples/browser/composition` renders `PlaneGeometry`, `SphereGeometry`, grouped meshes, `MeshNormalMaterial`, and a material color update through the same renderer path.
+- `examples/browser/composition` renders an `OrthographicCamera` view with `PlaneGeometry`, `SphereGeometry`, grouped meshes, `MeshNormalMaterial`, and a material color update through the same renderer path.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
-- The next implementation step is adding more small rendering surface area or reviewing low-risk dependency updates.
+- The next implementation step is reviewing low-risk dependency updates, then factoring shared browser boot utilities if example duplication starts slowing changes down.
 
 Recommended structure:
 
@@ -515,6 +515,7 @@ Initial bridge responsibilities:
 
 - Ruby `Scene` -> JS `THREE.Scene`
 - Ruby `PerspectiveCamera` -> JS `THREE.PerspectiveCamera`
+- Ruby `OrthographicCamera` -> JS `THREE.OrthographicCamera`
 - Ruby `BoxGeometry` -> JS `THREE.BufferGeometry` or JS `THREE.BoxGeometry`
 - Ruby `MeshBasicMaterial` -> JS `THREE.MeshBasicMaterial`
 - Ruby `Mesh` -> JS `THREE.Mesh`
@@ -773,9 +774,9 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add the next small rendering surface area: `OrthographicCamera`.
-2. Review and merge low-risk Dependabot updates after checking their CI results.
-3. Factor shared browser boot and smoke-test utilities if example duplication starts slowing changes down.
+1. Review and merge low-risk Dependabot updates after checking their CI results.
+2. Factor shared browser boot and smoke-test utilities if example duplication starts slowing changes down.
+3. Add the next renderer-adjacent object family, likely `AmbientLight` and `DirectionalLight`, once material behavior needs lighting.
 
 ## Decisions Still Open
 

@@ -316,6 +316,33 @@ module Three
       self
     end
 
+    def make_orthographic(left, right, top, bottom, near, far)
+      w = 1.0 / (right - left)
+      h = 1.0 / (top - bottom)
+      p = 1.0 / (far - near)
+      x = (right + left) * w
+      y = (top + bottom) * h
+      z = (far + near) * p
+
+      @elements[0] = 2 * w
+      @elements[4] = 0
+      @elements[8] = 0
+      @elements[12] = -x
+      @elements[1] = 0
+      @elements[5] = 2 * h
+      @elements[9] = 0
+      @elements[13] = -y
+      @elements[2] = 0
+      @elements[6] = 0
+      @elements[10] = -2 * p
+      @elements[14] = -z
+      @elements[3] = 0
+      @elements[7] = 0
+      @elements[11] = 0
+      @elements[15] = 1
+      self
+    end
+
     def compose(position, quaternion, scale)
       x = quaternion.x
       y = quaternion.y

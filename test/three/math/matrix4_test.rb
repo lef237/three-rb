@@ -85,4 +85,14 @@ class ThreeMatrix4Test < Minitest::Test
     assert_in_delta(-1.02020202020202, matrix.elements[10], 1e-12)
     assert_equal(-1, matrix.elements[11])
   end
+
+  def test_make_orthographic
+    matrix = Three::Matrix4.new.make_orthographic(-2, 2, 1, -1, 1, 101)
+
+    assert_in_delta 0.5, matrix.elements[0], 1e-12
+    assert_in_delta 1, matrix.elements[5], 1e-12
+    assert_in_delta(-0.02, matrix.elements[10], 1e-12)
+    assert_in_delta(-1.02, matrix.elements[14], 1e-12)
+    assert_equal 1, matrix.elements[15]
+  end
 end

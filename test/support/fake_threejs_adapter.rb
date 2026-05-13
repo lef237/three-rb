@@ -43,6 +43,10 @@ class FakeThreeJSAdapter
     handle(:perspective_camera, fov: fov, aspect: aspect, near: near, far: far, children: [])
   end
 
+  def new_orthographic_camera(left, right, top, bottom, near, far)
+    handle(:orthographic_camera, left: left, right: right, top: top, bottom: bottom, near: near, far: far, children: [])
+  end
+
   def new_mesh(geometry, material)
     handle(:mesh, geometry: geometry, material: material, children: [])
   end
@@ -159,6 +163,17 @@ class FakeThreeJSAdapter
     @calls << [:update_perspective_camera, camera, fov, aspect, near, far, zoom]
     camera[:fov] = fov
     camera[:aspect] = aspect
+    camera[:near] = near
+    camera[:far] = far
+    camera[:zoom] = zoom
+  end
+
+  def update_orthographic_camera(camera, left, right, top, bottom, near, far, zoom)
+    @calls << [:update_orthographic_camera, camera, left, right, top, bottom, near, far, zoom]
+    camera[:left] = left
+    camera[:right] = right
+    camera[:top] = top
+    camera[:bottom] = bottom
     camera[:near] = near
     camera[:far] = far
     camera[:zoom] = zoom
