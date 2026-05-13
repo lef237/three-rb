@@ -28,7 +28,9 @@ module Three
 
         def release_cached_object_handles(object, dispose_geometries:, dispose_materials:, dispose_textures:)
           key = cache_key(object)
-          @handles.delete(key) if key
+          handle = key ? @handles.delete(key) : nil
+          handle_key = @adapter.object_handle_key(handle) if handle
+          @objects_by_handle_key.delete(handle_key) if handle_key
 
           if object.is_a?(Mesh)
             release_cached_resource(object.geometry) if dispose_geometries

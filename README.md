@@ -39,6 +39,7 @@ http://localhost:8000/examples/browser/textures/
 http://localhost:8000/examples/browser/cubemap/
 http://localhost:8000/examples/browser/gltf/
 http://localhost:8000/examples/browser/serialization/
+http://localhost:8000/examples/browser/picking/
 ```
 
 The example loads pnpm-managed browser packages from `node_modules/`: `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`, `@ruby/wasm-wasi@2.9.4-2026-05-11-a`, and `three@0.184.0`.

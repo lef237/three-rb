@@ -28,9 +28,11 @@ class FakeThreeJSAdapter
   ].freeze
 
   attr_reader :calls
+  attr_accessor :raycaster_intersections
 
   def initialize
     @calls = []
+    @raycaster_intersections = []
   end
 
   def new_webgl_renderer(options = {})
@@ -67,6 +69,21 @@ class FakeThreeJSAdapter
 
   def new_orbit_controls(camera, dom_element)
     handle(:orbit_controls, camera: camera, dom_element: dom_element, target: [0, 0, 0])
+  end
+
+  def new_raycaster
+    handle(:raycaster)
+  end
+
+  def set_raycaster_from_camera(raycaster, coords, camera)
+    @calls << [:set_raycaster_from_camera, raycaster, coords, camera]
+    raycaster[:coords] = coords
+    raycaster[:camera] = camera
+  end
+
+  def intersect_objects(raycaster, objects, recursive: false)
+    @calls << [:intersect_objects, raycaster, objects, recursive]
+    @raycaster_intersections
   end
 
   def load_texture(source, parameters = {})
@@ -396,6 +413,40 @@ class FakeThreeJSAdapter
 
   def dispose(handle)
     @calls << [:dispose, handle]
+  end
+
+  def object_handle_key(object)
+    return nil unless object
+
+    object[:uuid] ||= "fake-#{object.object_id}"
+  end
+
+  def intersection_distance(intersection)
+    intersection[:distance]
+  end
+
+  def intersection_point(intersection)
+    intersection[:point]
+  end
+
+  def intersection_object(intersection)
+    intersection[:object]
+  end
+
+  def intersection_uv(intersection)
+    intersection[:uv]
+  end
+
+  def intersection_face_index(intersection)
+    intersection[:face_index]
+  end
+
+  def intersection_index(intersection)
+    intersection[:index]
+  end
+
+  def intersection_instance_id(intersection)
+    intersection[:instance_id]
   end
 
   def traverse_object3d(object, callback)

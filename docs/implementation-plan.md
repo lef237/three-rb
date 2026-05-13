@@ -503,6 +503,7 @@ Current implementation status:
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - `examples/browser/gltf` focuses on `GLTFLoader`, adding a loaded external scene to the Ruby-authored scene graph, and disposing the loaded subtree through the renderer API.
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
+- `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
@@ -674,6 +675,7 @@ Completion criteria:
 - Material and texture disposal does not leak resources.
 - Synchronizing 1000 repeated meshes through `InstancedMesh` remains interactive.
 - A benchmark separately measures 1000 individual `Mesh` transform sync to decide whether backend batching is needed there too.
+- Pointer picking can identify Ruby-authored meshes through `Three::Raycaster`.
 
 ### Phase 9: Native Renderer Evaluation
 

@@ -11,6 +11,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   CUBEMAP_EXAMPLE_DIR = File.join(ROOT, "examples/browser/cubemap")
   GLTF_EXAMPLE_DIR = File.join(ROOT, "examples/browser/gltf")
   SERIALIZATION_EXAMPLE_DIR = File.join(ROOT, "examples/browser/serialization")
+  PICKING_EXAMPLE_DIR = File.join(ROOT, "examples/browser/picking")
 
   def test_browser_cube_example_files_exist
     assert_path_exists File.join(EXAMPLE_DIR, "index.html")
@@ -53,6 +54,13 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_path_exists File.join(SERIALIZATION_EXAMPLE_DIR, "main.rb")
     assert_path_exists File.join(SERIALIZATION_EXAMPLE_DIR, "README.md")
     assert_path_exists File.join(SERIALIZATION_EXAMPLE_DIR, "smoke_test.mjs")
+  end
+
+  def test_browser_picking_example_files_exist
+    assert_path_exists File.join(PICKING_EXAMPLE_DIR, "index.html")
+    assert_path_exists File.join(PICKING_EXAMPLE_DIR, "main.rb")
+    assert_path_exists File.join(PICKING_EXAMPLE_DIR, "README.md")
+    assert_path_exists File.join(PICKING_EXAMPLE_DIR, "smoke_test.mjs")
   end
 
   def test_index_loads_pinned_browser_dependencies
@@ -146,6 +154,16 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "renderer.render(scene, camera)"
   end
 
+  def test_picking_example_exercises_raycaster
+    ruby = File.read(File.join(PICKING_EXAMPLE_DIR, "main.rb"))
+
+    assert_includes ruby, "Three::Raycaster"
+    assert_includes ruby, "raycaster.set_from_camera"
+    assert_includes ruby, "raycaster.intersect_objects"
+    assert_includes ruby, "selected.material.color.set_hex"
+    assert_includes ruby, "addEventListener, \"click\""
+  end
+
   def test_package_script_runs_browser_smoke_test
     package = JSON.parse(File.read(File.join(ROOT, "package.json")))
 
@@ -154,13 +172,14 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/3.4-wasm-wasi")
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/wasm-wasi")
     assert_equal "0.184.0", package.fetch("dependencies").fetch("three")
-    assert_equal "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization", package.fetch("scripts").fetch("test:browser")
+    assert_equal "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking", package.fetch("scripts").fetch("test:browser")
     assert_equal "node examples/browser/cube/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cube")
     assert_equal "node examples/browser/composition/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:composition")
     assert_equal "node examples/browser/textures/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:textures")
     assert_equal "node examples/browser/cubemap/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cubemap")
     assert_equal "node examples/browser/gltf/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:gltf")
     assert_equal "node examples/browser/serialization/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:serialization")
+    assert_equal "node examples/browser/picking/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:picking")
     assert_includes package.fetch("devDependencies"), "playwright"
   end
 end

@@ -80,6 +80,18 @@ module Three
           dom_element ? constructor.new(camera, dom_element) : constructor.new(camera)
         end
 
+        def new_raycaster
+          @three[:Raycaster].new
+        end
+
+        def set_raycaster_from_camera(raycaster, coords, camera)
+          raycaster.call(:setFromCamera, @three[:Vector2].new(*coords), camera)
+        end
+
+        def intersect_objects(raycaster, objects, recursive: false)
+          raycaster.call(:intersectObjects, js_array(objects), recursive).to_a
+        end
+
         def load_texture(source, parameters = {})
           texture = @three[:TextureLoader].new.call(:load, source)
           update_texture(texture, parameters)
@@ -375,6 +387,47 @@ module Three
 
         def dispose(handle)
           handle.call(:dispose) if handle.respond_to?(:call)
+        end
+
+        def object_handle_key(object)
+          return nil unless js_present?(object)
+
+          uuid = object[:uuid]
+          js_present?(uuid) ? uuid.to_s : nil
+        end
+
+        def intersection_distance(intersection)
+          value = intersection[:distance]
+          js_present?(value) ? value.to_f : nil
+        end
+
+        def intersection_point(intersection)
+          point = intersection[:point]
+          js_present?(point) ? js_vector_to_a(point, 3) : nil
+        end
+
+        def intersection_object(intersection)
+          intersection[:object]
+        end
+
+        def intersection_uv(intersection)
+          uv = intersection[:uv]
+          js_present?(uv) ? js_vector_to_a(uv, 2) : nil
+        end
+
+        def intersection_face_index(intersection)
+          value = intersection[:faceIndex]
+          js_present?(value) ? value.to_i : nil
+        end
+
+        def intersection_index(intersection)
+          value = intersection[:index]
+          js_present?(value) ? value.to_i : nil
+        end
+
+        def intersection_instance_id(intersection)
+          value = intersection[:instanceId]
+          js_present?(value) ? value.to_i : nil
         end
 
         def traverse_object3d(object, callback)

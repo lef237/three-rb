@@ -48,6 +48,7 @@ module Three
       def initialize(adapter: nil)
         @adapter = adapter || RubyWasmAdapter.new
         @handles = {}
+        @objects_by_handle_key = {}
         @geometry_attribute_names = {}
       end
 
@@ -111,12 +112,28 @@ module Three
         object
       end
 
+      def create_raycaster
+        @adapter.new_raycaster
+      end
+
+      def set_raycaster_from_camera(raycaster_handle, coords, camera)
+        @adapter.set_raycaster_from_camera(raycaster_handle, coords, sync(camera))
+      end
+
+      def intersect_objects(raycaster_handle, objects, recursive: false)
+        handles = Array(objects).map { |object| sync(object) }
+        @adapter.intersect_objects(raycaster_handle, handles, recursive: recursive).map do |intersection|
+          normalize_intersection(intersection)
+        end
+      end
+
       def materialize(object)
         key = cache_key(object)
         return @handles[key] if key && @handles.key?(key)
 
         handle = build_handle(object)
         @handles[key] = handle if key
+        register_object_handle(object, handle)
         mark_clean_after_materialize(object)
         handle
       end
@@ -143,6 +160,8 @@ module Three
 
         key = cache_key(object)
         handle = key ? @handles.delete(key) : nil
+        handle_key = @adapter.object_handle_key(handle) if handle
+        @objects_by_handle_key.delete(handle_key) if handle_key
         @adapter.dispose(handle) if handle
         handle
       end
@@ -192,6 +211,33 @@ module Three
 
       def cache_key(object)
         object.respond_to?(:uuid) ? object.uuid : nil
+      end
+
+      def register_object_handle(object, handle)
+        return unless object.is_a?(Object3D)
+
+        handle_key = @adapter.object_handle_key(handle)
+        @objects_by_handle_key[handle_key] = object if handle_key
+      end
+
+      def object_for_handle(handle)
+        handle_key = @adapter.object_handle_key(handle)
+        handle_key ? @objects_by_handle_key[handle_key] : nil
+      end
+
+      def normalize_intersection(intersection)
+        object_handle = @adapter.intersection_object(intersection)
+        {
+          distance: @adapter.intersection_distance(intersection),
+          point: @adapter.intersection_point(intersection),
+          object: object_for_handle(object_handle),
+          object_handle: object_handle,
+          uv: @adapter.intersection_uv(intersection),
+          face_index: @adapter.intersection_face_index(intersection),
+          index: @adapter.intersection_index(intersection),
+          instance_id: @adapter.intersection_instance_id(intersection),
+          raw: intersection
+        }
       end
     end
   end
