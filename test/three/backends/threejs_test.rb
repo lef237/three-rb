@@ -44,6 +44,19 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal [{ start: 0, count: 3, material_index: 0 }], handle[:groups]
   end
 
+  def test_materializes_plane_geometry_with_threejs_builtin
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    geometry = Three::PlaneGeometry.new(2, 3, width_segments: 4, height_segments: 5)
+
+    handle = backend.materialize(geometry)
+
+    assert_equal :plane_geometry, handle[:type]
+    assert_equal 2, handle[:width]
+    assert_equal 3, handle[:height]
+    assert_equal 4, handle[:width_segments]
+    assert_equal 5, handle[:height_segments]
+  end
+
   def test_sync_updates_object_transform
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     object = Three::Object3D.new

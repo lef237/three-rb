@@ -494,13 +494,13 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, generic `BufferGeometry`, `BufferAttribute`, and `MeshBasicMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, `PerspectiveCamera`, `Mesh`, `BoxGeometry`, `PlaneGeometry`, generic `BufferGeometry`, `BufferAttribute`, and `MeshBasicMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - CI runs the Ruby unit tests and the Playwright cube smoke test with pnpm-managed browser dependencies.
 - Core scene, material, and geometry objects expose dirty state, and the Three.js backend skips clean transform, material, geometry, and child-list sync work.
-- The next implementation step is adding a small amount of new rendering surface area.
+- The next implementation step is adding a second browser example that exercises the growing rendering surface area.
 
 Recommended structure:
 
@@ -772,8 +772,8 @@ The MVP is complete when:
 
 ## Next Tasks
 
-1. Add the next small rendering surface area: `PlaneGeometry`, `SphereGeometry`, `MeshNormalMaterial`, or `OrthographicCamera`.
-2. Add a second browser example that exercises multiple meshes, parent/child transforms, and material changes.
+1. Add a second browser example that exercises multiple meshes, parent/child transforms, and material changes.
+2. Add the next small rendering surface area: `SphereGeometry`, `MeshNormalMaterial`, or `OrthographicCamera`.
 3. Review and merge low-risk Dependabot updates after checking their CI results.
 
 ## Decisions Still Open

@@ -3,6 +3,7 @@
 require_relative "../cameras/perspective_camera"
 require_relative "../core/buffer_geometry"
 require_relative "../geometries/box_geometry"
+require_relative "../geometries/plane_geometry"
 require_relative "../materials/mesh_basic_material"
 require_relative "../objects/mesh"
 require_relative "../scenes/scene"
@@ -97,6 +98,14 @@ module Three
             parameters[:height_segments],
             parameters[:depth_segments]
           )
+        when PlaneGeometry
+          parameters = object.parameters
+          @adapter.new_plane_geometry(
+            parameters[:width],
+            parameters[:height],
+            parameters[:width_segments],
+            parameters[:height_segments]
+          )
         when BufferGeometry
           build_buffer_geometry(object)
         when MeshBasicMaterial
@@ -175,7 +184,7 @@ module Three
       end
 
       def sync_geometry(geometry, handle)
-        return handle if geometry.is_a?(BoxGeometry)
+        return handle if built_in_geometry?(geometry)
         return handle unless geometry_dirty?(geometry)
 
         if geometry.dirty_field?(:all) || geometry.dirty_field?(:index) || geometry.index&.dirty?
@@ -214,6 +223,10 @@ module Three
         geometry.dirty? ||
           geometry.index&.dirty? ||
           geometry.attributes.values.any?(&:dirty?)
+      end
+
+      def built_in_geometry?(geometry)
+        geometry.is_a?(BoxGeometry) || geometry.is_a?(PlaneGeometry)
       end
 
       def mark_clean_after_materialize(object)
@@ -305,6 +318,10 @@ module Three
 
         def new_box_geometry(width, height, depth, width_segments, height_segments, depth_segments)
           @three[:BoxGeometry].new(width, height, depth, width_segments, height_segments, depth_segments)
+        end
+
+        def new_plane_geometry(width, height, width_segments, height_segments)
+          @three[:PlaneGeometry].new(width, height, width_segments, height_segments)
         end
 
         def new_buffer_geometry

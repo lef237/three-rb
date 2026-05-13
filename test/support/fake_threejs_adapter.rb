@@ -69,6 +69,16 @@ class FakeThreeJSAdapter
     )
   end
 
+  def new_plane_geometry(width, height, width_segments, height_segments)
+    handle(
+      :plane_geometry,
+      width: width,
+      height: height,
+      width_segments: width_segments,
+      height_segments: height_segments
+    )
+  end
+
   def new_buffer_geometry
     handle(:buffer_geometry, attributes: {}, groups: [])
   end
