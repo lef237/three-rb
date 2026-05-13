@@ -6,7 +6,11 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    minitest (5.26.0)
+    drb (2.2.3)
+    minitest (6.0.6)
+      drb (~> 2.0)
+      prism (~> 1.5)
+    prism (1.9.0)
     rake (13.3.0)
 
 PLATFORMS
@@ -14,7 +18,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  minitest (~> 5.0)
+  minitest (~> 6.0)
   rake (~> 13.0)
   three.rb!
 
