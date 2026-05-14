@@ -72,7 +72,7 @@ http://localhost:8000/examples/browser/primitives/
 http://localhost:8000/examples/browser/postprocessing/
 ```
 
-See [Browser Examples](examples/browser/README.md) for the feature coverage map and per-example smoke commands.
+See [Browser Examples](examples/browser/README.md) for the feature coverage map and per-example smoke commands. See [Browser Runtime](docs/browser-runtime.md) for the current embedding and boot contract.
 
 The examples load pnpm-managed browser packages from `node_modules/`: `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`, `@ruby/wasm-wasi@2.9.4-2026-05-11-a`, and `three@0.184.0`.
 
@@ -143,6 +143,7 @@ bundle exec rake release:preflight
 
 - [Implementation Plan](docs/implementation-plan.md)
 - [Next Work](docs/next-work.md)
+- [Browser Runtime](docs/browser-runtime.md)
 - [Browser Examples](examples/browser/README.md)
 - [Loaded Asset Traversal and Disposal Design](docs/loaded-assets-design.md)
 - [Release Readiness](docs/release-readiness.md)

@@ -14,6 +14,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes readme, "bundle exec rake release:preflight"
     assert_includes readme, "docs/release-readiness.md"
     assert_includes readme, "docs/next-work.md"
+    assert_includes readme, "docs/browser-runtime.md"
     assert_includes readme, "docs/publishing.md"
     assert_includes readme, "examples/browser/README.md"
   end
@@ -22,21 +23,40 @@ class ThreeReleaseReadinessTest < Minitest::Test
     spec = Gem::Specification.load(File.join(ROOT, "three.rb.gemspec"))
 
     assert_path_exists File.join(ROOT, "CHANGELOG.md")
+    assert_path_exists File.join(ROOT, "docs/browser-runtime.md")
     assert_path_exists File.join(ROOT, "examples/browser/README.md")
     assert_path_exists File.join(ROOT, "docs/next-work.md")
     assert_path_exists File.join(ROOT, "docs/release-readiness.md")
     assert_path_exists File.join(ROOT, "docs/publishing.md")
     assert_includes spec.files, "CHANGELOG.md"
+    assert_includes spec.files, "docs/browser-runtime.md"
     assert_includes spec.files, "examples/browser/README.md"
     assert_includes spec.files, "docs/next-work.md"
     assert_includes spec.files, "docs/release-readiness.md"
     assert_includes spec.files, "docs/publishing.md"
   end
 
+  def test_browser_runtime_guide_documents_boot_contract
+    guide = File.read(File.join(ROOT, "docs/browser-runtime.md"))
+
+    assert_includes guide, "ruby.wasm"
+    assert_includes guide, "Three::Renderers::ThreeJSRenderer"
+    assert_includes guide, "@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a"
+    assert_includes guide, "three@0.184.0"
+    assert_includes guide, "globalThis.THREE"
+    assert_includes guide, "globalThis.THREE_GLTF_LOADER"
+    assert_includes guide, "examples/browser/shared/boot.mjs"
+    assert_includes guide, "examples/browser/README.md"
+    assert_includes guide, "docs/release-readiness.md"
+    assert_includes guide, "docs/publishing.md"
+    assert_includes guide, "Current Limits"
+  end
+
   def test_next_work_records_resume_point
     next_work = File.read(File.join(ROOT, "docs/next-work.md"))
 
-    assert_includes next_work, "Add a browser runtime guide"
+    assert_includes next_work, "Select the next browser-facing feature"
+    assert_includes next_work, "Browser runtime guide"
     assert_includes next_work, "Browser examples overview"
     assert_includes next_work, "Saved JSON export/load fixture regression coverage"
     assert_includes next_work, "Do not start Phase 9 native renderer work yet"

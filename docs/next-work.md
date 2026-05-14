@@ -17,59 +17,59 @@ Recent completed work:
 - Release readiness checks, gem install smoke, release preflight, and publishing documentation.
 - Saved JSON export/load fixture regression coverage for `Three::Exporters::ThreeJSONExporter` and `Three::Loaders::ThreeJSONLoader`.
 - Browser examples overview and smoke command map for cube, composition, textures, cubemap, glTF, serialization, picking, primitives, and postprocessing.
+- Browser runtime guide documenting the current ruby.wasm, import-map, `globalThis.THREE`, and `Three::Renderers::ThreeJSRenderer` boot contract.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
 
 ## Recommended Next Task
 
-Add a browser runtime guide for embedding three.rb outside this repository's examples.
+Select the next browser-facing feature only when it can be introduced with a dedicated example and deterministic smoke test.
 
 This is the best next step because:
 
-- The browser examples now document what is covered, but users still need a concise standalone boot recipe before relying on the gem in their own pages.
-- It improves public usability without expanding API scope.
-- It should reduce support risk around import maps, pnpm-managed browser packages, ruby.wasm boot order, and the shared `examples/browser/shared/boot.mjs` helper.
-- It gives future feature work a stable reference for what belongs in an example versus what belongs in application-specific boot code.
-- It is lower risk than adding render targets, more postprocessing passes, or new loaders before the browser integration story is clearly documented.
+- The public docs now cover release readiness, publishing, browser example coverage, and the browser runtime boot contract.
+- Further progress should come from a concrete browser workflow, not from broad API mirroring.
+- The current implementation plan says KTX2 and other decoder loaders should wait until fixture coverage needs them.
+- Additional postprocessing passes should wait unless they can strengthen `examples/browser/postprocessing` without forcing an oversized render-target API.
+- Render targets are useful, but they expand renderer surface area and should be added only when an example requires them.
 
 ## Scope
 
-Add a guide under `docs/browser-runtime.md`.
+Pick one feature target and keep the change small enough to verify through one browser example.
 
-The document should include:
+Candidate targets, in recommended order when there is no stronger product signal:
 
-- The expected deployment shape: Ruby code compiled/executed by ruby.wasm, with rendering delegated to pnpm-managed three.js modules.
-- Required browser dependencies and the currently pinned versions from `package.json`.
-- Minimum HTML/import-map requirements copied from the examples at a conceptual level, not as a second divergent boot implementation.
-- How `Three::Renderers::ThreeJSRenderer` connects a Ruby scene to an existing canvas.
-- How to use `examples/browser/shared/boot.mjs` as a reference implementation and when to write a custom boot file.
-- What is intentionally unsupported or unstable in the browser-first alpha.
-- Pointers to `examples/browser/README.md`, `docs/release-readiness.md`, and `docs/publishing.md`.
+1. A small postprocessing pass that can extend `examples/browser/postprocessing` without adding render targets.
+2. A small material class that reuses existing material parameter, JSON, backend sync, and browser smoke patterns.
+3. Render target support, but only with a focused example that proves why it is needed.
+4. A new addon loader only when a committed fixture requires it.
+5. KTX2 loader after texture-compression fixture coverage and decoder-path handling are planned.
 
 ## Suggested Implementation Plan
 
-1. Read `examples/browser/shared/boot.mjs`, one simple example boot file, and one feature-rich example boot file.
-2. Create `docs/browser-runtime.md` as a user-facing guide, keeping it descriptive rather than adding another implementation surface.
-3. Link it from the root `README.md` documents section and the browser example section.
-4. Add a release-readiness test assertion so the guide remains packaged and discoverable.
-5. Run Ruby tests. Browser smoke is optional unless browser boot code changes.
+1. Start from a user-visible workflow and choose exactly one feature target.
+2. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
+3. Add or extend one browser example and keep `examples/browser/README.md` in sync.
+4. Add or update a deterministic Playwright smoke command in `package.json`.
+5. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
 
 ## Acceptance Criteria
 
 - `bundle exec rake test` passes.
-- Root README links to `docs/browser-runtime.md`.
-- The guide points to `examples/browser/README.md` instead of duplicating the example coverage table.
-- The guide documents pinned browser dependencies, import-map expectations, renderer/canvas setup, and current alpha limitations.
+- The chosen feature has one dedicated or clearly extended browser example.
+- `examples/browser/README.md` documents the new coverage.
+- `package.json` has a matching `test:browser:*` command when a new example is added.
+- The affected browser smoke test passes.
 - `bundle exec rake release:gem_smoke` still passes.
 
-Optional after the browser runtime guide task:
+Optional after the next feature task:
 
-- Run `bundle exec rake release:preflight` if browser boot code changed.
+- Run `bundle exec rake release:preflight` before release work or when browser/runtime code changed.
 - Run `pnpm benchmark:browser` only if synchronization or renderer internals changed.
 
 ## What Not To Do Next
 
-Do not prioritize these before the browser runtime guide unless there is a clear product need:
+Do not prioritize these without a clear product need:
 
 - KTX2 loader.
 - Additional postprocessing passes.
@@ -78,12 +78,12 @@ Do not prioritize these before the browser runtime guide unless there is a clear
 - Native renderer.
 - Broad public API documentation beyond the current README, release readiness, implementation plan, browser examples overview, and browser runtime guide.
 
-Those are valid later tasks, but they expand feature scope. The immediate gap is making the browser runtime setup understandable outside the repository examples.
+Those are valid later tasks, but they expand feature scope. The immediate gap is choosing feature work by visible workflow and smoke-testability instead of API breadth.
 
 ## After This Task
 
-After the browser runtime guide is in place, reassess in this order:
+After the next feature task, reassess in this order:
 
-1. Add new material classes, postprocessing passes, render targets, or loaders only with a dedicated example and smoke test.
-2. Keep the release gate passing after each change.
+1. Keep the release gate passing after each change.
+2. Decide whether the new example reveals a natural follow-up feature.
 3. Delay Phase 9 native renderer work until the browser-first API is stable enough to justify a second renderer target.
