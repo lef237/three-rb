@@ -239,6 +239,27 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal true, handle[:parameters][:flatShading]
   end
 
+  def test_materializes_mesh_toon_material
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    gradient_map = Three::Texture.new("/gradient.png")
+    material = Three::MeshToonMaterial.new(
+      color: 0x99ccff,
+      emissive: 0x111827,
+      map: Three::Texture.new("/texture.png"),
+      gradient_map: gradient_map,
+      flat_shading: true
+    )
+
+    handle = backend.materialize(material)
+
+    assert_equal :mesh_toon_material, handle[:type]
+    assert_equal 0x99ccff, handle[:parameters][:color]
+    assert_equal 0x111827, handle[:parameters][:emissive]
+    assert_equal "/texture.png", handle[:parameters][:map][:source]
+    assert_equal "/gradient.png", handle[:parameters][:gradientMap][:source]
+    assert_equal true, handle[:parameters][:flatShading]
+  end
+
   def test_materializes_mesh_phong_material
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     specular_map = Three::Texture.new("/specular.png")
@@ -694,6 +715,31 @@ class ThreeThreeJSBackendTest < Minitest::Test
     refute backend.handles.key?(matcap.uuid)
   end
 
+  def test_dispose_toon_material_can_dispose_gradient_map
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    texture = Three::Texture.new("/texture.png")
+    gradient_map = Three::Texture.new("/gradient.png")
+    material = Three::MeshToonMaterial.new(map: texture, gradient_map: gradient_map)
+
+    material_handle = backend.materialize(material)
+    texture_handle = backend.materialize(texture)
+    gradient_map_handle = backend.materialize(gradient_map)
+    adapter.calls.clear
+
+    disposed_material = backend.dispose(material, dispose_textures: true)
+
+    assert_same material_handle, disposed_material
+    assert_equal [
+      [:dispose, texture_handle],
+      [:dispose, gradient_map_handle],
+      [:dispose, material_handle]
+    ], adapter.calls
+    refute backend.handles.key?(material.uuid)
+    refute backend.handles.key?(texture.uuid)
+    refute backend.handles.key?(gradient_map.uuid)
+  end
+
   def test_traverse_handles_walks_external_object3d_handle
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)
@@ -917,6 +963,25 @@ class ThreeThreeJSBackendTest < Minitest::Test
 
     assert_equal :update_material, adapter.calls.last[0]
     assert_equal 0x99ccff, adapter.calls.last[2][:color]
+    assert_equal true, adapter.calls.last[2][:flatShading]
+  end
+
+  def test_sync_updates_dirty_mesh_toon_material_parameters
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    material = Three::MeshToonMaterial.new(color: 0xffffff, emissive: 0x000000)
+
+    backend.sync(material)
+    adapter.calls.clear
+
+    material.color.set_hex(0x99ccff)
+    material.emissive.set_hex(0x101820)
+    material.flat_shading = true
+    backend.sync(material)
+
+    assert_equal :update_material, adapter.calls.last[0]
+    assert_equal 0x99ccff, adapter.calls.last[2][:color]
+    assert_equal 0x101820, adapter.calls.last[2][:emissive]
     assert_equal true, adapter.calls.last[2][:flatShading]
   end
 

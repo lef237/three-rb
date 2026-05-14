@@ -146,6 +146,8 @@ module Three
           MeshPhysicalMaterial.new(parameters)
         when "MeshStandardMaterial"
           MeshStandardMaterial.new(parameters)
+        when "MeshToonMaterial"
+          MeshToonMaterial.new(parameters)
         when "PointsMaterial"
           PointsMaterial.new(parameters)
         when "ShadowMaterial"
@@ -220,6 +222,7 @@ module Three
           displacement_map
           emissive_map
           env_map
+          gradient_map
           light_map
           matcap
           metalness_map

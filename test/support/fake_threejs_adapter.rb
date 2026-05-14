@@ -12,6 +12,7 @@ class FakeThreeJSAdapter
     bumpMap
     displacementMap
     envMap
+    gradientMap
     lightMap
     matcap
     specularMap
@@ -476,6 +477,10 @@ class FakeThreeJSAdapter
 
   def new_mesh_standard_material(parameters)
     handle(:mesh_standard_material, parameters: parameters.dup)
+  end
+
+  def new_mesh_toon_material(parameters)
+    handle(:mesh_toon_material, parameters: parameters.dup)
   end
 
   def new_points_material(parameters)

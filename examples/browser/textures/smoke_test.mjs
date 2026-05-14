@@ -48,6 +48,16 @@ async function main() {
       matcapMapType: globalThis.__threeRbMatcapMaterial?.map?.isTexture,
       matcapTextureSame: globalThis.__threeRbMatcapMaterial?.matcap === globalThis.__threeRbTextureExampleTexture,
       matcapMapSame: globalThis.__threeRbMatcapMaterial?.map === globalThis.__threeRbTextureExampleTexture,
+      toonMeshType: globalThis.__threeRbToonMesh?.type,
+      toonGeometryType: globalThis.__threeRbToonMesh?.geometry?.type,
+      toonMaterialType: globalThis.__threeRbToonMesh?.material?.type,
+      toonMaterialColor: globalThis.__threeRbToonMaterial?.color?.getHex?.(),
+      toonMaterialEmissive: globalThis.__threeRbToonMaterial?.emissive?.getHex?.(),
+      toonMaterialFlatShading: globalThis.__threeRbToonMaterial?.flatShading,
+      toonGradientMapType: globalThis.__threeRbToonMaterial?.gradientMap?.isTexture,
+      toonMapType: globalThis.__threeRbToonMaterial?.map?.isTexture,
+      toonGradientMapSame: globalThis.__threeRbToonMaterial?.gradientMap === globalThis.__threeRbTextureExampleTexture,
+      toonMapSame: globalThis.__threeRbToonMaterial?.map === globalThis.__threeRbTextureExampleTexture,
       materialRoughnessMapType: globalThis.__threeRbTextureMaterial?.roughnessMap?.isTexture,
       materialMetalnessMapType: globalThis.__threeRbTextureMaterial?.metalnessMap?.isTexture,
       materialAnisotropyMapType: globalThis.__threeRbTextureMaterial?.anisotropyMap?.isTexture,
@@ -102,6 +112,21 @@ async function main() {
       scene.matcapMapSame !== true
     ) {
       throw new Error(`expected MeshMatcapMaterial with shared matcap/map texture: ${JSON.stringify(scene)}`);
+    }
+    if (scene.toonMeshType !== "Mesh" || scene.toonGeometryType !== "SphereGeometry") {
+      throw new Error(`expected a toon sphere mesh: ${JSON.stringify(scene)}`);
+    }
+    if (
+      scene.toonMaterialType !== "MeshToonMaterial" ||
+      scene.toonMaterialColor !== 0xf6c85f ||
+      scene.toonMaterialEmissive !== 0x101820 ||
+      scene.toonMaterialFlatShading !== true ||
+      scene.toonGradientMapType !== true ||
+      scene.toonMapType !== true ||
+      scene.toonGradientMapSame !== true ||
+      scene.toonMapSame !== true
+    ) {
+      throw new Error(`expected MeshToonMaterial with shared map/gradient texture: ${JSON.stringify(scene)}`);
     }
     if (scene.materialRoughnessMapType !== true || scene.materialMetalnessMapType !== true || scene.materialAnisotropyMapType !== true || scene.materialClearcoatMapType !== true) {
       throw new Error(`expected MeshPhysicalMaterial with PBR and physical texture maps: ${JSON.stringify(scene)}`);

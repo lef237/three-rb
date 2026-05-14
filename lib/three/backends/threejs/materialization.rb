@@ -83,6 +83,8 @@ module Three
             @adapter.new_mesh_physical_material(material_parameters(object))
           when MeshStandardMaterial
             @adapter.new_mesh_standard_material(material_parameters(object))
+          when MeshToonMaterial
+            @adapter.new_mesh_toon_material(material_parameters(object))
           when PointsMaterial
             @adapter.new_points_material(material_parameters(object))
           when ShadowMaterial

@@ -218,6 +218,24 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert loaded_material.flat_shading
   end
 
+  def test_parse_reconstructs_mesh_toon_material
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/texture.png")
+    gradient_map = Three::Texture.new("/gradient.png")
+    material = Three::MeshToonMaterial.new(color: 0x99ccff, emissive: 0x101820, map: texture, gradient_map: gradient_map, flat_shading: true)
+    scene.add(Three::Mesh.new(Three::SphereGeometry.new, material))
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(Three::Exporters::ThreeJSONExporter.new.export(scene))
+    loaded_material = loaded.children.first.material
+
+    assert_instance_of Three::MeshToonMaterial, loaded_material
+    assert_equal 0x99ccff, loaded_material.color.hex
+    assert_equal 0x101820, loaded_material.emissive.hex
+    assert_equal "/texture.png", loaded_material.map.source
+    assert_equal "/gradient.png", loaded_material.gradient_map.source
+    assert loaded_material.flat_shading
+  end
+
   def test_parse_reconstructs_shadow_material
     scene = Three::Scene.new
     material = Three::ShadowMaterial.new(color: 0x112233, opacity: 0.32, fog: false)

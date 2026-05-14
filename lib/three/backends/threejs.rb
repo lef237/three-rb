@@ -18,6 +18,7 @@ require_relative "../materials/mesh_normal_material"
 require_relative "../materials/mesh_phong_material"
 require_relative "../materials/mesh_standard_material"
 require_relative "../materials/mesh_physical_material"
+require_relative "../materials/mesh_toon_material"
 require_relative "../materials/points_material"
 require_relative "../materials/shadow_material"
 require_relative "../objects/external_object3d"
@@ -42,6 +43,7 @@ module Three
         displacement_map: :displacementMap,
         emissive_map: :emissiveMap,
         env_map: :envMap,
+        gradient_map: :gradientMap,
         light_map: :lightMap,
         matcap: :matcap,
         metalness_map: :metalnessMap,

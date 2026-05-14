@@ -15,6 +15,7 @@ module Three
           bumpMap
           displacementMap
           envMap
+          gradientMap
           lightMap
           matcap
           specularMap
@@ -433,6 +434,12 @@ module Three
 
         def new_mesh_standard_material(parameters)
           @three[:MeshStandardMaterial].new(stringify_keys(parameters))
+        end
+
+        def new_mesh_toon_material(parameters)
+          material = @three[:MeshToonMaterial].new(stringify_keys(parameters))
+          update_material(material, parameters)
+          material
         end
 
         def new_points_material(parameters)

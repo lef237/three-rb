@@ -182,6 +182,25 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal [matcap.uuid, texture.uuid], exported[:textures].map { |entry| entry[:uuid] }
   end
 
+  def test_exports_mesh_toon_material_resources
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/texture.png")
+    gradient_map = Three::Texture.new("/gradient.png")
+    material = Three::MeshToonMaterial.new(color: 0x99ccff, emissive: 0x101820, map: texture, gradient_map: gradient_map, flat_shading: true)
+    scene.add(Three::Mesh.new(Three::SphereGeometry.new, material))
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+    material_data = exported[:materials].first
+
+    assert_equal "MeshToonMaterial", material_data[:type]
+    assert_equal 0x99ccff, material_data[:color]
+    assert_equal 0x101820, material_data[:emissive]
+    assert_equal texture.uuid, material_data[:map]
+    assert_equal gradient_map.uuid, material_data[:gradient_map]
+    assert material_data[:flat_shading]
+    assert_equal [texture.uuid, gradient_map.uuid], exported[:textures].map { |entry| entry[:uuid] }
+  end
+
   def test_exports_shadow_material
     scene = Three::Scene.new
     material = Three::ShadowMaterial.new(color: 0x112233, opacity: 0.32, fog: false)

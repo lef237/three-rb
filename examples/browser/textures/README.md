@@ -1,6 +1,6 @@
 # Browser Textures Example
 
-This example renders Ruby-authored textured meshes through ruby.wasm and the JavaScript three.js renderer. It focuses on `TextureLoader`, `RGBELoader`, repeat/wrap/filter settings, `MeshPhysicalMaterial`, `MeshMatcapMaterial`, standard plus physical material texture maps, matcap texture assignment, and an HDR environment texture.
+This example renders Ruby-authored textured meshes through ruby.wasm and the JavaScript three.js renderer. It focuses on `TextureLoader`, `RGBELoader`, repeat/wrap/filter settings, `MeshPhysicalMaterial`, `MeshMatcapMaterial`, `MeshToonMaterial`, standard plus physical material texture maps, matcap and toon gradient texture assignment, and an HDR environment texture.
 
 Install browser dependencies and serve the repository root over HTTP:
 
@@ -32,4 +32,4 @@ Run the browser smoke test:
 pnpm test:browser:textures
 ```
 
-The smoke test serves the repository root, waits for the Ruby scene to reach `Running`, samples the WebGL canvas for nonblank pixels, verifies the textured meshes, physical and matcap material parameters, RGBE environment mapping, and checks that repeat/wrap/filter settings reach the three.js texture.
+The smoke test serves the repository root, waits for the Ruby scene to reach `Running`, samples the WebGL canvas for nonblank pixels, verifies the textured meshes, physical, matcap, and toon material parameters, RGBE environment mapping, and checks that repeat/wrap/filter settings reach the three.js texture.
