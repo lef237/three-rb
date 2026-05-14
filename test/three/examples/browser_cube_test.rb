@@ -235,9 +235,12 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
 
     assert_includes ruby, "Three::Line"
     assert_includes ruby, "Three::Points"
+    assert_includes ruby, "Three::Sprite"
     assert_includes ruby, "Three::LineBasicMaterial"
     assert_includes ruby, "Three::PointsMaterial"
+    assert_includes ruby, "Three::SpriteMaterial"
     assert_includes ruby, "Three::Float32BufferAttribute"
+    assert_includes ruby, "sprite_material.rotation +="
   end
 
   def test_postprocessing_example_exercises_composer_and_bloom_pipeline

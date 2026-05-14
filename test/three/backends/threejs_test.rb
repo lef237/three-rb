@@ -168,9 +168,11 @@ class ThreeThreeJSBackendTest < Minitest::Test
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     line = Three::LineBasicMaterial.new(color: 0xff8844, linewidth: 2, linecap: "butt", linejoin: "miter", fog: false)
     points = Three::PointsMaterial.new(color: 0x66ddff, map: Three::Texture.new("/points.png"), size: 0.5, size_attenuation: false)
+    sprite = Three::SpriteMaterial.new(color: 0xffcc4d, map: Three::Texture.new("/sprite.png"), rotation: 0.25, size_attenuation: false)
 
     line_handle = backend.materialize(line)
     points_handle = backend.materialize(points)
+    sprite_handle = backend.materialize(sprite)
 
     assert_equal :line_basic_material, line_handle[:type]
     assert_equal 0xff8844, line_handle[:parameters][:color]
@@ -183,6 +185,12 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal "/points.png", points_handle[:parameters][:map][:source]
     assert_equal 0.5, points_handle[:parameters][:size]
     assert_equal false, points_handle[:parameters][:sizeAttenuation]
+    assert_equal :sprite_material, sprite_handle[:type]
+    assert_equal 0xffcc4d, sprite_handle[:parameters][:color]
+    assert_equal "/sprite.png", sprite_handle[:parameters][:map][:source]
+    assert_equal 0.25, sprite_handle[:parameters][:rotation]
+    assert_equal false, sprite_handle[:parameters][:sizeAttenuation]
+    assert_equal true, sprite_handle[:parameters][:transparent]
   end
 
   def test_materializes_shadow_material
@@ -574,6 +582,21 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 2, points_handle[:material][:parameters][:size]
   end
 
+  def test_materializes_sprite_object
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    sprite = Three::Sprite.new(Three::SpriteMaterial.new(color: 0xffcc4d))
+    sprite.center = [0.25, 0.75]
+    sprite.scale.set(0.4, 0.4, 1)
+
+    handle = backend.sync(sprite)
+
+    assert_equal :sprite, handle[:type]
+    assert_equal :sprite_material, handle[:material][:type]
+    assert_equal 0xffcc4d, handle[:material][:parameters][:color]
+    assert_equal [0.25, 0.75], handle[:center]
+    assert_equal [0.4, 0.4, 1], handle[:scale]
+  end
+
   def test_sync_updates_object_transform
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     object = Three::Object3D.new
@@ -738,6 +761,30 @@ class ThreeThreeJSBackendTest < Minitest::Test
     refute backend.handles.key?(material.uuid)
     refute backend.handles.key?(texture.uuid)
     refute backend.handles.key?(gradient_map.uuid)
+  end
+
+  def test_dispose_subtree_disposes_sprite_material_and_texture
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    texture = Three::Texture.new("/sprite.png")
+    material = Three::SpriteMaterial.new(map: texture)
+    sprite = Three::Sprite.new(material)
+
+    sprite_handle = backend.sync(sprite)
+    material_handle = backend.materialize(material)
+    texture_handle = backend.materialize(texture)
+    adapter.calls.clear
+
+    disposed = backend.dispose_subtree(sprite, dispose_textures: true)
+
+    assert_same sprite_handle, disposed
+    assert_equal [
+      [:dispose, material_handle],
+      [:dispose, texture_handle]
+    ], adapter.calls
+    refute backend.handles.key?(sprite.uuid)
+    refute backend.handles.key?(material.uuid)
+    refute backend.handles.key?(texture.uuid)
   end
 
   def test_traverse_handles_walks_external_object3d_handle
@@ -983,6 +1030,27 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 0x99ccff, adapter.calls.last[2][:color]
     assert_equal 0x101820, adapter.calls.last[2][:emissive]
     assert_equal true, adapter.calls.last[2][:flatShading]
+  end
+
+  def test_sync_updates_dirty_sprite_material_and_center
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    material = Three::SpriteMaterial.new(color: 0xffffff, rotation: 0)
+    sprite = Three::Sprite.new(material)
+
+    handle = backend.sync(sprite)
+    adapter.calls.clear
+
+    material.color.set_hex(0xffcc4d)
+    material.rotation = 0.5
+    sprite.center.set(0.25, 0.75)
+    backend.sync(sprite)
+
+    assert_includes adapter.calls, [:set_sprite_center, handle, [0.25, 0.75]]
+    update_call = adapter.calls.find { |call| call[0] == :update_material }
+    refute_nil update_call
+    assert_equal 0xffcc4d, update_call[2][:color]
+    assert_equal 0.5, update_call[2][:rotation]
   end
 
   def test_sync_updates_dirty_mesh_physical_material_parameters

@@ -54,7 +54,20 @@ begin
     Three::PointsMaterial.new(color: 0xffcc4d, size: 12, size_attenuation: false)
   )
 
-  scene.add(line, points)
+  sprite_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  sprite_material = Three::SpriteMaterial.new(
+    color: 0xffffff,
+    map: sprite_texture,
+    rotation: 0.2,
+    size_attenuation: false,
+    opacity: 0.82
+  )
+  sprite = Three::Sprite.new(sprite_material)
+  sprite.center = [0.5, 0.5]
+  sprite.position.set(1.45, -0.95, 0.2)
+  sprite.scale.set(0.42, 0.42, 1)
+
+  scene.add(line, points, sprite)
 
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
@@ -82,12 +95,16 @@ begin
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
   JS.global[:__threeRbLine] = renderer.backend.materialize(line)
   JS.global[:__threeRbPoints] = renderer.backend.materialize(points)
+  JS.global[:__threeRbSprite] = renderer.backend.materialize(sprite)
+  JS.global[:__threeRbSpriteMaterial] = renderer.backend.materialize(sprite_material)
+  JS.global[:__threeRbSpriteTexture] = renderer.backend.materialize(sprite_texture)
   JS.global[:__threeRbPrimitivesFrame] = 0
 
   renderer.animation_loop do
     JS.global[:__threeRbPrimitivesFrame] = JS.global[:__threeRbPrimitivesFrame].to_i + 1
     line.rotation.z += 0.004
     points.rotation.y += 0.012
+    sprite_material.rotation += 0.01
     renderer.render(scene, camera)
   end
 

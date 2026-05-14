@@ -106,12 +106,13 @@ module Three
       end
 
       def geometry_material_object?(object)
-        object.is_a?(Mesh) || object.is_a?(Line) || object.is_a?(Points)
+        object.is_a?(Mesh) || object.is_a?(Line) || object.is_a?(Points) || object.is_a?(Sprite)
       end
 
       def serialize_geometry_material_object(object, data)
-        data[:geometry] = register_geometry(object.geometry)
+        data[:geometry] = register_geometry(object.geometry) if object.respond_to?(:geometry)
         data[:material] = register_material(object.material)
+        data[:center] = object.center.to_a if object.is_a?(Sprite)
 
         return unless object.is_a?(InstancedMesh)
 

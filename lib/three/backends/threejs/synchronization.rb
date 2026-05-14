@@ -28,6 +28,8 @@ module Three
 
           if object.is_a?(InstancedMesh)
             sync_instanced_mesh(object, handle)
+          elsif object.is_a?(Sprite)
+            sync_sprite(object, handle)
           elsif geometry_material_object?(object)
             sync_geometry_material_object(object, handle)
           end
@@ -70,6 +72,15 @@ module Three
 
         def geometry_material_object?(object)
           object.is_a?(Mesh) || object.is_a?(Line) || object.is_a?(Points)
+        end
+
+        def sync_sprite(object, handle)
+          material_handle = sync(object.material) if object.material.respond_to?(:uuid)
+
+          if object.dirty_field?(:sprite)
+            @adapter.set_object_material(handle, material_handle) if material_handle
+            @adapter.set_sprite_center(handle, object.center.to_a)
+          end
         end
 
         def sync_geometry_material_object(object, handle)

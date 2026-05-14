@@ -328,6 +328,10 @@ class FakeThreeJSAdapter
     handle(:points, geometry: geometry, material: material, children: [])
   end
 
+  def new_sprite(material)
+    handle(:sprite, material: material, center: [0.5, 0.5], children: [])
+  end
+
   def new_instanced_mesh(geometry, material, count)
     handle(
       :instanced_mesh,
@@ -359,6 +363,11 @@ class FakeThreeJSAdapter
   def set_mesh_material(mesh, material)
     @calls << [:set_mesh_material, mesh, material]
     mesh[:material] = material
+  end
+
+  def set_sprite_center(sprite, center)
+    @calls << [:set_sprite_center, sprite, center]
+    sprite[:center] = center.dup
   end
 
   def set_object_layers(object, mask)
@@ -509,6 +518,10 @@ class FakeThreeJSAdapter
 
   def new_shadow_material(parameters)
     handle(:shadow_material, parameters: parameters.dup)
+  end
+
+  def new_sprite_material(parameters)
+    handle(:sprite_material, parameters: parameters.dup)
   end
 
   def set_object_name(object, name)

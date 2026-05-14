@@ -39,6 +39,8 @@ assert(defined?(Three::Controls::OrbitControls), "expected controls API to load"
 assert(defined?(Three::MeshMatcapMaterial), "expected matcap material API to load")
 assert(defined?(Three::MeshToonMaterial), "expected toon material API to load")
 assert(defined?(Three::ShadowMaterial), "expected shadow material API to load")
+assert(defined?(Three::Sprite), "expected sprite object API to load")
+assert(defined?(Three::SpriteMaterial), "expected sprite material API to load")
 assert(defined?(Three::Postprocessing::EffectComposer), "expected postprocessing API to load")
 assert(defined?(Three::Postprocessing::OutputPass), "expected output pass API to load")
 assert(defined?(Three::Postprocessing::DotScreenPass), "expected dot screen pass API to load")

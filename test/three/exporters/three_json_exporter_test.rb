@@ -217,6 +217,29 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_empty exported[:textures]
   end
 
+  def test_exports_sprite_material_and_object
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/sprite.png")
+    material = Three::SpriteMaterial.new(color: 0xffcc4d, map: texture, rotation: 0.25, size_attenuation: false)
+    sprite = Three::Sprite.new(material)
+    sprite.center = [0.25, 0.75]
+    scene.add(sprite)
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+    object_data = exported[:object][:children].first
+    material_data = exported[:materials].first
+
+    assert_equal "Sprite", object_data[:type]
+    assert_equal material.uuid, object_data[:material]
+    assert_equal [0.25, 0.75], object_data[:center]
+    assert_equal "SpriteMaterial", material_data[:type]
+    assert_equal 0xffcc4d, material_data[:color]
+    assert_equal texture.uuid, material_data[:map]
+    assert_equal 0.25, material_data[:rotation]
+    refute material_data[:size_attenuation]
+    assert_equal [texture.uuid], exported[:textures].map { |entry| entry[:uuid] }
+  end
+
   def test_object3d_to_json_uses_exporter_format
     scene = Three::Scene.new
     scene.add(Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new))

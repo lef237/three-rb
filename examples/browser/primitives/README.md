@@ -1,6 +1,6 @@
 # Browser Primitives Example
 
-This example renders Ruby-authored `Three::Line` and `Three::Points` objects from generic `BufferGeometry` attributes through the Three.js browser backend.
+This example renders Ruby-authored `Three::Line`, `Three::Points`, and `Three::Sprite` objects through the Three.js browser backend. It covers generic `BufferGeometry` attributes, line/points materials, and a textured billboard sprite marker.
 
 Install browser dependencies and serve the repository root over HTTP:
 

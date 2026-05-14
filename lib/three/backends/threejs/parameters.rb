@@ -44,6 +44,7 @@ module Three
           parameters[:linewidth] = material.linewidth if material.respond_to?(:linewidth)
           parameters[:linecap] = material.linecap if material.respond_to?(:linecap)
           parameters[:linejoin] = material.linejoin if material.respond_to?(:linejoin)
+          parameters[:rotation] = material.rotation if material.respond_to?(:rotation)
           parameters[:size] = material.size if material.respond_to?(:size)
           parameters[:sizeAttenuation] = material.size_attenuation if material.respond_to?(:size_attenuation)
           parameters[:fog] = material.fog if material.respond_to?(:fog)

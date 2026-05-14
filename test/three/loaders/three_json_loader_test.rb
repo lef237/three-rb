@@ -250,4 +250,24 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert loaded_material.transparent
     refute loaded_material.fog
   end
+
+  def test_parse_reconstructs_sprite_material_and_object
+    scene = Three::Scene.new
+    material = Three::SpriteMaterial.new(color: 0xffcc4d, map: Three::Texture.new("/sprite.png"), rotation: 0.25, size_attenuation: false)
+    sprite = Three::Sprite.new(material)
+    sprite.center = [0.25, 0.75]
+    scene.add(sprite)
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(Three::Exporters::ThreeJSONExporter.new.export(scene))
+    loaded_sprite = loaded.children.first
+    loaded_material = loaded_sprite.material
+
+    assert_instance_of Three::Sprite, loaded_sprite
+    assert_equal [0.25, 0.75], loaded_sprite.center.to_a
+    assert_instance_of Three::SpriteMaterial, loaded_material
+    assert_equal 0xffcc4d, loaded_material.color.hex
+    assert_equal "/sprite.png", loaded_material.map.source
+    assert_equal 0.25, loaded_material.rotation
+    refute loaded_material.size_attenuation
+  end
 end

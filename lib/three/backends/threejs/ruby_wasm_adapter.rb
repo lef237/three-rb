@@ -328,6 +328,10 @@ module Three
           @three[:Points].new(geometry, material)
         end
 
+        def new_sprite(material)
+          @three[:Sprite].new(material)
+        end
+
         def new_instanced_mesh(geometry, material, count)
           @three[:InstancedMesh].new(geometry, material, count)
         end
@@ -346,6 +350,10 @@ module Three
 
         def set_mesh_material(mesh, material)
           set_object_material(mesh, material)
+        end
+
+        def set_sprite_center(sprite, center)
+          sprite[:center].call(:set, *center)
         end
 
         def set_object_layers(object, mask)
@@ -464,6 +472,10 @@ module Three
 
         def new_shadow_material(parameters)
           @three[:ShadowMaterial].new(stringify_keys(parameters))
+        end
+
+        def new_sprite_material(parameters)
+          @three[:SpriteMaterial].new(stringify_keys(parameters))
         end
 
         def set_object_name(object, name)

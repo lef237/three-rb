@@ -152,6 +152,8 @@ module Three
           PointsMaterial.new(parameters)
         when "ShadowMaterial"
           ShadowMaterial.new(parameters)
+        when "SpriteMaterial"
+          SpriteMaterial.new(parameters)
         else
           Material.new(parameters)
         end
@@ -198,6 +200,7 @@ module Three
           linejoin
           fog
           flat_shading
+          rotation
           size
           size_attenuation
         ].each do |key|
@@ -296,6 +299,8 @@ module Three
           Line.new(@geometries[value(entry, :geometry)], material_reference(entry))
         when "Points"
           Points.new(@geometries[value(entry, :geometry)], material_reference(entry))
+        when "Sprite"
+          build_sprite(entry)
         when "Group"
           Group.new
         else
@@ -332,6 +337,12 @@ module Three
           mesh.set_color_at(index, color) if color
         end
         mesh
+      end
+
+      def build_sprite(entry)
+        sprite = Sprite.new(material_reference(entry))
+        sprite.center = value(entry, :center) if value(entry, :center)
+        sprite
       end
 
       def material_reference(entry)

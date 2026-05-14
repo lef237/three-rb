@@ -22,6 +22,8 @@ module Three
             @adapter.new_mesh(materialize(object.geometry), materialize(object.material))
           when Points
             @adapter.new_points(materialize(object.geometry), materialize(object.material))
+          when Sprite
+            @adapter.new_sprite(materialize(object.material))
           when CubeTexture
             @adapter.load_cube_texture(object.sources, texture_parameters(object))
           when RGBETexture
@@ -89,6 +91,8 @@ module Three
             @adapter.new_points_material(material_parameters(object))
           when ShadowMaterial
             @adapter.new_shadow_material(material_parameters(object))
+          when SpriteMaterial
+            @adapter.new_sprite_material(material_parameters(object))
           when Group
             @adapter.new_group
           when ExternalObject3D

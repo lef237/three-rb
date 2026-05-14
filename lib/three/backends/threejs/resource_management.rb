@@ -32,8 +32,11 @@ module Three
           handle_key = @adapter.object_handle_key(handle) if handle
           @objects_by_handle_key.delete(handle_key) if handle_key
 
-          if object.is_a?(Mesh)
+          if object.respond_to?(:geometry) && object.respond_to?(:material)
             release_cached_resource(object.geometry) if dispose_geometries
+          end
+
+          if object.respond_to?(:material)
             release_cached_material(object.material, dispose_textures: dispose_textures) if dispose_materials
           end
 

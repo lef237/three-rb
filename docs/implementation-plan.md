@@ -494,7 +494,7 @@ Current implementation status:
 
 - `Three::Backends::ThreeJS` exists with an injectable adapter boundary.
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
-- The bridge can materialize `Scene`, `Group`, `Object3D`, external loaded `Object3D` handles, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `Line`, `Points`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `RGBETexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `LineBasicMaterial`, `PointsMaterial`, `MeshLambertMaterial`, `MeshMatcapMaterial`, `MeshToonMaterial`, `MeshStandardMaterial`, `MeshPhysicalMaterial`, `MeshNormalMaterial`, and `ShadowMaterial`.
+- The bridge can materialize `Scene`, `Group`, `Object3D`, external loaded `Object3D` handles, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `Line`, `Points`, `Sprite`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `RGBETexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `LineBasicMaterial`, `PointsMaterial`, `SpriteMaterial`, `MeshLambertMaterial`, `MeshMatcapMaterial`, `MeshToonMaterial`, `MeshStandardMaterial`, `MeshPhysicalMaterial`, `MeshNormalMaterial`, and `ShadowMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
@@ -505,7 +505,7 @@ Current implementation status:
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
 - `test/fixtures/scene_export_v1.json` and `test/three/exporters/three_json_fixture_test.rb` provide saved fixture regression coverage for the exporter/loader format, including physical material texture slots, shared resources, instancing, line/points, and RGBE environment textures.
 - `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
-- `examples/browser/primitives` focuses on `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
+- `examples/browser/primitives` focuses on `Line`, `Points`, `Sprite`, `LineBasicMaterial`, `PointsMaterial`, `SpriteMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
 - `examples/browser/postprocessing` focuses on an explicit render pipeline using `Three::Postprocessing::EffectComposer`, `RenderPass`, `UnrealBloomPass`, `DotScreenPass`, `OutputPass`, composer sizing, and pass property/uniform updates.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
@@ -526,6 +526,7 @@ Current implementation status:
 - `MeshMatcapMaterial` supports matcap, color map, alpha, bump, displacement, and normal texture slots with backend sync, JSON export/load, resource disposal, and browser smoke coverage.
 - `MeshToonMaterial` supports color/emissive parameters plus map, gradient, light, AO, emissive, bump, normal, displacement, and alpha texture slots with backend sync, JSON export/load, resource disposal, and texture browser smoke coverage.
 - `ShadowMaterial` supports transparent shadow-catching surfaces with color/fog parameters, backend sync, JSON export/load, and browser smoke coverage.
+- `Sprite` and `SpriteMaterial` support textured billboard markers with center, rotation, size attenuation, backend sync, JSON export/load, resource disposal, and primitives browser smoke coverage.
 - `Object3D#cast_shadow`, `Object3D#receive_shadow`, renderer shadow map configuration, and directional light shadow camera settings are supported through the Three.js backend.
 - The Three.js backend internals are split into materialization, synchronization, parameter conversion, resource management, and ruby.wasm adapter files so renderer additions do not keep growing one monolithic backend file.
 - `MeshPhysicalMaterial` was prioritized before additional addon loaders because it extends the existing material, texture-slot, JSON, disposal, and browser-smoke boundaries without adding new decoder or renderer-pipeline constraints.

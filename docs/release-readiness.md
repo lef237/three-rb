@@ -12,7 +12,7 @@ The first public release should be positioned as browser-first alpha. The stable
 
 Included in the first public scope:
 
-- Ruby object model for scenes, groups, transforms, cameras, lights, geometries, common materials including matcap, toon, and shadow materials, textures, and common math primitives.
+- Ruby object model for scenes, groups, transforms, cameras, lights, geometries, non-mesh primitives including sprites, common materials including matcap, toon, sprite, and shadow materials, textures, and common math primitives.
 - Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and `three@0.184.0`.
 - Dirty-tracked synchronization from Ruby objects into three.js handles.
 - JSON export/load for Ruby-authored scenes.
