@@ -19,6 +19,7 @@ Recent completed work:
 - Browser examples overview and smoke command map for cube, composition, textures, cubemap, glTF, serialization, picking, primitives, and postprocessing.
 - Browser runtime guide documenting the current ruby.wasm, import-map, `globalThis.THREE`, and `Three::Renderers::ThreeJSRenderer` boot contract.
 - `Three::Postprocessing::OutputPass` support in the postprocessing composer example and browser smoke test.
+- `MeshMatcapMaterial` support with matcap texture-slot sync, JSON export/load, resource disposal, and texture browser smoke coverage.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
 
@@ -40,7 +41,7 @@ Pick one feature target and keep the change small enough to verify through one b
 
 Candidate targets, in recommended order when there is no stronger product signal:
 
-1. A small material class that reuses existing material parameter, JSON, backend sync, and browser smoke patterns.
+1. Another small material class only when it reuses existing material parameter, JSON, backend sync, and browser smoke patterns.
 2. Another small postprocessing pass only when it can extend `examples/browser/postprocessing` without adding render targets.
 3. Render target support, but only with a focused example that proves why it is needed.
 4. A new addon loader only when a committed fixture requires it.

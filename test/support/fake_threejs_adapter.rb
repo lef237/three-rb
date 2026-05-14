@@ -13,6 +13,7 @@ class FakeThreeJSAdapter
     displacementMap
     envMap
     lightMap
+    matcap
     specularMap
     anisotropyMap
     clearcoatMap
@@ -455,6 +456,10 @@ class FakeThreeJSAdapter
 
   def new_mesh_lambert_material(parameters)
     handle(:mesh_lambert_material, parameters: parameters.dup)
+  end
+
+  def new_mesh_matcap_material(parameters)
+    handle(:mesh_matcap_material, parameters: parameters.dup)
   end
 
   def new_mesh_normal_material(parameters)

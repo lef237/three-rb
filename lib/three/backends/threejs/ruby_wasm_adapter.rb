@@ -16,6 +16,7 @@ module Three
           displacementMap
           envMap
           lightMap
+          matcap
           specularMap
           anisotropyMap
           clearcoatMap
@@ -412,6 +413,10 @@ module Three
 
         def new_mesh_lambert_material(parameters)
           @three[:MeshLambertMaterial].new(stringify_keys(parameters))
+        end
+
+        def new_mesh_matcap_material(parameters)
+          @three[:MeshMatcapMaterial].new(stringify_keys(parameters))
         end
 
         def new_mesh_normal_material(parameters)

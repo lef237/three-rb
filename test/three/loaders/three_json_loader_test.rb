@@ -200,4 +200,21 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert_equal 0x88aaff, loaded_material.attenuation_color.hex
     assert_equal "/texture.png", loaded_material.map.source
   end
+
+  def test_parse_reconstructs_mesh_matcap_material
+    scene = Three::Scene.new
+    matcap = Three::Texture.new("/matcap.png")
+    texture = Three::Texture.new("/texture.png")
+    material = Three::MeshMatcapMaterial.new(color: 0x99ccff, matcap: matcap, map: texture, flat_shading: true)
+    scene.add(Three::Mesh.new(Three::SphereGeometry.new, material))
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(Three::Exporters::ThreeJSONExporter.new.export(scene))
+    loaded_material = loaded.children.first.material
+
+    assert_instance_of Three::MeshMatcapMaterial, loaded_material
+    assert_equal 0x99ccff, loaded_material.color.hex
+    assert_equal "/matcap.png", loaded_material.matcap.source
+    assert_equal "/texture.png", loaded_material.map.source
+    assert loaded_material.flat_shading
+  end
 end

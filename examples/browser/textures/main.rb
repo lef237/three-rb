@@ -55,9 +55,19 @@ begin
     clearcoat_map: texture
   )
   mesh = Three::Mesh.new(Three::BoxGeometry.new(1.8, 1.15, 0.32), material)
+  mesh.position.x = -0.75
   mesh.rotation.x = -0.25
   mesh.rotation.y = 0.38
   scene.add(mesh)
+
+  matcap_material = Three::MeshMatcapMaterial.new(color: 0xffffff, matcap: texture, map: texture, flat_shading: true)
+  matcap_mesh = Three::Mesh.new(
+    Three::SphereGeometry.new(0.52, width_segments: 32, height_segments: 16),
+    matcap_material
+  )
+  matcap_mesh.position.x = 1.35
+  matcap_mesh.rotation.y = -0.28
+  scene.add(matcap_mesh)
 
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
@@ -90,6 +100,8 @@ begin
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
   JS.global[:__threeRbTexturedMesh] = renderer.backend.materialize(mesh)
   JS.global[:__threeRbTextureMaterial] = renderer.backend.materialize(material)
+  JS.global[:__threeRbMatcapMesh] = renderer.backend.materialize(matcap_mesh)
+  JS.global[:__threeRbMatcapMaterial] = renderer.backend.materialize(matcap_material)
   JS.global[:__threeRbTextureExampleTexture] = renderer.backend.materialize(texture)
   JS.global[:__threeRbTextureExampleEnvironment] = renderer.backend.materialize(environment_texture)
   JS.global[:__threeRbTextureExampleFrame] = 0
@@ -99,6 +111,8 @@ begin
     frame += 1
     mesh.rotation.x -= 0.006
     mesh.rotation.y += 0.011
+    matcap_mesh.rotation.x += 0.005
+    matcap_mesh.rotation.y -= 0.009
     JS.global[:__threeRbTextureExampleFrame] = frame
     renderer.render(scene, camera)
   end

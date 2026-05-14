@@ -73,6 +73,8 @@ module Three
             @adapter.new_mesh_basic_material(material_parameters(object))
           when MeshLambertMaterial
             @adapter.new_mesh_lambert_material(material_parameters(object))
+          when MeshMatcapMaterial
+            @adapter.new_mesh_matcap_material(material_parameters(object))
           when MeshNormalMaterial
             @adapter.new_mesh_normal_material(material_parameters(object))
           when MeshPhongMaterial

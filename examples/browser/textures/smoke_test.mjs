@@ -39,6 +39,15 @@ async function main() {
       geometryType: globalThis.__threeRbTexturedMesh?.geometry?.type,
       materialType: globalThis.__threeRbTexturedMesh?.material?.type,
       materialMapType: globalThis.__threeRbTexturedMesh?.material?.map?.isTexture,
+      matcapMeshType: globalThis.__threeRbMatcapMesh?.type,
+      matcapGeometryType: globalThis.__threeRbMatcapMesh?.geometry?.type,
+      matcapMaterialType: globalThis.__threeRbMatcapMesh?.material?.type,
+      matcapMaterialColor: globalThis.__threeRbMatcapMaterial?.color?.getHex?.(),
+      matcapMaterialFlatShading: globalThis.__threeRbMatcapMaterial?.flatShading,
+      matcapTextureType: globalThis.__threeRbMatcapMaterial?.matcap?.isTexture,
+      matcapMapType: globalThis.__threeRbMatcapMaterial?.map?.isTexture,
+      matcapTextureSame: globalThis.__threeRbMatcapMaterial?.matcap === globalThis.__threeRbTextureExampleTexture,
+      matcapMapSame: globalThis.__threeRbMatcapMaterial?.map === globalThis.__threeRbTextureExampleTexture,
       materialRoughnessMapType: globalThis.__threeRbTextureMaterial?.roughnessMap?.isTexture,
       materialMetalnessMapType: globalThis.__threeRbTextureMaterial?.metalnessMap?.isTexture,
       materialAnisotropyMapType: globalThis.__threeRbTextureMaterial?.anisotropyMap?.isTexture,
@@ -79,6 +88,20 @@ async function main() {
     }
     if (scene.materialType !== "MeshPhysicalMaterial" || scene.materialMapType !== true) {
       throw new Error(`expected MeshPhysicalMaterial with a texture map: ${JSON.stringify(scene)}`);
+    }
+    if (scene.matcapMeshType !== "Mesh" || scene.matcapGeometryType !== "SphereGeometry") {
+      throw new Error(`expected a matcap sphere mesh: ${JSON.stringify(scene)}`);
+    }
+    if (
+      scene.matcapMaterialType !== "MeshMatcapMaterial" ||
+      scene.matcapMaterialColor !== 0xffffff ||
+      scene.matcapMaterialFlatShading !== true ||
+      scene.matcapTextureType !== true ||
+      scene.matcapMapType !== true ||
+      scene.matcapTextureSame !== true ||
+      scene.matcapMapSame !== true
+    ) {
+      throw new Error(`expected MeshMatcapMaterial with shared matcap/map texture: ${JSON.stringify(scene)}`);
     }
     if (scene.materialRoughnessMapType !== true || scene.materialMetalnessMapType !== true || scene.materialAnisotropyMapType !== true || scene.materialClearcoatMapType !== true) {
       throw new Error(`expected MeshPhysicalMaterial with PBR and physical texture maps: ${JSON.stringify(scene)}`);

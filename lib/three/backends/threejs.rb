@@ -13,6 +13,7 @@ require_relative "../lights/point_light"
 require_relative "../materials/line_basic_material"
 require_relative "../materials/mesh_basic_material"
 require_relative "../materials/mesh_lambert_material"
+require_relative "../materials/mesh_matcap_material"
 require_relative "../materials/mesh_normal_material"
 require_relative "../materials/mesh_phong_material"
 require_relative "../materials/mesh_standard_material"
@@ -41,6 +42,7 @@ module Three
         emissive_map: :emissiveMap,
         env_map: :envMap,
         light_map: :lightMap,
+        matcap: :matcap,
         metalness_map: :metalnessMap,
         normal_map: :normalMap,
         roughness_map: :roughnessMap,

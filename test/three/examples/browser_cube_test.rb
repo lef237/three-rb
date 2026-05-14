@@ -174,6 +174,9 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "anisotropy_map: texture"
     assert_includes ruby, "clearcoat_map: texture"
     assert_includes ruby, "specular_intensity:"
+    assert_includes ruby, "Three::MeshMatcapMaterial"
+    assert_includes ruby, "matcap: texture"
+    assert_includes ruby, "JS.global[:__threeRbMatcapMaterial]"
     assert_includes ruby, "renderer.animation_loop"
   end
 

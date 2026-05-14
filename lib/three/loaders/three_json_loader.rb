@@ -136,6 +136,8 @@ module Three
           LineBasicMaterial.new(parameters)
         when "MeshLambertMaterial"
           MeshLambertMaterial.new(parameters)
+        when "MeshMatcapMaterial"
+          MeshMatcapMaterial.new(parameters)
         when "MeshNormalMaterial"
           MeshNormalMaterial.new(parameters)
         when "MeshPhongMaterial"
@@ -217,6 +219,7 @@ module Three
           emissive_map
           env_map
           light_map
+          matcap
           metalness_map
           normal_map
           roughness_map
