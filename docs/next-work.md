@@ -6,7 +6,7 @@ Last updated: 2026-05-14.
 
 ## Current Position
 
-The project is past the original MVP and is in Phase 8, renderer maturity.
+The project is past the original MVP and is in Phase 8, renderer maturity. The `0.1.0` browser-first alpha target is implemented and release-gate ready; the remaining release work is manual metadata finalization and publishing after owner confirmation.
 
 Recent completed work:
 
@@ -25,27 +25,28 @@ Recent completed work:
 - `Three::Postprocessing::DotScreenPass` support with composer integration, uniform update coverage, browser runtime boot contract updates, and postprocessing browser smoke coverage.
 - `Sprite` / `SpriteMaterial` support with textured billboard marker sync, JSON export/load, resource disposal, and primitives browser smoke coverage.
 - Saved JSON fixture coverage now includes `Sprite` / `SpriteMaterial` so the representative exporter/loader regression fixture matches the current primitive surface.
+- Completed public API and documentation consistency pass for the current browser-first alpha scope.
+- Local release gate and latest `main` CI are green for the `0.1.0` release candidate.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
 
 ## Recommended Next Task
 
-Do a public API and documentation consistency pass before selecting the next browser-facing feature.
+Prepare the manual `0.1.0` release metadata and publish only after the release owner confirms the date and RubyGems credentials.
 
 This is the best next step because:
 
-- The representative JSON fixture now covers the current primitive/material surface, including `Sprite` / `SpriteMaterial`.
-- The public docs cover release readiness, publishing, browser example coverage, and the browser runtime boot contract, but they should be checked against the latest implemented API before more feature scope is added.
-- Further progress should come from a concrete browser workflow, not from broad API mirroring.
-- The current implementation plan says KTX2 and other decoder loaders should wait until fixture coverage needs them.
-- Additional postprocessing passes should wait unless they can strengthen `examples/browser/postprocessing` without forcing an oversized render-target API.
-- Render targets are useful, but they expand renderer surface area and should be added only when an example requires them.
+- The representative JSON fixture covers the current primitive/material surface, including `Sprite` / `SpriteMaterial`.
+- The public docs now cover release readiness, publishing, browser example coverage, browser runtime boot contract, and the current implemented API scope.
+- `lib/three/version.rb` already contains `0.1.0`.
+- `CHANGELOG.md` intentionally remains `## 0.1.0 - Unreleased` until the owner confirms the release date.
+- Further feature scope should wait until after the `0.1.0` release unless an already-advertised example breaks.
 
 ## Scope
 
-First compare `README.md`, `docs/browser-runtime.md`, `docs/release-readiness.md`, `examples/browser/README.md`, and `docs/implementation-plan.md` against the current API surface. Keep any edits factual and narrow: document existing supported behavior, remove stale next-step wording, and avoid broad reference documentation.
+Follow `docs/publishing.md`: confirm the release date, update `CHANGELOG.md`, run `bundle exec rake release:preflight`, commit the metadata update, publish the gem, tag `v0.1.0`, push `main` and the tag, then verify installation from RubyGems.
 
-After that pass, pick one feature target and keep the change small enough to verify through one browser example.
+After the release is published, pick one feature target and keep the change small enough to verify through one browser example.
 
 Candidate targets, in recommended order when there is no stronger product signal:
 
@@ -57,12 +58,15 @@ Candidate targets, in recommended order when there is no stronger product signal
 
 ## Suggested Implementation Plan
 
-1. Run the public API/docs consistency pass and keep the changes scoped to already implemented behavior.
-2. Start the next feature from a user-visible workflow and choose exactly one feature target.
-3. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
-4. Add or extend one browser example and keep `examples/browser/README.md` in sync.
-5. Add or update a deterministic Playwright smoke command in `package.json`.
-6. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
+1. Finalize `CHANGELOG.md` with the confirmed release date.
+2. Run `bundle exec rake release:preflight`.
+3. Commit the release metadata with a message that does not include co-author trailers.
+4. Publish and tag using `docs/publishing.md`.
+5. After publishing, start the next feature from a user-visible workflow and choose exactly one feature target.
+6. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
+7. Add or extend one browser example and keep `examples/browser/README.md` in sync.
+8. Add or update a deterministic Playwright smoke command in `package.json`.
+9. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
 
 ## Acceptance Criteria
 
@@ -89,7 +93,7 @@ Do not prioritize these without a clear product need:
 - Native renderer.
 - Broad public API documentation beyond the current README, release readiness, implementation plan, browser examples overview, and browser runtime guide.
 
-Those are valid later tasks, but they expand feature scope. The immediate gap is choosing feature work by visible workflow and smoke-testability instead of API breadth.
+Those are valid later tasks, but they expand feature scope. The immediate gap is final release-owner confirmation and publishing, then choosing future feature work by visible workflow and smoke-testability instead of API breadth.
 
 ## After This Task
 

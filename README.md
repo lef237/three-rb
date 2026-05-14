@@ -49,7 +49,7 @@ cube = Three::Mesh.new(geometry, material)
 scene.add(cube)
 ```
 
-Browser rendering is being wired through `Three::Renderers::ThreeJSRenderer`, which targets three.js from ruby.wasm.
+Browser rendering is available through `Three::Renderers::ThreeJSRenderer`, which targets three.js from ruby.wasm.
 
 ## Browser Example
 
