@@ -112,12 +112,28 @@ module Three
           unreal_bloom_pass_constructor.new(@three[:Vector2].new(*resolution), strength, radius, threshold)
         end
 
+        def new_dot_screen_pass(center, angle, scale)
+          dot_screen_pass_constructor.new(@three[:Vector2].new(*center), angle, scale)
+        end
+
         def new_output_pass
           output_pass_constructor.new
         end
 
         def set_postprocessing_pass_property(pass, name, value)
           pass[name] = value
+        end
+
+        def set_postprocessing_pass_uniform(pass, name, value)
+          uniform = pass[:uniforms][name]
+          return unless js_present?(uniform)
+
+          target = uniform[:value]
+          if value.respond_to?(:to_a) && js_present?(target) && target.respond_to?(:call)
+            target.call(:set, *value.to_a)
+          else
+            uniform[:value] = value
+          end
         end
 
         def new_orbit_controls(camera, dom_element)
@@ -684,6 +700,16 @@ module Three
           constructor
         rescue LoadError
           raise RuntimeError, "Three::Postprocessing::UnrealBloomPass requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def dot_screen_pass_constructor
+          require "js"
+          constructor = JS.global[:THREE_DOT_SCREEN_PASS]
+          raise RuntimeError, "Three::Postprocessing::DotScreenPass requires globalThis.THREE_DOT_SCREEN_PASS" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Postprocessing::DotScreenPass requires ruby.wasm's js gem or an injected adapter"
         end
 
         def output_pass_constructor

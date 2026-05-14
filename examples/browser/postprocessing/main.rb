@@ -35,9 +35,16 @@ begin
     threshold: 0.22,
     composer: composer
   )
+  dot_screen_pass = Three::Postprocessing::DotScreenPass.new(
+    center: [0.5, 0.5],
+    angle: 0.72,
+    scale: 1.4,
+    composer: composer
+  )
   output_pass = Three::Postprocessing::OutputPass.new(composer: composer)
   composer.add_pass(render_pass)
   composer.add_pass(bloom_pass)
+  composer.add_pass(dot_screen_pass)
   composer.add_pass(output_pass)
 
   core_material = Three::MeshBasicMaterial.new(color: 0xf8fbff)
@@ -76,6 +83,7 @@ begin
   JS.global[:__threeRbPostComposer] = composer.handle
   JS.global[:__threeRbPostRenderPass] = render_pass.handle
   JS.global[:__threeRbPostBloomPass] = bloom_pass.handle
+  JS.global[:__threeRbPostDotScreenPass] = dot_screen_pass.handle
   JS.global[:__threeRbPostOutputPass] = output_pass.handle
   JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
@@ -96,6 +104,7 @@ begin
     right_accent.rotation.x -= 0.014
     right_accent.rotation.y += 0.017
     bloom_pass.strength = 0.95 + (0.22 * ((Math.sin(frame * 0.035) + 1) / 2.0))
+    dot_screen_pass.scale = 1.35 + (0.18 * ((Math.sin(frame * 0.025) + 1) / 2.0))
 
     composer.render(scene, camera)
   end

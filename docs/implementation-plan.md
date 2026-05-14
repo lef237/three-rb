@@ -506,7 +506,7 @@ Current implementation status:
 - `test/fixtures/scene_export_v1.json` and `test/three/exporters/three_json_fixture_test.rb` provide saved fixture regression coverage for the exporter/loader format, including physical material texture slots, shared resources, instancing, line/points, and RGBE environment textures.
 - `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
 - `examples/browser/primitives` focuses on `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
-- `examples/browser/postprocessing` focuses on an explicit render pipeline using `Three::Postprocessing::EffectComposer`, `RenderPass`, `UnrealBloomPass`, `OutputPass`, composer sizing, and pass property updates.
+- `examples/browser/postprocessing` focuses on an explicit render pipeline using `Three::Postprocessing::EffectComposer`, `RenderPass`, `UnrealBloomPass`, `DotScreenPass`, `OutputPass`, composer sizing, and pass property/uniform updates.
 - The browser bridge exposes the three.js `OrbitControls` addon through `Three::Controls::OrbitControls`.
 - Browser examples share common ruby.wasm boot and Playwright smoke-test helpers under `examples/browser/shared`.
 - CI runs the Ruby unit tests and Playwright browser smoke tests with pnpm-managed browser dependencies.
@@ -532,6 +532,7 @@ Current implementation status:
 - `RGBELoader`/`RGBETexture` was prioritized after `MeshPhysicalMaterial` because HDR environment maps directly improve PBR and physical-material scenes while reusing the existing texture, scene environment, JSON, and browser-smoke boundaries.
 - `DRACOLoader` was prioritized before postprocessing because a compressed glTF fixture can verify it through the existing GLTFLoader, ExternalObject3D, loaded-asset disposal, and browser-smoke paths with a small API addition.
 - Postprocessing was prioritized after `DRACOLoader` because the core render, material, texture, glTF, and interaction paths now have enough coverage to justify a dedicated render-pipeline example. The first wrapper set intentionally stayed small: `EffectComposer`, `RenderPass`, `UnrealBloomPass`, and `OutputPass`.
+- `DotScreenPass` was added as the first follow-up postprocessing pass because it strengthens the existing composer example with deterministic shader-pass uniform updates without requiring render targets or external assets.
 - The next implementation step is adding more material classes, postprocessing passes, render targets, or addon loaders only when an example or API target needs them; KTX2 should wait until texture-compression fixture coverage is needed.
 - Public release readiness is tracked in `docs/release-readiness.md`; before adding broad new feature scope, prioritize install smoke coverage, CI gates, and public-scope documentation.
 - The current resume point for the next implementation session is tracked in `docs/next-work.md`.

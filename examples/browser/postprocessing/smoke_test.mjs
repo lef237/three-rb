@@ -39,6 +39,11 @@ async function main() {
       bloomStrength: globalThis.__threeRbPostBloomPass?.strength,
       bloomRadius: globalThis.__threeRbPostBloomPass?.radius,
       bloomThreshold: globalThis.__threeRbPostBloomPass?.threshold,
+      dotScreenPassEnabled: globalThis.__threeRbPostDotScreenPass?.enabled,
+      dotScreenPassType: globalThis.__threeRbPostDotScreenPass?.constructor?.name,
+      dotScreenCenter: globalThis.__threeRbPostDotScreenPass?.uniforms?.center?.value?.toArray?.(),
+      dotScreenAngle: globalThis.__threeRbPostDotScreenPass?.uniforms?.angle?.value,
+      dotScreenScale: globalThis.__threeRbPostDotScreenPass?.uniforms?.scale?.value,
       outputPassEnabled: globalThis.__threeRbPostOutputPass?.enabled,
       outputPassType: globalThis.__threeRbPostOutputPass?.constructor?.name,
       outputPassFlag: globalThis.__threeRbPostOutputPass?.isOutputPass,
@@ -49,15 +54,16 @@ async function main() {
       rightAccentType: globalThis.__threeRbPostRightAccent?.type
     }));
 
-    if (!Array.isArray(state.composerPasses) || state.composerPasses.length !== 3) {
-      throw new Error(`expected three postprocessing passes: ${JSON.stringify(state)}`);
+    if (!Array.isArray(state.composerPasses) || state.composerPasses.length !== 4) {
+      throw new Error(`expected four postprocessing passes: ${JSON.stringify(state)}`);
     }
     if (
       state.composerPasses[0] !== "RenderPass" ||
       state.composerPasses[1] !== "UnrealBloomPass" ||
-      state.composerPasses[2] !== "OutputPass"
+      state.composerPasses[2] !== "DotScreenPass" ||
+      state.composerPasses[3] !== "OutputPass"
     ) {
-      throw new Error(`expected RenderPass, UnrealBloomPass, then OutputPass: ${JSON.stringify(state)}`);
+      throw new Error(`expected RenderPass, UnrealBloomPass, DotScreenPass, then OutputPass: ${JSON.stringify(state)}`);
     }
     if (state.composerWidth <= 0 || state.composerHeight <= 0) {
       throw new Error(`expected composer render targets to be sized: ${JSON.stringify(state)}`);
@@ -72,6 +78,17 @@ async function main() {
       Math.abs(state.bloomThreshold - 0.22) > 1e-12
     ) {
       throw new Error(`expected configured bloom pass values: ${JSON.stringify(state)}`);
+    }
+    if (
+      state.dotScreenPassEnabled !== true ||
+      state.dotScreenPassType !== "DotScreenPass" ||
+      !Array.isArray(state.dotScreenCenter) ||
+      state.dotScreenCenter[0] !== 0.5 ||
+      state.dotScreenCenter[1] !== 0.5 ||
+      Math.abs(state.dotScreenAngle - 0.72) > 1e-12 ||
+      state.dotScreenScale < 1.3
+    ) {
+      throw new Error(`expected configured dot screen pass values: ${JSON.stringify(state)}`);
     }
     if (state.outputPassEnabled !== true || state.outputPassType !== "OutputPass" || state.outputPassFlag !== true) {
       throw new Error(`expected configured output pass values: ${JSON.stringify(state)}`);

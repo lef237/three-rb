@@ -42,26 +42,34 @@ class ThreePostprocessingEffectComposerTest < Minitest::Test
       threshold: 0.18,
       composer: composer
     )
+    dot_pass = Three::Postprocessing::DotScreenPass.new(center: [0.25, 0.75], angle: 0.35, scale: 1.8, composer: composer)
     output_pass = Three::Postprocessing::OutputPass.new(composer: composer)
 
     assert_same backend, render_pass.backend
     assert_same backend, bloom_pass.backend
+    assert_same backend, dot_pass.backend
     assert_same backend, output_pass.backend
     assert_equal :render_pass, render_pass.handle[:type]
     assert_equal :unreal_bloom_pass, bloom_pass.handle[:type]
+    assert_equal :dot_screen_pass, dot_pass.handle[:type]
     assert_equal :output_pass, output_pass.handle[:type]
     assert_equal [640, 480], bloom_pass.handle[:resolution]
     assert_equal 1.25, bloom_pass.strength
+    assert_equal [0.25, 0.75], dot_pass.center.to_a
+    assert_equal 0.35, dot_pass.angle
+    assert_equal 1.8, dot_pass.scale
     assert output_pass.handle[:is_output_pass]
 
     assert_same composer, composer.add_pass(render_pass)
     assert_same composer, composer.add_pass(bloom_pass)
+    assert_same composer, composer.add_pass(dot_pass)
     assert_same composer, composer.add_pass(output_pass)
 
-    assert_equal [render_pass, bloom_pass, output_pass], composer.passes
-    assert_equal [render_pass.handle, bloom_pass.handle, output_pass.handle], composer.handle[:passes]
+    assert_equal [render_pass, bloom_pass, dot_pass, output_pass], composer.passes
+    assert_equal [render_pass.handle, bloom_pass.handle, dot_pass.handle, output_pass.handle], composer.handle[:passes]
     assert_includes adapter.calls, [:effect_composer_add_pass, composer.handle, render_pass.handle]
     assert_includes adapter.calls, [:effect_composer_add_pass, composer.handle, bloom_pass.handle]
+    assert_includes adapter.calls, [:effect_composer_add_pass, composer.handle, dot_pass.handle]
     assert_includes adapter.calls, [:effect_composer_add_pass, composer.handle, output_pass.handle]
   end
 
@@ -97,24 +105,50 @@ class ThreePostprocessingEffectComposerTest < Minitest::Test
     camera = Three::PerspectiveCamera.new
     render_pass = Three::Postprocessing::RenderPass.new(scene, camera, backend: backend)
     bloom_pass = Three::Postprocessing::UnrealBloomPass.new(backend: backend)
+    dot_pass = Three::Postprocessing::DotScreenPass.new(backend: backend)
     output_pass = Three::Postprocessing::OutputPass.new(backend: backend)
 
     render_pass.enabled = false
     bloom_pass.strength = 1.8
     bloom_pass.radius = 0.45
     bloom_pass.threshold = 0.22
+    dot_pass.center.set(0.25, 0.75)
+    dot_pass.angle = 0.65
+    dot_pass.scale = 1.35
+    dot_pass.enabled = false
     output_pass.enabled = false
 
     assert_includes adapter.calls, [:set_postprocessing_pass_property, render_pass.handle, "enabled", false]
     assert_includes adapter.calls, [:set_postprocessing_pass_property, bloom_pass.handle, "strength", 1.8]
     assert_includes adapter.calls, [:set_postprocessing_pass_property, bloom_pass.handle, "radius", 0.45]
     assert_includes adapter.calls, [:set_postprocessing_pass_property, bloom_pass.handle, "threshold", 0.22]
+    assert_includes adapter.calls, [:set_postprocessing_pass_uniform, dot_pass.handle, "center", [0.25, 0.75]]
+    assert_includes adapter.calls, [:set_postprocessing_pass_uniform, dot_pass.handle, "angle", 0.65]
+    assert_includes adapter.calls, [:set_postprocessing_pass_uniform, dot_pass.handle, "scale", 1.35]
+    assert_includes adapter.calls, [:set_postprocessing_pass_property, dot_pass.handle, "enabled", false]
     assert_includes adapter.calls, [:set_postprocessing_pass_property, output_pass.handle, "enabled", false]
     refute render_pass.handle[:enabled]
+    refute dot_pass.handle[:enabled]
     refute output_pass.handle[:enabled]
     assert_equal 1.8, bloom_pass.handle[:strength]
     assert_equal 0.45, bloom_pass.handle[:radius]
     assert_equal 0.22, bloom_pass.handle[:threshold]
+    assert_equal [0.25, 0.75], dot_pass.handle[:uniforms][:center]
+    assert_equal 0.65, dot_pass.handle[:uniforms][:angle]
+    assert_equal 1.35, dot_pass.handle[:uniforms][:scale]
+  end
+
+  def test_dot_screen_pass_accepts_vector_center_and_rejects_invalid_center
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    center = Three::Vector2.new(0.2, 0.8)
+    dot_pass = Three::Postprocessing::DotScreenPass.new(center: center, backend: backend)
+
+    assert_same center, dot_pass.center
+    assert_equal [0.2, 0.8], dot_pass.handle[:center]
+
+    assert_raises(TypeError) do
+      Three::Postprocessing::DotScreenPass.new(center: [1, 2, 3], backend: backend)
+    end
   end
 
   def test_add_pass_requires_matching_backend

@@ -22,6 +22,7 @@ Recent completed work:
 - `MeshMatcapMaterial` support with matcap texture-slot sync, JSON export/load, resource disposal, and texture browser smoke coverage.
 - `ShadowMaterial` support with backend sync, JSON export/load, and composition browser smoke coverage.
 - `MeshToonMaterial` support with gradient-map texture-slot sync, JSON export/load, resource disposal, and texture browser smoke coverage.
+- `Three::Postprocessing::DotScreenPass` support with composer integration, uniform update coverage, browser runtime boot contract updates, and postprocessing browser smoke coverage.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
 
@@ -44,7 +45,7 @@ Pick one feature target and keep the change small enough to verify through one b
 Candidate targets, in recommended order when there is no stronger product signal:
 
 1. Another small material class only when it reuses existing material parameter, JSON, backend sync, and browser smoke patterns. After `MeshToonMaterial`, prefer this only for a concrete example gap rather than API breadth.
-2. Another small postprocessing pass only when it can extend `examples/browser/postprocessing` without adding render targets.
+2. Another small postprocessing pass only when it can extend `examples/browser/postprocessing` without adding render targets. After `DotScreenPass`, prefer this only for a specific visual workflow rather than pass count.
 3. Render target support, but only with a focused example that proves why it is needed.
 4. A new addon loader only when a committed fixture requires it.
 5. KTX2 loader after texture-compression fixture coverage and decoder-path handling are planned.

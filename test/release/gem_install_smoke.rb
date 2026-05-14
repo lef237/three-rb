@@ -41,5 +41,6 @@ assert(defined?(Three::MeshToonMaterial), "expected toon material API to load")
 assert(defined?(Three::ShadowMaterial), "expected shadow material API to load")
 assert(defined?(Three::Postprocessing::EffectComposer), "expected postprocessing API to load")
 assert(defined?(Three::Postprocessing::OutputPass), "expected output pass API to load")
+assert(defined?(Three::Postprocessing::DotScreenPass), "expected dot screen pass API to load")
 
 puts "gem install smoke passed for three.rb #{Three::VERSION}"

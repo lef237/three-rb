@@ -109,6 +109,21 @@ class FakeThreeJSAdapter
     )
   end
 
+  def new_dot_screen_pass(center, angle, scale)
+    handle(
+      :dot_screen_pass,
+      center: center.dup,
+      angle: angle,
+      scale: scale,
+      enabled: true,
+      uniforms: {
+        center: center.dup,
+        angle: angle,
+        scale: scale
+      }
+    )
+  end
+
   def new_output_pass
     handle(:output_pass, enabled: true, is_output_pass: true)
   end
@@ -116,6 +131,11 @@ class FakeThreeJSAdapter
   def set_postprocessing_pass_property(pass, name, value)
     @calls << [:set_postprocessing_pass_property, pass, name, value]
     pass[name.to_sym] = value
+  end
+
+  def set_postprocessing_pass_uniform(pass, name, value)
+    @calls << [:set_postprocessing_pass_uniform, pass, name, value]
+    pass[:uniforms][name.to_sym] = value.respond_to?(:dup) ? value.dup : value
   end
 
   def new_orbit_controls(camera, dom_element)

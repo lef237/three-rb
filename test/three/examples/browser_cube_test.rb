@@ -246,13 +246,16 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::Postprocessing::EffectComposer"
     assert_includes ruby, "Three::Postprocessing::RenderPass"
     assert_includes ruby, "Three::Postprocessing::UnrealBloomPass"
+    assert_includes ruby, "Three::Postprocessing::DotScreenPass"
     assert_includes ruby, "Three::Postprocessing::OutputPass"
     assert_includes ruby, "composer.add_pass(render_pass)"
     assert_includes ruby, "composer.add_pass(bloom_pass)"
+    assert_includes ruby, "composer.add_pass(dot_screen_pass)"
     assert_includes ruby, "composer.add_pass(output_pass)"
     assert_includes ruby, "composer.set_size(width, height)"
     assert_includes ruby, "composer.render(scene, camera)"
     assert_includes ruby, "bloom_pass.strength ="
+    assert_includes ruby, "dot_screen_pass.scale ="
     assert_includes ruby, "preserveDrawingBuffer: true"
   end
 

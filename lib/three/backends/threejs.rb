@@ -135,12 +135,20 @@ module Three
         @adapter.new_unreal_bloom_pass(resolution, strength, radius, threshold)
       end
 
+      def create_dot_screen_pass(center, angle, scale)
+        @adapter.new_dot_screen_pass(center, angle, scale)
+      end
+
       def create_output_pass
         @adapter.new_output_pass
       end
 
       def set_postprocessing_pass_property(pass_handle, name, value)
         @adapter.set_postprocessing_pass_property(pass_handle, name, value)
+      end
+
+      def set_postprocessing_pass_uniform(pass_handle, name, value)
+        @adapter.set_postprocessing_pass_uniform(pass_handle, name, value)
       end
 
       def create_orbit_controls(camera, dom_element = nil)
