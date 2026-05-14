@@ -110,6 +110,10 @@ module Three
           unreal_bloom_pass_constructor.new(@three[:Vector2].new(*resolution), strength, radius, threshold)
         end
 
+        def new_output_pass
+          output_pass_constructor.new
+        end
+
         def set_postprocessing_pass_property(pass, name, value)
           pass[name] = value
         end
@@ -664,6 +668,16 @@ module Three
           constructor
         rescue LoadError
           raise RuntimeError, "Three::Postprocessing::UnrealBloomPass requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def output_pass_constructor
+          require "js"
+          constructor = JS.global[:THREE_OUTPUT_PASS]
+          raise RuntimeError, "Three::Postprocessing::OutputPass requires globalThis.THREE_OUTPUT_PASS" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Postprocessing::OutputPass requires ruby.wasm's js gem or an injected adapter"
         end
 
         def gltf_loader_constructor

@@ -35,8 +35,10 @@ begin
     threshold: 0.22,
     composer: composer
   )
+  output_pass = Three::Postprocessing::OutputPass.new(composer: composer)
   composer.add_pass(render_pass)
   composer.add_pass(bloom_pass)
+  composer.add_pass(output_pass)
 
   core_material = Three::MeshBasicMaterial.new(color: 0xf8fbff)
   core = Three::Mesh.new(Three::SphereGeometry.new(0.48, width_segments: 32, height_segments: 16), core_material)
@@ -74,6 +76,7 @@ begin
   JS.global[:__threeRbPostComposer] = composer.handle
   JS.global[:__threeRbPostRenderPass] = render_pass.handle
   JS.global[:__threeRbPostBloomPass] = bloom_pass.handle
+  JS.global[:__threeRbPostOutputPass] = output_pass.handle
   JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
   JS.global[:__threeRbPostCore] = renderer.backend.materialize(core)

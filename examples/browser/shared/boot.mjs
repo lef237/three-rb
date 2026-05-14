@@ -7,6 +7,7 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
 export async function bootRubyExample({ main, clearColor }) {
   const setStatus = globalThis.__threeRbSetStatus || (() => {});
@@ -22,6 +23,7 @@ export async function bootRubyExample({ main, clearColor }) {
     globalThis.THREE_EFFECT_COMPOSER = EffectComposer;
     globalThis.THREE_RENDER_PASS = RenderPass;
     globalThis.THREE_UNREAL_BLOOM_PASS = UnrealBloomPass;
+    globalThis.THREE_OUTPUT_PASS = OutputPass;
     globalThis.__threeReady = Promise.resolve(THREE);
     globalThis.__threeRbRenderCount = 0;
     globalThis.__threeRbRenderFrameCount = 0;

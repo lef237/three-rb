@@ -74,6 +74,7 @@ The boot module is responsible for:
   - `globalThis.THREE_EFFECT_COMPOSER`
   - `globalThis.THREE_RENDER_PASS`
   - `globalThis.THREE_UNREAL_BLOOM_PASS`
+  - `globalThis.THREE_OUTPUT_PASS`
 - Setting `globalThis.__threeReady` to a promise Ruby can wait on.
 - Loading `/node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm`.
 - Starting the Ruby VM and loading the Ruby entrypoint through `JS::RequireRemote`.

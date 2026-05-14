@@ -16,7 +16,7 @@ Included in the first public scope:
 - Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and `three@0.184.0`.
 - Dirty-tracked synchronization from Ruby objects into three.js handles.
 - JSON export/load for Ruby-authored scenes.
-- JavaScript-delegated browser integrations for textures, cube maps, RGBE environment maps, glTF, DRACO, animation mixers, OrbitControls, raycasting, instancing, shadows, and initial postprocessing.
+- JavaScript-delegated browser integrations for textures, cube maps, RGBE environment maps, glTF, DRACO, animation mixers, OrbitControls, raycasting, instancing, shadows, and initial postprocessing with composer/render/bloom/output passes.
 - Browser examples and smoke tests that verify visible rendering paths.
 
 Explicitly out of scope for the first public scope:

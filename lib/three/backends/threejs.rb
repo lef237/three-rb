@@ -130,6 +130,10 @@ module Three
         @adapter.new_unreal_bloom_pass(resolution, strength, radius, threshold)
       end
 
+      def create_output_pass
+        @adapter.new_output_pass
+      end
+
       def set_postprocessing_pass_property(pass_handle, name, value)
         @adapter.set_postprocessing_pass_property(pass_handle, name, value)
       end

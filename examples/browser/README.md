@@ -47,7 +47,7 @@ Run one smoke test by using the command listed in the table below.
 | `examples/browser/serialization/` | `ThreeJSONExporter`, `ThreeJSONLoader`, deterministic ids, shared geometry/material/texture resources, loaded scene rendering | `pnpm test:browser:serialization` | Confirms exported Ruby scenes round-trip through JSON and render after loading. |
 | `examples/browser/picking/` | `Raycaster`, pointer-to-camera coordinates, intersection mapping back to Ruby `Object3D`, selected material updates | `pnpm test:browser:picking` | Verifies browser event coordinates can drive Ruby-side picking and mutate rendered objects. |
 | `examples/browser/primitives/` | `BufferGeometry`, `Float32BufferAttribute`, `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial` | `pnpm test:browser:primitives` | Covers non-`Mesh` primitive rendering and generic buffer attribute synchronization. |
-| `examples/browser/postprocessing/` | `EffectComposer`, `RenderPass`, `UnrealBloomPass`, composer sizing, pass property updates, `composer.render` | `pnpm test:browser:postprocessing` | Verifies the explicit postprocessing render path stays separate from direct renderer rendering and remains smoke-tested. |
+| `examples/browser/postprocessing/` | `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `OutputPass`, composer sizing, pass property updates, `composer.render` | `pnpm test:browser:postprocessing` | Verifies the explicit postprocessing render path stays separate from direct renderer rendering and remains smoke-tested. |
 
 ## Adding Browser Coverage
 

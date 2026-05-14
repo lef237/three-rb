@@ -64,6 +64,7 @@ require_relative "three/controls/orbit_controls"
 require_relative "three/postprocessing/effect_composer"
 require_relative "three/postprocessing/render_pass"
 require_relative "three/postprocessing/unreal_bloom_pass"
+require_relative "three/postprocessing/output_pass"
 require_relative "three/exporters/three_json_exporter"
 
 module Three

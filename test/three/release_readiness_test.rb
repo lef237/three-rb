@@ -45,6 +45,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes guide, "three@0.184.0"
     assert_includes guide, "globalThis.THREE"
     assert_includes guide, "globalThis.THREE_GLTF_LOADER"
+    assert_includes guide, "globalThis.THREE_OUTPUT_PASS"
     assert_includes guide, "examples/browser/shared/boot.mjs"
     assert_includes guide, "examples/browser/README.md"
     assert_includes guide, "docs/release-readiness.md"

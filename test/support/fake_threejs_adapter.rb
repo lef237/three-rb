@@ -107,6 +107,10 @@ class FakeThreeJSAdapter
     )
   end
 
+  def new_output_pass
+    handle(:output_pass, enabled: true, is_output_pass: true)
+  end
+
   def set_postprocessing_pass_property(pass, name, value)
     @calls << [:set_postprocessing_pass_property, pass, name, value]
     pass[name.to_sym] = value

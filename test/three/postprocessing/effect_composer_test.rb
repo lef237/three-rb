@@ -26,7 +26,7 @@ class ThreePostprocessingEffectComposerTest < Minitest::Test
     assert_equal "effect composer backend must match the renderer backend", error.message
   end
 
-  def test_adds_render_and_bloom_passes
+  def test_adds_postprocessing_passes
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)
     renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
@@ -42,21 +42,27 @@ class ThreePostprocessingEffectComposerTest < Minitest::Test
       threshold: 0.18,
       composer: composer
     )
+    output_pass = Three::Postprocessing::OutputPass.new(composer: composer)
 
     assert_same backend, render_pass.backend
     assert_same backend, bloom_pass.backend
+    assert_same backend, output_pass.backend
     assert_equal :render_pass, render_pass.handle[:type]
     assert_equal :unreal_bloom_pass, bloom_pass.handle[:type]
+    assert_equal :output_pass, output_pass.handle[:type]
     assert_equal [640, 480], bloom_pass.handle[:resolution]
     assert_equal 1.25, bloom_pass.strength
+    assert output_pass.handle[:is_output_pass]
 
     assert_same composer, composer.add_pass(render_pass)
     assert_same composer, composer.add_pass(bloom_pass)
+    assert_same composer, composer.add_pass(output_pass)
 
-    assert_equal [render_pass, bloom_pass], composer.passes
-    assert_equal [render_pass.handle, bloom_pass.handle], composer.handle[:passes]
+    assert_equal [render_pass, bloom_pass, output_pass], composer.passes
+    assert_equal [render_pass.handle, bloom_pass.handle, output_pass.handle], composer.handle[:passes]
     assert_includes adapter.calls, [:effect_composer_add_pass, composer.handle, render_pass.handle]
     assert_includes adapter.calls, [:effect_composer_add_pass, composer.handle, bloom_pass.handle]
+    assert_includes adapter.calls, [:effect_composer_add_pass, composer.handle, output_pass.handle]
   end
 
   def test_set_size_render_and_dispose_delegate_to_backend
@@ -91,17 +97,21 @@ class ThreePostprocessingEffectComposerTest < Minitest::Test
     camera = Three::PerspectiveCamera.new
     render_pass = Three::Postprocessing::RenderPass.new(scene, camera, backend: backend)
     bloom_pass = Three::Postprocessing::UnrealBloomPass.new(backend: backend)
+    output_pass = Three::Postprocessing::OutputPass.new(backend: backend)
 
     render_pass.enabled = false
     bloom_pass.strength = 1.8
     bloom_pass.radius = 0.45
     bloom_pass.threshold = 0.22
+    output_pass.enabled = false
 
     assert_includes adapter.calls, [:set_postprocessing_pass_property, render_pass.handle, "enabled", false]
     assert_includes adapter.calls, [:set_postprocessing_pass_property, bloom_pass.handle, "strength", 1.8]
     assert_includes adapter.calls, [:set_postprocessing_pass_property, bloom_pass.handle, "radius", 0.45]
     assert_includes adapter.calls, [:set_postprocessing_pass_property, bloom_pass.handle, "threshold", 0.22]
+    assert_includes adapter.calls, [:set_postprocessing_pass_property, output_pass.handle, "enabled", false]
     refute render_pass.handle[:enabled]
+    refute output_pass.handle[:enabled]
     assert_equal 1.8, bloom_pass.handle[:strength]
     assert_equal 0.45, bloom_pass.handle[:radius]
     assert_equal 0.22, bloom_pass.handle[:threshold]

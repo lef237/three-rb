@@ -37,5 +37,6 @@ assert(loaded.children.any? { |child| child.is_a?(Three::Mesh) }, "expected mesh
 assert(defined?(Three::Renderers::ThreeJSRenderer), "expected browser renderer API to load")
 assert(defined?(Three::Controls::OrbitControls), "expected controls API to load")
 assert(defined?(Three::Postprocessing::EffectComposer), "expected postprocessing API to load")
+assert(defined?(Three::Postprocessing::OutputPass), "expected output pass API to load")
 
 puts "gem install smoke passed for three.rb #{Three::VERSION}"
