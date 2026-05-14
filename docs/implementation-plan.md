@@ -860,14 +860,14 @@ The MVP is complete when:
 5. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
 6. Keep reviewing low-risk dependency updates after checking their CI results.
 
-## Decisions Still Open
+## Resolved Early Decisions
 
-Before implementation begins, decide:
+The original MVP decisions are now resolved:
 
-- Whether to start with `minitest` or `rspec`.
-- Browser examples should use pnpm-managed local browser dependencies for ruby.wasm and three.js, avoiding CDN runtime drift and browser ORB failures.
-- Whether camelCase aliases should exist from the first release or be added later.
-- Whether geometry arrays should use `numo-narray` or start with standard `Array`.
-- Whether the published gem name should be `three.rb`, `three-rb`, or `three`.
+- Use `minitest` for the first public release test suite.
+- Use pnpm-managed local browser dependencies for ruby.wasm and three.js, avoiding CDN runtime drift and browser ORB failures.
+- Defer broad camelCase three.js compatibility aliases until after the first public release; snake-case Ruby methods are the documented API style.
+- Start geometry and attribute data with standard Ruby `Array` values instead of requiring `numo-narray`.
+- Publish the gem as `three.rb`.
 
-Current recommendation: use `minitest`, pnpm-managed browser dependencies, defer camelCase aliases, start with standard `Array`, and publish as `three.rb`.
+The first public target is `0.1.0` browser-first alpha. Its completion definition and release gate are tracked in `docs/release-readiness.md`.

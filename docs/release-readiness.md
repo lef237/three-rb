@@ -8,6 +8,21 @@ The project is past the original MVP. It is now in Phase 8, renderer maturity: c
 
 The first public release should be positioned as browser-first alpha. The stable promise is narrow: users can build Ruby-authored scenes and render them in a browser through ruby.wasm and the delegated three.js backend. Native rendering and full three.js API compatibility are not part of the first release.
 
+## 0.1.0 Target and Completion Definition
+
+The current release plan targets `0.1.0` as the first public browser-first alpha. This is not a `1.0` stable API commitment. A future `1.0` should get a separate stability plan covering compatibility guarantees, deprecation policy, support windows, and any non-browser renderer commitment.
+
+The `0.1.0` target is complete when all of these are true:
+
+- Scope is frozen to the browser-first alpha surface in this document and `README.md`; no additional material, loader, render-target, postprocessing, WebGPU, XR, native-renderer, or broad compatibility work is required for the release unless an already-advertised example is broken.
+- Public API documentation matches the implemented, tested Ruby API surface loaded by `require "three"`.
+- Snake-case Ruby methods are the documented API style. Broad camelCase three.js compatibility aliases are deferred until after `0.1.0`.
+- `Three::Exporters::ThreeJSONExporter` and `Three::Loaders::ThreeJSONLoader` continue to round-trip Ruby-authored scenes covered by the saved `test/fixtures/scene_export_v1.json` regression fixture.
+- JavaScript-loaded assets remain opaque `ExternalObject3D` roots for `0.1.0`; transform-level use, renderer traversal helpers, animation mixer usage, and explicit subtree disposal are in scope, while Ruby child mutation inside loaded external roots is out of scope.
+- Every browser example advertised in `README.md` and `examples/browser/README.md` has a matching deterministic Playwright smoke command, and `pnpm test:browser` runs them all.
+- The required gate below passes locally before tagging, and the CI workflow passes on the release commit.
+- Release metadata is final: `lib/three/version.rb` contains `0.1.0`, `CHANGELOG.md` has either the unreleased heading during development or the final release date before publishing, and `docs/publishing.md` has the manual publish steps.
+
 ## Public Scope
 
 Included in the first public scope:
