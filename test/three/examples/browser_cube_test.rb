@@ -14,6 +14,18 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   PICKING_EXAMPLE_DIR = File.join(ROOT, "examples/browser/picking")
   PRIMITIVES_EXAMPLE_DIR = File.join(ROOT, "examples/browser/primitives")
   POSTPROCESSING_EXAMPLE_DIR = File.join(ROOT, "examples/browser/postprocessing")
+  OVERVIEW_PATH = File.join(ROOT, "examples/browser/README.md")
+  BROWSER_EXAMPLES = {
+    "cube" => "test:browser:cube",
+    "composition" => "test:browser:composition",
+    "textures" => "test:browser:textures",
+    "cubemap" => "test:browser:cubemap",
+    "gltf" => "test:browser:gltf",
+    "serialization" => "test:browser:serialization",
+    "picking" => "test:browser:picking",
+    "primitives" => "test:browser:primitives",
+    "postprocessing" => "test:browser:postprocessing"
+  }.freeze
 
   def test_browser_cube_example_files_exist
     assert_path_exists File.join(EXAMPLE_DIR, "index.html")
@@ -79,6 +91,21 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_path_exists File.join(POSTPROCESSING_EXAMPLE_DIR, "main.rb")
     assert_path_exists File.join(POSTPROCESSING_EXAMPLE_DIR, "README.md")
     assert_path_exists File.join(POSTPROCESSING_EXAMPLE_DIR, "smoke_test.mjs")
+  end
+
+  def test_browser_examples_overview_documents_smoke_coverage
+    overview = File.read(OVERVIEW_PATH)
+    package = JSON.parse(File.read(File.join(ROOT, "package.json")))
+
+    assert_includes overview, "# Browser Examples"
+    assert_includes overview, "pnpm test:browser"
+    assert_includes overview, "New browser-facing features should add or extend one of these examples"
+
+    BROWSER_EXAMPLES.each do |example, script|
+      assert_includes overview, "examples/browser/#{example}/"
+      assert_includes overview, "pnpm #{script}"
+      assert_equal "node examples/browser/#{example}/smoke_test.mjs", package.fetch("scripts").fetch(script)
+    end
   end
 
   def test_index_loads_pinned_browser_dependencies

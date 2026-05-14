@@ -1,0 +1,54 @@
+# Browser Examples
+
+These examples are the browser-facing coverage map for three.rb's browser-first alpha. They run Ruby through ruby.wasm, load pnpm-managed three.js packages, and render through `Three::Renderers::ThreeJSRenderer`.
+
+## Run Examples
+
+Install browser dependencies and serve the repository root:
+
+```sh
+pnpm install
+ruby -run -e httpd . -p 8000
+```
+
+Open an example URL:
+
+```text
+http://localhost:8000/examples/browser/cube/
+http://localhost:8000/examples/browser/composition/
+http://localhost:8000/examples/browser/textures/
+http://localhost:8000/examples/browser/cubemap/
+http://localhost:8000/examples/browser/gltf/
+http://localhost:8000/examples/browser/serialization/
+http://localhost:8000/examples/browser/picking/
+http://localhost:8000/examples/browser/primitives/
+http://localhost:8000/examples/browser/postprocessing/
+```
+
+## Smoke Tests
+
+Run all browser smoke tests:
+
+```sh
+pnpm install
+pnpm exec playwright install chromium
+pnpm test:browser
+```
+
+Run one smoke test by using the command listed in the table below.
+
+| Example | Primary APIs covered | Smoke command | Why it exists |
+| --- | --- | --- | --- |
+| `examples/browser/cube/` | `Scene`, `PerspectiveCamera`, `BoxGeometry`, `Mesh`, `MeshBasicMaterial`, `ThreeJSRenderer`, animation loop | `pnpm test:browser:cube` | Verifies the smallest Ruby-authored scene can boot through ruby.wasm and draw nonblank WebGL pixels through the three.js renderer path. |
+| `examples/browser/composition/` | `OrthographicCamera`, ambient/directional/point/hemisphere lights, shadows, `Group`, `InstancedMesh`, `TextureLoader`, `OrbitControls`, material/texture disposal | `pnpm test:browser:composition` | Exercises the broad scene-composition path used by richer browser scenes, including dynamic material updates and camera controls. |
+| `examples/browser/textures/` | `TextureLoader`, `RGBELoader`, repeat/wrap/filter/UV-transform settings, `MeshPhysicalMaterial`, physical texture maps, scene environment | `pnpm test:browser:textures` | Verifies browser texture loading, HDR environment synchronization, and the current physical material bridge. |
+| `examples/browser/cubemap/` | `CubeTextureLoader`, `CubeTexture`, scene `background`, scene `environment`, reflective `MeshStandardMaterial` | `pnpm test:browser:cubemap` | Keeps cubemap background/environment behavior covered separately from ordinary 2D texture loading. |
+| `examples/browser/gltf/` | `GLTFLoader`, `DRACOLoader` decoder path, loaded external scenes, `AnimationMixer`, `Clock`, loaded subtree disposal | `pnpm test:browser:gltf` | Verifies that external assets can be loaded, animated, attached to Ruby scenes, and disposed through the renderer API. |
+| `examples/browser/serialization/` | `ThreeJSONExporter`, `ThreeJSONLoader`, deterministic ids, shared geometry/material/texture resources, loaded scene rendering | `pnpm test:browser:serialization` | Confirms exported Ruby scenes round-trip through JSON and render after loading. |
+| `examples/browser/picking/` | `Raycaster`, pointer-to-camera coordinates, intersection mapping back to Ruby `Object3D`, selected material updates | `pnpm test:browser:picking` | Verifies browser event coordinates can drive Ruby-side picking and mutate rendered objects. |
+| `examples/browser/primitives/` | `BufferGeometry`, `Float32BufferAttribute`, `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial` | `pnpm test:browser:primitives` | Covers non-`Mesh` primitive rendering and generic buffer attribute synchronization. |
+| `examples/browser/postprocessing/` | `EffectComposer`, `RenderPass`, `UnrealBloomPass`, composer sizing, pass property updates, `composer.render` | `pnpm test:browser:postprocessing` | Verifies the explicit postprocessing render path stays separate from direct renderer rendering and remains smoke-tested. |
+
+## Adding Browser Coverage
+
+New browser-facing features should add or extend one of these examples and include deterministic smoke coverage. Prefer extending an existing example when the feature strengthens the same workflow; add a new example when it introduces a distinct API surface such as a new loader family, render target workflow, or postprocessing pipeline.
