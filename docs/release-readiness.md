@@ -77,6 +77,7 @@ Before expanding feature scope, prefer:
 
 1. Keep release checks fast and deterministic.
 2. Keep fixture-based JSON export/load regression tests current.
-3. Improve public docs around browser examples, browser boot, and unsupported APIs; see `docs/next-work.md`.
-4. Add new material classes, postprocessing passes, render targets, or loaders only when a dedicated example and smoke test need them.
-5. Treat KTX2, WebGPU, WebXR, and native rendering as post-0.1 planning items.
+3. Keep `CHANGELOG.md` accurate while it remains under the `0.1.0 - Unreleased` heading.
+4. Improve public docs around browser examples, browser boot, and unsupported APIs; see `docs/next-work.md`.
+5. Add new material classes, postprocessing passes, render targets, or loaders only when a dedicated example and smoke test need them.
+6. Treat KTX2, WebGPU, WebXR, and native rendering as post-0.1 planning items.

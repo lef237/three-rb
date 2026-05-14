@@ -32,19 +32,21 @@ Do not start Phase 9 native renderer work yet. The implementation plan still rec
 
 ## Recommended Next Task
 
-Prepare the manual `0.1.0` release metadata and publish only after the release owner confirms the date and RubyGems credentials.
+Keep the `0.1.0` release candidate current while the release is deferred. Publish only after the release owner confirms the date and RubyGems credentials.
 
 This is the best next step because:
 
 - The representative JSON fixture covers the current primitive/material surface, including `Sprite` / `SpriteMaterial`.
 - The public docs now cover release readiness, publishing, browser example coverage, browser runtime boot contract, and the current implemented API scope.
 - `lib/three/version.rb` already contains `0.1.0`.
-- `CHANGELOG.md` intentionally remains `## 0.1.0 - Unreleased` until the owner confirms the release date.
+- `CHANGELOG.md` intentionally remains `## 0.1.0 - Unreleased` until the owner confirms the release date, but its contents should continue to reflect the current release-candidate surface.
 - Further feature scope should wait until after the `0.1.0` release unless an already-advertised example breaks.
 
 ## Scope
 
-Follow `docs/publishing.md`: confirm the release date, update `CHANGELOG.md`, run `bundle exec rake release:preflight`, commit the metadata update, publish the gem, tag `v0.1.0`, push `main` and the tag, then verify installation from RubyGems.
+For deferred-release maintenance, keep `CHANGELOG.md`, `docs/release-readiness.md`, and this resume point aligned with the implemented release-candidate surface. Do not date the changelog, tag, push, or publish until the release owner confirms the release window.
+
+When the owner is ready to publish, follow `docs/publishing.md`: confirm the release date, update `CHANGELOG.md`, run `bundle exec rake release:preflight`, commit the metadata update, publish the gem, tag `v0.1.0`, push `main` and the tag, then verify installation from RubyGems.
 
 After the release is published, pick one feature target and keep the change small enough to verify through one browser example.
 
@@ -58,15 +60,16 @@ Candidate targets, in recommended order when there is no stronger product signal
 
 ## Suggested Implementation Plan
 
-1. Finalize `CHANGELOG.md` with the confirmed release date.
-2. Run `bundle exec rake release:preflight`.
-3. Commit the release metadata with a message that does not include co-author trailers.
-4. Publish and tag using `docs/publishing.md`.
-5. After publishing, start the next feature from a user-visible workflow and choose exactly one feature target.
-6. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
-7. Add or extend one browser example and keep `examples/browser/README.md` in sync.
-8. Add or update a deterministic Playwright smoke command in `package.json`.
-9. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
+1. While release is deferred, keep the unreleased changelog and release-readiness docs current without changing the version, date, tag, or published artifact.
+2. When release is confirmed, finalize `CHANGELOG.md` with the confirmed release date.
+3. Run `bundle exec rake release:preflight`.
+4. Commit the release metadata with a message that does not include co-author trailers.
+5. Publish and tag using `docs/publishing.md`.
+6. After publishing, start the next feature from a user-visible workflow and choose exactly one feature target.
+7. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
+8. Add or extend one browser example and keep `examples/browser/README.md` in sync.
+9. Add or update a deterministic Playwright smoke command in `package.json`.
+10. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
 
 ## Acceptance Criteria
 
@@ -93,7 +96,7 @@ Do not prioritize these without a clear product need:
 - Native renderer.
 - Broad public API documentation beyond the current README, release readiness, implementation plan, browser examples overview, and browser runtime guide.
 
-Those are valid later tasks, but they expand feature scope. The immediate gap is final release-owner confirmation and publishing, then choosing future feature work by visible workflow and smoke-testability instead of API breadth.
+Those are valid later tasks, but they expand feature scope. The immediate gap is keeping the deferred release candidate accurate, then getting final release-owner confirmation and publishing before choosing future feature work by visible workflow and smoke-testability instead of API breadth.
 
 ## After This Task
 

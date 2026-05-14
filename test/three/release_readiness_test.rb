@@ -36,6 +36,19 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes spec.files, "docs/publishing.md"
   end
 
+  def test_changelog_tracks_current_alpha_surface
+    changelog = File.read(File.join(ROOT, "CHANGELOG.md"))
+
+    assert_includes changelog, "## 0.1.0 - Unreleased"
+    assert_includes changelog, "physical, matcap, toon, normal, shadow, line, points, and sprite materials"
+    assert_includes changelog, "glTF/DRACO"
+    assert_includes changelog, "loaded-asset traversal/disposal helpers"
+    assert_includes changelog, "DotScreenPass"
+    assert_includes changelog, "OutputPass"
+    assert_includes changelog, "Deterministic JSON fixture regression coverage"
+    assert_includes changelog, "Release install smoke and preflight tasks"
+  end
+
   def test_browser_runtime_guide_documents_boot_contract
     guide = File.read(File.join(ROOT, "docs/browser-runtime.md"))
 

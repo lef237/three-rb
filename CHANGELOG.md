@@ -4,11 +4,15 @@
 
 ### Added
 
-- Ruby scene graph, math primitives, cameras, lights, geometries, materials, textures, layers, and JSON export/load.
+- Ruby scene graph, math primitives, cameras, lights, geometries, textures, layers, raycasting helpers, and JSON export/load.
+- Mesh, instanced mesh, line, points, and sprite object support.
+- Common material APIs including basic, Lambert, Phong, standard, physical, matcap, toon, normal, shadow, line, points, and sprite materials.
 - Browser rendering through ruby.wasm and a delegated three.js backend.
 - Browser examples and Playwright smoke tests for cube, composition, textures, cubemap, glTF/DRACO, serialization, picking, primitives, and postprocessing.
-- Texture loading, cube textures, RGBE environment textures, glTF loading, DRACO decoder configuration, animation mixers, OrbitControls, instancing, raycasting, shadows, and initial EffectComposer/RenderPass/UnrealBloomPass wrappers.
-- Release install smoke test for validating the built gem outside the repository load path.
+- Texture loading, cube textures, RGBE environment textures, glTF loading, DRACO decoder configuration, animation mixers, OrbitControls, instancing, picking, shadows, and loaded-asset traversal/disposal helpers.
+- Initial postprocessing wrappers for `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `DotScreenPass`, and `OutputPass`.
+- Deterministic JSON fixture regression coverage for exporter/loader compatibility.
+- Release install smoke and preflight tasks for validating the built gem outside the repository load path.
 
 ### Notes
 
