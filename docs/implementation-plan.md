@@ -503,6 +503,7 @@ Current implementation status:
 - `examples/browser/cubemap` focuses on `CubeTextureLoader`, `CubeTexture`, and scene `background`/`environment` synchronization.
 - `examples/browser/gltf` focuses on `GLTFLoader`, optional `DRACOLoader` decoder configuration for compressed geometry, adding loaded external scenes to the Ruby-authored scene graph, playing loaded animation clips through `AnimationMixer`, and disposing loaded subtrees through the renderer API.
 - `examples/browser/serialization` focuses on exporting a Ruby-authored scene to JSON, parsing it back into Ruby objects, preserving shared resources, and rendering the loaded scene.
+- `test/fixtures/scene_export_v1.json` and `test/three/exporters/three_json_fixture_test.rb` provide saved fixture regression coverage for the exporter/loader format, including physical material texture slots, shared resources, instancing, line/points, and RGBE environment textures.
 - `examples/browser/picking` focuses on `Three::Raycaster`, mapping three.js intersections back to Ruby objects, and updating selected mesh materials from browser click coordinates.
 - `examples/browser/primitives` focuses on `Line`, `Points`, `LineBasicMaterial`, `PointsMaterial`, and generic `BufferGeometry` attributes outside the `Mesh` path.
 - `examples/browser/postprocessing` focuses on an explicit render pipeline using `Three::Postprocessing::EffectComposer`, `RenderPass`, `UnrealBloomPass`, composer sizing, and pass property updates.
@@ -850,7 +851,7 @@ The MVP is complete when:
 1. Prefer feature work that has visible user value, reuses the current Three.js backend boundary, and can be verified by deterministic browser smoke tests.
 2. Keep the public release gate passing: Ruby tests, gem install smoke, browser smoke tests, and gem build.
 3. Expand postprocessing beyond `RenderPass`/`UnrealBloomPass` only when a dedicated example requires a new pass or render-target API; add KTX2 or other decoder loaders only with fixtures that require them.
-4. Exercise `ThreeJSONExporter` and `ThreeJSONLoader` with a browser or saved-fixture example before treating the format as stable. See `docs/next-work.md` for the recommended next implementation task.
+4. Keep `ThreeJSONExporter` and `ThreeJSONLoader` saved fixtures current whenever the format changes.
 5. Keep Ruby-side resource ownership helpers in sync whenever new material texture slots are introduced.
 6. Keep reviewing low-risk dependency updates after checking their CI results.
 

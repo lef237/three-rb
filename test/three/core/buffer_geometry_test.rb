@@ -39,6 +39,13 @@ class ThreeBufferGeometryTest < Minitest::Test
     assert_equal({ start: 2, count: 4 }, geometry.draw_range)
   end
 
+  def test_to_h_includes_name_for_json_round_trip
+    geometry = Three::BufferGeometry.new
+    geometry.name = "named-geometry"
+
+    assert_equal "named-geometry", geometry.to_h[:name]
+  end
+
   def test_compute_bounding_box_and_sphere
     geometry = Three::BufferGeometry.new
     geometry.set_attribute(:position, Three::Float32BufferAttribute.new([-1, -2, -3, 3, 2, 1], 3))

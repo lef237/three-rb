@@ -33,9 +33,9 @@ class ThreeReleaseReadinessTest < Minitest::Test
   def test_next_work_records_resume_point
     next_work = File.read(File.join(ROOT, "docs/next-work.md"))
 
-    assert_includes next_work, "Add saved fixture regression coverage"
-    assert_includes next_work, "Three::Exporters::ThreeJSONExporter"
-    assert_includes next_work, "Three::Loaders::ThreeJSONLoader"
+    assert_includes next_work, "Add `examples/browser/README.md`"
+    assert_includes next_work, "cube, composition, textures, cubemap, glTF, serialization, picking, primitives, and postprocessing"
+    assert_includes next_work, "Saved JSON export/load fixture regression coverage"
     assert_includes next_work, "Do not start Phase 9 native renderer work yet"
   end
 

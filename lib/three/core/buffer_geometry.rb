@@ -149,6 +149,7 @@ module Three
       {
         uuid: @uuid,
         type: @type,
+        name: @name,
         index: @index&.to_h,
         attributes: @attributes.transform_values(&:to_h),
         groups: @groups.map(&:dup),
