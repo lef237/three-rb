@@ -20,6 +20,7 @@ Recent completed work:
 - Browser runtime guide documenting the current ruby.wasm, import-map, `globalThis.THREE`, and `Three::Renderers::ThreeJSRenderer` boot contract.
 - `Three::Postprocessing::OutputPass` support in the postprocessing composer example and browser smoke test.
 - `MeshMatcapMaterial` support with matcap texture-slot sync, JSON export/load, resource disposal, and texture browser smoke coverage.
+- `ShadowMaterial` support with backend sync, JSON export/load, and composition browser smoke coverage.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
 

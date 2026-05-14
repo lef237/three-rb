@@ -85,6 +85,8 @@ module Three
             @adapter.new_mesh_standard_material(material_parameters(object))
           when PointsMaterial
             @adapter.new_points_material(material_parameters(object))
+          when ShadowMaterial
+            @adapter.new_shadow_material(material_parameters(object))
           when Group
             @adapter.new_group
           when ExternalObject3D

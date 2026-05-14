@@ -217,4 +217,19 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert_equal "/texture.png", loaded_material.map.source
     assert loaded_material.flat_shading
   end
+
+  def test_parse_reconstructs_shadow_material
+    scene = Three::Scene.new
+    material = Three::ShadowMaterial.new(color: 0x112233, opacity: 0.32, fog: false)
+    scene.add(Three::Mesh.new(Three::PlaneGeometry.new, material))
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(Three::Exporters::ThreeJSONExporter.new.export(scene))
+    loaded_material = loaded.children.first.material
+
+    assert_instance_of Three::ShadowMaterial, loaded_material
+    assert_equal 0x112233, loaded_material.color.hex
+    assert_equal 0.32, loaded_material.opacity
+    assert loaded_material.transparent
+    refute loaded_material.fog
+  end
 end

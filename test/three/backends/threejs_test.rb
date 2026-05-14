@@ -185,6 +185,19 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal false, points_handle[:parameters][:sizeAttenuation]
   end
 
+  def test_materializes_shadow_material
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    material = Three::ShadowMaterial.new(color: 0x112233, opacity: 0.32, fog: false)
+
+    handle = backend.materialize(material)
+
+    assert_equal :shadow_material, handle[:type]
+    assert_equal 0x112233, handle[:parameters][:color]
+    assert_equal 0.32, handle[:parameters][:opacity]
+    assert_equal true, handle[:parameters][:transparent]
+    assert_equal false, handle[:parameters][:fog]
+  end
+
   def test_materializes_material_vertex_colors
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     material = Three::MeshBasicMaterial.new(vertex_colors: true)
@@ -941,6 +954,25 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 0xf0f6ff, adapter.calls.last[2][:specular]
     assert_equal 0x101820, adapter.calls.last[2][:emissive]
     assert_equal 92, adapter.calls.last[2][:shininess]
+  end
+
+  def test_sync_updates_dirty_shadow_material_parameters
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    material = Three::ShadowMaterial.new(color: 0x000000, opacity: 0.25)
+
+    backend.sync(material)
+    adapter.calls.clear
+
+    material.color.set_hex(0x112233)
+    material.opacity = 0.45
+    material.fog = false
+    backend.sync(material)
+
+    assert_equal :update_material, adapter.calls.last[0]
+    assert_equal 0x112233, adapter.calls.last[2][:color]
+    assert_equal 0.45, adapter.calls.last[2][:opacity]
+    assert_equal false, adapter.calls.last[2][:fog]
   end
 
   def test_sync_updates_dirty_material_texture_even_when_material_is_clean

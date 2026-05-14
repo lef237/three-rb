@@ -439,6 +439,10 @@ module Three
           @three[:PointsMaterial].new(stringify_keys(parameters))
         end
 
+        def new_shadow_material(parameters)
+          @three[:ShadowMaterial].new(stringify_keys(parameters))
+        end
+
         def set_object_name(object, name)
           object[:name] = name
         end

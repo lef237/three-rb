@@ -42,6 +42,12 @@ begin
   backdrop.receive_shadow = true
   scene.add(backdrop)
 
+  shadow_material = Three::ShadowMaterial.new(color: 0x000000, opacity: 0.32)
+  shadow_catcher = Three::Mesh.new(Three::PlaneGeometry.new(5.4, 3.0, width_segments: 1, height_segments: 1), shadow_material)
+  shadow_catcher.position.z = -1.18
+  shadow_catcher.receive_shadow = true
+  scene.add(shadow_catcher)
+
   rig = Three::Group.new
   rig.name = "composition-rig"
   scene.add(rig)
@@ -152,6 +158,8 @@ begin
   JS.global[:__threeRbPointLight] = renderer.backend.materialize(point_light)
   JS.global[:__threeRbHemisphereLight] = renderer.backend.materialize(hemisphere_light)
   JS.global[:__threeRbPlane] = renderer.backend.materialize(backdrop)
+  JS.global[:__threeRbShadowCatcher] = renderer.backend.materialize(shadow_catcher)
+  JS.global[:__threeRbShadowMaterial] = renderer.backend.materialize(shadow_material)
   JS.global[:__threeRbRig] = renderer.backend.materialize(rig)
   JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)
   JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)

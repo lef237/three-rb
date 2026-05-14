@@ -182,6 +182,22 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal [matcap.uuid, texture.uuid], exported[:textures].map { |entry| entry[:uuid] }
   end
 
+  def test_exports_shadow_material
+    scene = Three::Scene.new
+    material = Three::ShadowMaterial.new(color: 0x112233, opacity: 0.32, fog: false)
+    scene.add(Three::Mesh.new(Three::PlaneGeometry.new, material))
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+    material_data = exported[:materials].first
+
+    assert_equal "ShadowMaterial", material_data[:type]
+    assert_equal 0x112233, material_data[:color]
+    assert_equal 0.32, material_data[:opacity]
+    assert material_data[:transparent]
+    refute material_data[:fog]
+    assert_empty exported[:textures]
+  end
+
   def test_object3d_to_json_uses_exporter_format
     scene = Three::Scene.new
     scene.add(Three::Mesh.new(Three::BoxGeometry.new, Three::MeshBasicMaterial.new))

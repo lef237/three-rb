@@ -482,6 +482,10 @@ class FakeThreeJSAdapter
     handle(:points_material, parameters: parameters.dup)
   end
 
+  def new_shadow_material(parameters)
+    handle(:shadow_material, parameters: parameters.dup)
+  end
+
   def set_object_name(object, name)
     @calls << [:set_object_name, object, name]
     object[:name] = name

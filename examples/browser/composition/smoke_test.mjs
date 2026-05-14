@@ -65,6 +65,14 @@ async function main() {
       hemisphereLightIntensity: globalThis.__threeRbHemisphereLight?.intensity,
       planeGeometryType: globalThis.__threeRbPlane?.geometry?.type,
       planeReceiveShadow: globalThis.__threeRbPlane?.receiveShadow,
+      shadowCatcherType: globalThis.__threeRbShadowCatcher?.type,
+      shadowCatcherGeometryType: globalThis.__threeRbShadowCatcher?.geometry?.type,
+      shadowCatcherReceiveShadow: globalThis.__threeRbShadowCatcher?.receiveShadow,
+      shadowMaterialType: globalThis.__threeRbShadowMaterial?.type,
+      shadowMaterialColor: globalThis.__threeRbShadowMaterial?.color?.getHex?.(),
+      shadowMaterialOpacity: globalThis.__threeRbShadowMaterial?.opacity,
+      shadowMaterialTransparent: globalThis.__threeRbShadowMaterial?.transparent,
+      shadowMaterialFog: globalThis.__threeRbShadowMaterial?.fog,
       rigType: globalThis.__threeRbRig?.type,
       primaryParentType: globalThis.__threeRbPrimaryMesh?.parent?.type,
       primaryCastShadow: globalThis.__threeRbPrimaryMesh?.castShadow,
@@ -120,6 +128,18 @@ async function main() {
 
     if (scene.planeGeometryType !== "PlaneGeometry") {
       throw new Error(`expected a PlaneGeometry backdrop: ${JSON.stringify(scene)}`);
+    }
+    if (
+      scene.shadowCatcherType !== "Mesh" ||
+      scene.shadowCatcherGeometryType !== "PlaneGeometry" ||
+      scene.shadowCatcherReceiveShadow !== true ||
+      scene.shadowMaterialType !== "ShadowMaterial" ||
+      scene.shadowMaterialColor !== 0x000000 ||
+      scene.shadowMaterialOpacity !== 0.32 ||
+      scene.shadowMaterialTransparent !== true ||
+      scene.shadowMaterialFog !== true
+    ) {
+      throw new Error(`expected a configured ShadowMaterial catcher: ${JSON.stringify(scene)}`);
     }
     if (scene.cameraType !== "OrthographicCamera") {
       throw new Error(`expected an OrthographicCamera composition view: ${JSON.stringify(scene)}`);

@@ -148,6 +148,8 @@ module Three
           MeshStandardMaterial.new(parameters)
         when "PointsMaterial"
           PointsMaterial.new(parameters)
+        when "ShadowMaterial"
+          ShadowMaterial.new(parameters)
         else
           Material.new(parameters)
         end

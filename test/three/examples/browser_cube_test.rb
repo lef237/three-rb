@@ -138,6 +138,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::MeshNormalMaterial"
     assert_includes ruby, "Three::MeshPhongMaterial"
     assert_includes ruby, "Three::MeshStandardMaterial"
+    assert_includes ruby, "Three::ShadowMaterial"
     assert_includes ruby, "Three::InstancedMesh"
     assert_includes ruby, "Three::Loaders::TextureLoader"
     assert_includes ruby, "Three::RepeatWrapping"
@@ -154,6 +155,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "instanced_field.set_matrix_at"
     assert_includes ruby, "instanced_field.set_color_at"
     assert_includes ruby, "primary_material.color.set_rgb"
+    assert_includes ruby, "JS.global[:__threeRbShadowMaterial]"
     assert_includes ruby, "renderer.animation_loop"
   end
 
