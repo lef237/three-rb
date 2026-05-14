@@ -265,11 +265,44 @@
             "children": [],
             "geometry": "geometry-1",
             "material": "material-2"
+          },
+          {
+            "uuid": "object-8",
+            "type": "Sprite",
+            "name": "fixture-sprite",
+            "visible": true,
+            "layers": 1,
+            "cast_shadow": false,
+            "receive_shadow": false,
+            "matrix_auto_update": true,
+            "position": [
+              1.35,
+              0.35,
+              0.1
+            ],
+            "quaternion": [
+              0,
+              0,
+              0,
+              1
+            ],
+            "scale": [
+              0.6,
+              0.6,
+              1
+            ],
+            "user_data": {},
+            "children": [],
+            "material": "material-3",
+            "center": [
+              0.25,
+              0.75
+            ]
           }
         ]
       },
       {
-        "uuid": "object-8",
+        "uuid": "object-9",
         "type": "InstancedMesh",
         "name": "fixture-instanced",
         "visible": true,
@@ -296,7 +329,7 @@
         "user_data": {},
         "children": [],
         "geometry": "geometry-2",
-        "material": "material-3",
+        "material": "material-4",
         "count": 2,
         "capacity": 3,
         "instance_matrices": [
@@ -980,6 +1013,22 @@
     },
     {
       "uuid": "material-3",
+      "type": "SpriteMaterial",
+      "name": "",
+      "side": 0,
+      "opacity": 1,
+      "transparent": true,
+      "visible": true,
+      "vertex_colors": false,
+      "color": 16763981,
+      "map": "texture-0",
+      "alpha_map": null,
+      "rotation": 0.25,
+      "size_attenuation": false,
+      "fog": true
+    },
+    {
+      "uuid": "material-4",
       "type": "MeshLambertMaterial",
       "name": "",
       "side": 0,

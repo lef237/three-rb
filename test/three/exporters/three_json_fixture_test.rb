@@ -38,7 +38,7 @@ class ThreeJSONFixtureTest < Minitest::Test
 
     rig = find_child(loaded, "fixture-rig")
     assert_instance_of Three::Group, rig
-    assert_child_types rig, [Three::Mesh, Three::Line, Three::Points]
+    assert_child_types rig, [Three::Mesh, Three::Line, Three::Points, Three::Sprite]
   end
 
   def test_saved_fixture_preserves_material_texture_slots_and_shared_resources
@@ -47,6 +47,7 @@ class ThreeJSONFixtureTest < Minitest::Test
     cube = find_child(rig, "physical-cube")
     line = find_child(rig, "fixture-line")
     points = find_child(rig, "fixture-points")
+    sprite = find_child(rig, "fixture-sprite")
 
     material = cube.material
     assert_instance_of Three::MeshPhysicalMaterial, material
@@ -62,6 +63,7 @@ class ThreeJSONFixtureTest < Minitest::Test
 
     assert_same material.map, material.roughness_map
     assert_same material.map, points.material.map
+    assert_same material.map, sprite.material.map
     assert_same material.map, find_child(loaded, "fixture-instanced").material.map
     assert_equal "/fixtures/checker.png", material.map.source
     assert_equal "/fixtures/clearcoat.png", material.clearcoat_map.source
@@ -73,6 +75,12 @@ class ThreeJSONFixtureTest < Minitest::Test
     assert_same line.geometry, points.geometry
     assert_equal "shared-primitive-geometry", line.geometry.name
     assert_equal 4, line.geometry.get_attribute(:position).count
+
+    assert_instance_of Three::SpriteMaterial, sprite.material
+    assert_equal 0xffcc4d, sprite.material.color.hex
+    assert_equal 0.25, sprite.material.rotation
+    refute sprite.material.size_attenuation
+    assert_equal [0.25, 0.75], sprite.center.to_a
   end
 
   def test_saved_fixture_preserves_instanced_mesh_data

@@ -57,7 +57,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
   def test_next_work_records_resume_point
     next_work = File.read(File.join(ROOT, "docs/next-work.md"))
 
-    assert_includes next_work, "Select the next browser-facing feature"
+    assert_includes next_work, "public API and documentation consistency pass"
     assert_includes next_work, "Browser runtime guide"
     assert_includes next_work, "Browser examples overview"
     assert_includes next_work, "Saved JSON export/load fixture regression coverage"

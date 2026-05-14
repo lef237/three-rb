@@ -24,16 +24,18 @@ Recent completed work:
 - `MeshToonMaterial` support with gradient-map texture-slot sync, JSON export/load, resource disposal, and texture browser smoke coverage.
 - `Three::Postprocessing::DotScreenPass` support with composer integration, uniform update coverage, browser runtime boot contract updates, and postprocessing browser smoke coverage.
 - `Sprite` / `SpriteMaterial` support with textured billboard marker sync, JSON export/load, resource disposal, and primitives browser smoke coverage.
+- Saved JSON fixture coverage now includes `Sprite` / `SpriteMaterial` so the representative exporter/loader regression fixture matches the current primitive surface.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
 
 ## Recommended Next Task
 
-Select the next browser-facing feature only when it can be introduced with a dedicated example and deterministic smoke test.
+Do a public API and documentation consistency pass before selecting the next browser-facing feature.
 
 This is the best next step because:
 
-- The public docs now cover release readiness, publishing, browser example coverage, and the browser runtime boot contract.
+- The representative JSON fixture now covers the current primitive/material surface, including `Sprite` / `SpriteMaterial`.
+- The public docs cover release readiness, publishing, browser example coverage, and the browser runtime boot contract, but they should be checked against the latest implemented API before more feature scope is added.
 - Further progress should come from a concrete browser workflow, not from broad API mirroring.
 - The current implementation plan says KTX2 and other decoder loaders should wait until fixture coverage needs them.
 - Additional postprocessing passes should wait unless they can strengthen `examples/browser/postprocessing` without forcing an oversized render-target API.
@@ -41,7 +43,9 @@ This is the best next step because:
 
 ## Scope
 
-Pick one feature target and keep the change small enough to verify through one browser example.
+First compare `README.md`, `docs/browser-runtime.md`, `docs/release-readiness.md`, `examples/browser/README.md`, and `docs/implementation-plan.md` against the current API surface. Keep any edits factual and narrow: document existing supported behavior, remove stale next-step wording, and avoid broad reference documentation.
+
+After that pass, pick one feature target and keep the change small enough to verify through one browser example.
 
 Candidate targets, in recommended order when there is no stronger product signal:
 
@@ -53,11 +57,12 @@ Candidate targets, in recommended order when there is no stronger product signal
 
 ## Suggested Implementation Plan
 
-1. Start from a user-visible workflow and choose exactly one feature target.
-2. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
-3. Add or extend one browser example and keep `examples/browser/README.md` in sync.
-4. Add or update a deterministic Playwright smoke command in `package.json`.
-5. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
+1. Run the public API/docs consistency pass and keep the changes scoped to already implemented behavior.
+2. Start the next feature from a user-visible workflow and choose exactly one feature target.
+3. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
+4. Add or extend one browser example and keep `examples/browser/README.md` in sync.
+5. Add or update a deterministic Playwright smoke command in `package.json`.
+6. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
 
 ## Acceptance Criteria
 

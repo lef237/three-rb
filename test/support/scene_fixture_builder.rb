@@ -97,7 +97,14 @@ module SceneFixtureBuilder
       Three::PointsMaterial.new(color: 0x66ddff, map: checker, size: 0.35, size_attenuation: false)
     )
     points.name = "fixture-points"
-    rig.add(line, points)
+    sprite = Three::Sprite.new(
+      Three::SpriteMaterial.new(color: 0xffcc4d, map: checker, rotation: 0.25, size_attenuation: false)
+    )
+    sprite.name = "fixture-sprite"
+    sprite.center = [0.25, 0.75]
+    sprite.position.set(1.35, 0.35, 0.1)
+    sprite.scale.set(0.6, 0.6, 1)
+    rig.add(line, points, sprite)
 
     instanced = Three::InstancedMesh.new(
       Three::PlaneGeometry.new(0.3, 0.3),
