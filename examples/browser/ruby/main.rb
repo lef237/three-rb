@@ -314,12 +314,13 @@ begin
     accent.position.y = -1.52 + (Math.sin((frame * 0.014) + 1.2) * 0.005)
     accent.scale.x = 1.0 + (Math.sin(frame * 0.018) * 0.014)
     sparkles.each_with_index do |(sparkle, phase, _size), index|
-      flicker = (Math.sin((frame * 0.19) + phase) + 1) / 2.0
-      shimmer = (Math.sin((frame * 0.071) + (phase * 1.7)) + 1) / 2.0
-      burst = ((flicker * 0.7) + (shimmer * 0.3))**2.2
-      scale = 0.44 + (burst * 1.36)
+      cycle = 156 + (index * 17)
+      flash_window = 22 + ((index % 3) * 3)
+      progress = (frame + (phase * 41).to_i) % cycle
+      burst = progress < flash_window ? Math.sin(Math::PI * progress / flash_window)**2.4 : 0
+      scale = 0.18 + (burst * 1.22)
       sparkle.scale.set(scale, scale, scale)
-      sparkle.visible = burst > 0.004
+      sparkle.visible = burst > 0.08
       sparkle.rotation.z += index.even? ? 0.026 : -0.021
     end
 
