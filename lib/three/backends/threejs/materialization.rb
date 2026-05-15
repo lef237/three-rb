@@ -67,6 +67,8 @@ module Three
               parameters[:theta_start],
               parameters[:theta_length]
             )
+          when TextGeometry
+            @adapter.new_text_geometry(object.text, text_geometry_parameters(object))
           when BufferGeometry
             build_buffer_geometry(object)
           when LineBasicMaterial

@@ -5,6 +5,7 @@ require "json"
 
 class ThreeBrowserCubeExampleTest < Minitest::Test
   ROOT = File.expand_path("../../..", __dir__)
+  RUBY_EXAMPLE_DIR = File.join(ROOT, "examples/browser/ruby")
   EXAMPLE_DIR = File.join(ROOT, "examples/browser/cube")
   COMPOSITION_EXAMPLE_DIR = File.join(ROOT, "examples/browser/composition")
   TEXTURES_EXAMPLE_DIR = File.join(ROOT, "examples/browser/textures")
@@ -16,6 +17,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   POSTPROCESSING_EXAMPLE_DIR = File.join(ROOT, "examples/browser/postprocessing")
   OVERVIEW_PATH = File.join(ROOT, "examples/browser/README.md")
   BROWSER_EXAMPLES = {
+    "ruby" => "test:browser:ruby",
     "cube" => "test:browser:cube",
     "composition" => "test:browser:composition",
     "textures" => "test:browser:textures",
@@ -26,6 +28,13 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     "primitives" => "test:browser:primitives",
     "postprocessing" => "test:browser:postprocessing"
   }.freeze
+
+  def test_browser_ruby_example_files_exist
+    assert_path_exists File.join(RUBY_EXAMPLE_DIR, "index.html")
+    assert_path_exists File.join(RUBY_EXAMPLE_DIR, "main.rb")
+    assert_path_exists File.join(RUBY_EXAMPLE_DIR, "README.md")
+    assert_path_exists File.join(RUBY_EXAMPLE_DIR, "smoke_test.mjs")
+  end
 
   def test_browser_cube_example_files_exist
     assert_path_exists File.join(EXAMPLE_DIR, "index.html")
@@ -128,6 +137,28 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "renderer.animation_loop"
     assert_includes ruby, "renderer.render(scene, camera)"
     assert_includes ruby, "preserveDrawingBuffer: true"
+  end
+
+  def test_ruby_example_exercises_gemstone_and_text_title
+    ruby = File.read(File.join(RUBY_EXAMPLE_DIR, "main.rb"))
+
+    assert_includes ruby, "faceted_ruby_geometry"
+    assert_includes ruby, "Three::BufferGeometry"
+    assert_includes ruby, "Three::Float32BufferAttribute"
+    assert_includes ruby, "Three::MeshPhysicalMaterial"
+    assert_includes ruby, "Three::Renderers::ThreeJSRenderer"
+    assert_includes ruby, "transmission:"
+    assert_includes ruby, "attenuation_color:"
+    assert_includes ruby, "Three::Loaders::RGBELoader"
+    assert_includes ruby, "scene.environment = environment_texture"
+    assert_includes ruby, "Three::Loaders::FontLoader"
+    assert_includes ruby, "Three::TextGeometry"
+    assert_includes ruby, "\"three-rb\""
+    assert_includes ruby, "Three::Controls::OrbitControls"
+    assert_includes ruby, "JS.global[:__threeRbRubyGem]"
+    assert_includes ruby, "JS.global[:__threeRbRubyTitle]"
+    assert_includes ruby, "preserveDrawingBuffer: true"
+    assert_includes ruby, "renderer.animation_loop"
   end
 
   def test_composition_example_exercises_plane_grouping_and_material_updates
@@ -270,7 +301,8 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/3.4-wasm-wasi")
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/wasm-wasi")
     assert_equal "0.184.0", package.fetch("dependencies").fetch("three")
-    assert_equal "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing", package.fetch("scripts").fetch("test:browser")
+    assert_equal "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing", package.fetch("scripts").fetch("test:browser")
+    assert_equal "node examples/browser/ruby/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:ruby")
     assert_equal "node examples/browser/cube/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cube")
     assert_equal "node examples/browser/composition/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:composition")
     assert_equal "node examples/browser/textures/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:textures")

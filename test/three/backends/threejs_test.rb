@@ -153,6 +153,35 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 2.0, handle[:theta_length]
   end
 
+  def test_materializes_text_geometry_with_threejs_addon
+    backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
+    font = Three::Font.new({ type: :font, name: "Helvetiker" })
+    geometry = Three::TextGeometry.new(
+      "three-rb",
+      font: font,
+      size: 0.45,
+      depth: 0.1,
+      curve_segments: 8,
+      bevel_enabled: true,
+      bevel_thickness: 0.02,
+      bevel_size: 0.01,
+      bevel_segments: 3
+    )
+
+    handle = backend.materialize(geometry)
+
+    assert_equal :text_geometry, handle[:type]
+    assert_equal "three-rb", handle[:text]
+    assert_same font.handle, handle[:parameters][:font]
+    assert_equal 0.45, handle[:parameters][:size]
+    assert_equal 0.1, handle[:parameters][:depth]
+    assert_equal 8, handle[:parameters][:curveSegments]
+    assert_equal true, handle[:parameters][:bevelEnabled]
+    assert_equal 0.02, handle[:parameters][:bevelThickness]
+    assert_equal 0.01, handle[:parameters][:bevelSize]
+    assert_equal 3, handle[:parameters][:bevelSegments]
+  end
+
   def test_materializes_mesh_normal_material
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     material = Three::MeshNormalMaterial.new(flat_shading: true, wireframe: true)

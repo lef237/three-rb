@@ -172,6 +172,10 @@ module Three
           texture
         end
 
+        def load_font(source)
+          font_loader_constructor.new.call(:loadAsync, source)
+        end
+
         def load_gltf(source, draco_decoder_path: nil, draco_decoder_config: nil)
           loader = gltf_loader_constructor.new
           configure_draco_loader(loader, draco_decoder_path, draco_decoder_config) if draco_decoder_path
@@ -393,6 +397,10 @@ module Three
 
         def new_sphere_geometry(radius, width_segments, height_segments, phi_start, phi_length, theta_start, theta_length)
           @three[:SphereGeometry].new(radius, width_segments, height_segments, phi_start, phi_length, theta_start, theta_length)
+        end
+
+        def new_text_geometry(text, parameters)
+          text_geometry_constructor.new(text, stringify_keys(parameters))
         end
 
         def new_buffer_geometry
@@ -769,6 +777,26 @@ module Three
           constructor
         rescue LoadError
           raise RuntimeError, "Three::Loaders::RGBELoader requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def font_loader_constructor
+          require "js"
+          constructor = JS.global[:THREE_FONT_LOADER]
+          raise RuntimeError, "Three::Loaders::FontLoader requires globalThis.THREE_FONT_LOADER" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::Loaders::FontLoader requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def text_geometry_constructor
+          require "js"
+          constructor = JS.global[:THREE_TEXT_GEOMETRY]
+          raise RuntimeError, "Three::TextGeometry requires globalThis.THREE_TEXT_GEOMETRY" if constructor.typeof == "undefined"
+
+          constructor
+        rescue LoadError
+          raise RuntimeError, "Three::TextGeometry requires ruby.wasm's js gem or an injected adapter"
         end
 
         def resolve_canvas(canvas)

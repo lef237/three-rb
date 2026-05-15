@@ -169,6 +169,10 @@ class FakeThreeJSAdapter
     handle(:rgbe_texture, { source: source }.merge(parameters))
   end
 
+  def load_font(source)
+    handle(:font, source: source)
+  end
+
   def load_gltf(source, draco_decoder_path: nil, draco_decoder_config: nil)
     handle(
       :gltf,
@@ -436,6 +440,10 @@ class FakeThreeJSAdapter
       theta_start: theta_start,
       theta_length: theta_length
     )
+  end
+
+  def new_text_geometry(text, parameters)
+    handle(:text_geometry, text: text, parameters: parameters.dup)
   end
 
   def new_buffer_geometry

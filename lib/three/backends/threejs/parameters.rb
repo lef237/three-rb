@@ -89,6 +89,23 @@ module Three
             matrix: texture.matrix.to_a
           }
         end
+
+        def text_geometry_parameters(geometry)
+          parameters = geometry.parameters
+          {
+            font: parameters[:font].handle,
+            size: parameters[:size],
+            depth: parameters[:depth],
+            curveSegments: parameters[:curve_segments],
+            steps: parameters[:steps],
+            bevelEnabled: parameters[:bevel_enabled],
+            bevelThickness: parameters[:bevel_thickness],
+            bevelSize: parameters[:bevel_size],
+            bevelOffset: parameters[:bevel_offset],
+            bevelSegments: parameters[:bevel_segments],
+            direction: parameters[:direction]
+          }
+        end
       end
 
       include Parameters

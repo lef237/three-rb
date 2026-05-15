@@ -214,7 +214,10 @@ module Three
         end
 
         def built_in_geometry?(geometry)
-          geometry.is_a?(BoxGeometry) || geometry.is_a?(PlaneGeometry) || geometry.is_a?(SphereGeometry)
+          geometry.is_a?(BoxGeometry) ||
+            geometry.is_a?(PlaneGeometry) ||
+            geometry.is_a?(SphereGeometry) ||
+            geometry.is_a?(TextGeometry)
         end
       end
 

@@ -14,6 +14,7 @@ ruby -run -e httpd . -p 8000
 Open an example URL:
 
 ```text
+http://localhost:8000/examples/browser/ruby/
 http://localhost:8000/examples/browser/cube/
 http://localhost:8000/examples/browser/composition/
 http://localhost:8000/examples/browser/textures/
@@ -39,6 +40,7 @@ Run one smoke test by using the command listed in the table below.
 
 | Example | Primary APIs covered | Smoke command | Why it exists |
 | --- | --- | --- | --- |
+| `examples/browser/ruby/` | `BufferGeometry`, `Float32BufferAttribute`, `MeshPhysicalMaterial`, `RGBELoader`, `FontLoader`, `TextGeometry`, `OrbitControls`, shadows | `pnpm test:browser:ruby` | Provides the first visual sample: a Ruby-authored faceted red gemstone with a three-dimensional `three-rb` title. |
 | `examples/browser/cube/` | `Scene`, `PerspectiveCamera`, `BoxGeometry`, `Mesh`, `MeshBasicMaterial`, `ThreeJSRenderer`, animation loop | `pnpm test:browser:cube` | Verifies the smallest Ruby-authored scene can boot through ruby.wasm and draw nonblank WebGL pixels through the three.js renderer path. |
 | `examples/browser/composition/` | `OrthographicCamera`, ambient/directional/point/hemisphere lights, shadows, `ShadowMaterial`, `Group`, `InstancedMesh`, `TextureLoader`, `OrbitControls`, material/texture disposal | `pnpm test:browser:composition` | Exercises the broad scene-composition path used by richer browser scenes, including dynamic material updates and camera controls. |
 | `examples/browser/textures/` | `TextureLoader`, `RGBELoader`, repeat/wrap/filter/UV-transform settings, `MeshPhysicalMaterial`, `MeshMatcapMaterial`, `MeshToonMaterial`, physical, matcap, and toon texture slots, scene environment | `pnpm test:browser:textures` | Verifies browser texture loading, HDR environment synchronization, and the current material texture bridge. |

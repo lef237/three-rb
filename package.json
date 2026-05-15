@@ -4,7 +4,8 @@
   "type": "module",
   "packageManager": "pnpm@11.1.1",
   "scripts": {
-    "test:browser": "pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing",
+    "test:browser": "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing",
+    "test:browser:ruby": "node examples/browser/ruby/smoke_test.mjs",
     "test:browser:cube": "node examples/browser/cube/smoke_test.mjs",
     "test:browser:composition": "node examples/browser/composition/smoke_test.mjs",
     "test:browser:textures": "node examples/browser/textures/smoke_test.mjs",

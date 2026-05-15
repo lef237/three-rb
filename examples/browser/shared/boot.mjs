@@ -3,6 +3,8 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { HDRLoader } from "three/addons/loaders/HDRLoader.js";
+import { FontLoader } from "three/addons/loaders/FontLoader.js";
+import { TextGeometry } from "three/addons/geometries/TextGeometry.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -20,6 +22,8 @@ export async function bootRubyExample({ main, clearColor }) {
     globalThis.THREE_GLTF_LOADER = GLTFLoader;
     globalThis.THREE_DRACO_LOADER = DRACOLoader;
     globalThis.THREE_RGBE_LOADER = HDRLoader;
+    globalThis.THREE_FONT_LOADER = FontLoader;
+    globalThis.THREE_TEXT_GEOMETRY = TextGeometry;
     globalThis.THREE_ORBIT_CONTROLS = OrbitControls;
     globalThis.THREE_EFFECT_COMPOSER = EffectComposer;
     globalThis.THREE_RENDER_PASS = RenderPass;
