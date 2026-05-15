@@ -192,16 +192,14 @@ begin
   ]
   sparkle_specs = [
     [[-0.88, 1.08, 0.74], 0.2, 0.05],
-    [[1.0, 0.98, 0.8], 0.24, 1.15],
+    [[1.0, 0.98, 0.8], 0.21, 1.15],
     [[1.22, 0.36, 0.72], 0.18, 2.3],
     [[-1.05, 0.18, 0.68], 0.17, 3.1],
     [[0.34, 1.25, 0.74], 0.15, 4.0],
-    [[-0.32, 1.22, 0.7], 0.13, 5.2],
-    [[-0.48, 0.74, 0.96], 0.105, 0.65],
-    [[0.42, 0.68, 0.98], 0.11, 2.05],
-    [[0.78, 0.36, 0.94], 0.085, 3.75],
-    [[-0.78, 0.26, 0.9], 0.09, 4.7],
-    [[0.08, 0.98, 0.97], 0.078, 5.85]
+    [[-0.32, 1.22, 0.7], 0.12, 5.2],
+    [[-0.48, 0.74, 0.96], 0.09, 0.65],
+    [[0.42, 0.68, 0.98], 0.095, 2.05],
+    [[-0.78, 0.26, 0.9], 0.08, 4.7]
   ]
   sparkles = sparkle_specs.each_with_index.map do |(position, size, phase), index|
     sparkle = build_spark(size, spark_materials[index % spark_materials.length])
@@ -319,7 +317,7 @@ begin
       flicker = (Math.sin((frame * 0.19) + phase) + 1) / 2.0
       shimmer = (Math.sin((frame * 0.071) + (phase * 1.7)) + 1) / 2.0
       burst = ((flicker * 0.7) + (shimmer * 0.3))**2.2
-      scale = 0.5 + (burst * 1.68)
+      scale = 0.44 + (burst * 1.36)
       sparkle.scale.set(scale, scale, scale)
       sparkle.visible = burst > 0.004
       sparkle.rotation.z += index.even? ? 0.026 : -0.021
