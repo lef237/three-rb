@@ -71,22 +71,29 @@ def build_spark(size, material)
   spark = Three::Group.new
   spark.name = "ruby-spark"
 
-  long_ray = Three::Mesh.new(Three::BoxGeometry.new(size, size * 0.08, size * 0.08), material)
+  diamond_vertices = [
+    0, size * 0.32, 0,
+    size * 0.22, 0, 0,
+    0, -size * 0.32, 0,
+    -size * 0.22, 0, 0
+  ]
+  diamond_geometry = Three::BufferGeometry.new
+  diamond_geometry.set_index([0, 1, 2, 0, 2, 3])
+  diamond_geometry.set_attribute(:position, Three::Float32BufferAttribute.new(diamond_vertices, 3))
+  diamond_geometry.set_attribute(:normal, Three::Float32BufferAttribute.new([0, 0, 1] * 4, 3))
+  diamond = Three::Mesh.new(diamond_geometry, material)
+  spark.add(diamond)
+
+  long_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.72, size * 0.035, size * 0.035), material)
   spark.add(long_ray)
 
-  cross_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.68, size * 0.065, size * 0.065), material)
+  cross_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.5, size * 0.03, size * 0.03), material)
   cross_ray.rotation.z = Math::PI / 2
   spark.add(cross_ray)
 
-  slash_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.52, size * 0.055, size * 0.055), material)
+  slash_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.38, size * 0.024, size * 0.024), material)
   slash_ray.rotation.z = Math::PI / 4
   spark.add(slash_ray)
-
-  core = Three::Mesh.new(
-    Three::SphereGeometry.new(size * 0.075, width_segments: 10, height_segments: 6),
-    material
-  )
-  spark.add(core)
   spark
 end
 
@@ -109,10 +116,10 @@ begin
   environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/assets/studio.hdr")
   scene.environment = environment_texture
 
-  scene.add(Three::AmbientLight.new(0xffffff, 0.62))
-  scene.add(Three::HemisphereLight.new(0xf7fbff, 0xffd7dd, 0.8))
+  scene.add(Three::AmbientLight.new(0xffffff, 0.82))
+  scene.add(Three::HemisphereLight.new(0xffffff, 0xffedf2, 1.0))
 
-  key_light = Three::DirectionalLight.new(0xffffff, 2.2)
+  key_light = Three::DirectionalLight.new(0xffffff, 2.55)
   key_light.position.set(3.2, 4.4, 4.8)
   key_light.cast_shadow = true
   key_light.shadow_map_size = [1024, 1024]
@@ -120,17 +127,17 @@ begin
   key_light.set_shadow_camera(left: -3.2, right: 3.2, top: 2.6, bottom: -2.6, near: 0.2, far: 12)
   scene.add(key_light)
 
-  rim_light = Three::PointLight.new(0xff6f91, 1.9, 8, 2)
+  rim_light = Three::PointLight.new(0xff89a4, 2.15, 8, 2)
   rim_light.position.set(-2.2, 1.6, 2.8)
   scene.add(rim_light)
 
-  cool_light = Three::PointLight.new(0x8ed6ff, 1.1, 7, 2)
+  cool_light = Three::PointLight.new(0xb4e6ff, 1.35, 7, 2)
   cool_light.position.set(2.4, -0.8, 2.2)
   scene.add(cool_light)
 
   backdrop = Three::Mesh.new(
     Three::PlaneGeometry.new(7.2, 4.4, width_segments: 1, height_segments: 1),
-    Three::MeshBasicMaterial.new(color: 0xf8fbff)
+    Three::MeshBasicMaterial.new(color: 0xffffff)
   )
   backdrop.position.z = -1.35
   scene.add(backdrop)
@@ -163,23 +170,24 @@ begin
   scene.add(ruby_gem)
 
   spark_materials = [
-    Three::MeshBasicMaterial.new(color: 0xfff8cc, transparent: true, opacity: 0.9),
-    Three::MeshBasicMaterial.new(color: 0xffffff, transparent: true, opacity: 0.84),
-    Three::MeshBasicMaterial.new(color: 0xffd6e2, transparent: true, opacity: 0.78)
+    Three::MeshBasicMaterial.new(color: 0xffef8a, transparent: true, opacity: 1.0),
+    Three::MeshBasicMaterial.new(color: 0xffcf3f, transparent: true, opacity: 0.96),
+    Three::MeshBasicMaterial.new(color: 0xffffb8, transparent: true, opacity: 0.92)
   ]
   sparkle_specs = [
-    [[-0.84, 1.06, 0.72], 0.24, 0.05],
-    [[0.98, 0.95, 0.78], 0.31, 1.15],
-    [[1.24, 0.34, 0.72], 0.22, 2.3],
-    [[-1.06, 0.18, 0.68], 0.2, 3.1],
-    [[0.34, 1.24, 0.74], 0.18, 4.0]
+    [[-0.88, 1.08, 0.74], 0.2, 0.05],
+    [[1.0, 0.98, 0.8], 0.24, 1.15],
+    [[1.22, 0.36, 0.72], 0.18, 2.3],
+    [[-1.05, 0.18, 0.68], 0.17, 3.1],
+    [[0.34, 1.25, 0.74], 0.15, 4.0],
+    [[-0.32, 1.22, 0.7], 0.13, 5.2]
   ]
   sparkles = sparkle_specs.each_with_index.map do |(position, size, phase), index|
     sparkle = build_spark(size, spark_materials[index % spark_materials.length])
     sparkle.position.set(*position)
     sparkle.rotation.z = phase
     scene.add(sparkle)
-    [sparkle, phase]
+    [sparkle, phase, size]
   end
 
   title_font = Three::Loaders::FontLoader.new.load("/node_modules/three/examples/fonts/helvetiker_regular.typeface.json")
@@ -195,9 +203,9 @@ begin
     bevel_segments: 3
   )
   title_material = Three::MeshPhysicalMaterial.new(
-    color: 0x3c8fbd,
-    roughness: 0.2,
-    metalness: 0.08,
+    color: 0x55ace0,
+    roughness: 0.18,
+    metalness: 0.05,
     clearcoat: 0.72,
     clearcoat_roughness: 0.16,
     specular_intensity: 0.9,
@@ -223,9 +231,9 @@ begin
     shadow_map_enabled: true,
     shadow_map_type: Three::PCFSoftShadowMap
   )
-  renderer.set_clear_color(0xf8fbff, 1)
+  renderer.set_clear_color(0xffffff, 1)
   renderer.handle[:toneMapping] = JS.global[:THREE][:ACESFilmicToneMapping]
-  renderer.handle[:toneMappingExposure] = 1.18
+  renderer.handle[:toneMappingExposure] = 1.45
   renderer.backend.materialize(title_geometry).call(:center)
 
   controls = Three::Controls::OrbitControls.new(
@@ -278,17 +286,20 @@ begin
     title.rotation.y = Math.sin(frame * 0.018) * 0.055
     title.position.y = -1.18 + (Math.sin(frame * 0.02) * 0.025)
     title_twinkle = (Math.sin(frame * 0.048) + 1) / 2.0
-    title_material.color.set_rgb(0.2 + (0.1 * title_twinkle), 0.48 + (0.12 * title_twinkle), 0.68 + (0.16 * title_twinkle))
-    title_material.specular_intensity = 0.78 + (0.18 * title_twinkle)
+    title_material.color.set_rgb(0.28 + (0.12 * title_twinkle), 0.58 + (0.12 * title_twinkle), 0.78 + (0.14 * title_twinkle))
+    title_material.specular_intensity = 0.82 + (0.18 * title_twinkle)
     title_material.clearcoat = 0.62 + (0.18 * title_twinkle)
     accent.rotation.z = -0.035 + (Math.sin(frame * 0.018) * 0.008)
     accent.position.y = -1.45 + (Math.sin((frame * 0.014) + 1.2) * 0.005)
     accent.scale.x = 1.0 + (Math.sin(frame * 0.018) * 0.014)
-    sparkles.each_with_index do |(sparkle, phase), index|
-      pulse = (Math.sin((frame * 0.07) + phase) + 1) / 2.0
-      scale = 0.58 + (pulse * 0.78)
+    sparkles.each_with_index do |(sparkle, phase, _size), index|
+      flicker = ((Math.sin((frame * 0.19) + phase) + 1) / 2.0) *
+        ((Math.sin((frame * 0.071) + (phase * 1.7)) + 1) / 2.0)
+      burst = flicker**2.6
+      scale = 0.42 + (burst * 1.28)
       sparkle.scale.set(scale, scale, scale)
-      sparkle.rotation.z += index.even? ? 0.018 : -0.014
+      sparkle.visible = burst > 0.006
+      sparkle.rotation.z += index.even? ? 0.026 : -0.021
     end
 
     JS.global[:__threeRbRubyFrame] = frame
