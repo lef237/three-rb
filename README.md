@@ -24,7 +24,7 @@ Out of scope for the first public release:
 
 ## Installation
 
-After a release is published:
+Install the released gem from RubyGems:
 
 ```sh
 gem install three-rb
@@ -36,10 +36,38 @@ Or add it to a Gemfile:
 gem "three-rb", "~> 0.1"
 ```
 
+Browser rendering examples also need `pnpm`, because ruby.wasm, three.js, and three.js addons are installed from `package.json`.
+
 ## Quick Start
+
+three-rb is browser-first. The fastest way to try the released gem is to unpack a writable copy of the gem and run one of the included browser examples:
+
+```sh
+gem install three-rb
+mkdir hello-three-rb
+cd hello-three-rb
+gem unpack three-rb
+cd three-rb-*/
+pnpm install
+ruby -run -e httpd . -p 8000
+```
+
+```text
+http://localhost:8000/examples/browser/cube/
+```
+
+This page runs the Ruby entrypoint at `examples/browser/cube/main.rb` through ruby.wasm and renders it with three.js. Use `http://localhost:8000/...`; do not open the files with `file://`, because the browser runtime loads ES modules, wasm, and assets over HTTP.
+
+After the cube example works, inspect `examples/browser/cube/main.rb` to see the Ruby scene code. For a standalone app directory with your own Ruby entrypoint, see [Standalone Browser App](docs/standalone-browser-app.md).
+
+## Plain Ruby Check
+
+If you only want to confirm the Ruby API loads without browser rendering, create `hello_three.rb`:
 
 ```ruby
 require "three"
+
+puts "three-rb #{Three::VERSION}"
 
 scene = Three::Scene.new
 camera = Three::PerspectiveCamera.new(75, aspect: 16.0 / 9.0)
@@ -50,13 +78,30 @@ material = Three::MeshBasicMaterial.new(color: 0x00ff00)
 cube = Three::Mesh.new(geometry, material)
 
 scene.add(cube)
+
+puts scene.class
+puts cube.class
+```
+
+Run it:
+
+```sh
+ruby hello_three.rb
+```
+
+You should see the library load and create Ruby scene objects:
+
+```text
+three-rb 0.1.0
+Three::Scene
+Three::Mesh
 ```
 
 Browser rendering is available through `Three::Renderers::ThreeJSRenderer`, which targets three.js from ruby.wasm.
 
-## Browser Example
+## Browser Examples In This Repository
 
-Install browser dependencies, serve the repository root, and open one of the browser examples:
+When developing this repository, install browser dependencies, serve the repository root, and open one of the browser examples:
 
 ```sh
 pnpm install
@@ -148,6 +193,7 @@ bundle exec rake release:preflight
 - [Next Work](docs/next-work.md)
 - [Browser Runtime](docs/browser-runtime.md)
 - [Browser Examples](examples/browser/README.md)
+- [Standalone Browser App](docs/standalone-browser-app.md)
 - [Loaded Asset Traversal and Disposal Design](docs/loaded-assets-design.md)
 - [Release Readiness](docs/release-readiness.md)
 - [Publishing](docs/publishing.md)
