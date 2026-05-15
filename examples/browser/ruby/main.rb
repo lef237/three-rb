@@ -104,7 +104,7 @@ begin
 
   scene = Three::Scene.new
   camera = Three::PerspectiveCamera.new(42, aspect: 1.0, near: 0.1, far: 100)
-  camera.position.set(0, 0.1, 6.9)
+  camera.position.set(0, 0.42, 6.9)
 
   environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/assets/studio.hdr")
   scene.environment = environment_texture
@@ -233,9 +233,11 @@ begin
     renderer: renderer,
     enable_damping: true,
     damping_factor: 0.07,
+    auto_rotate: true,
+    auto_rotate_speed: 0.72,
     enable_pan: false
   )
-  controls.target.set(0, -0.05, 0)
+  controls.target.set(0, 0.34, 0.08)
 
   resize = proc do
     width = [viewport[:clientWidth].to_i, 1].max
@@ -272,13 +274,6 @@ begin
     frame += 1
     ruby_gem.rotation.y += 0.009
     ruby_gem.rotation.z = Math.sin(frame * 0.012) * 0.045
-    camera_angle = frame * 0.0035
-    camera_radius = 6.9 + (Math.sin(frame * 0.004) * 0.12)
-    camera.position.set(
-      Math.sin(camera_angle) * 0.36,
-      0.1 + (Math.sin(frame * 0.005) * 0.08),
-      Math.cos(camera_angle) * camera_radius
-    )
     title.rotation.x = -0.08 + (Math.sin(frame * 0.015) * 0.018)
     title.rotation.y = Math.sin(frame * 0.018) * 0.055
     title.position.y = -1.18 + (Math.sin(frame * 0.02) * 0.025)
