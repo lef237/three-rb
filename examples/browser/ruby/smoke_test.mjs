@@ -62,6 +62,7 @@ async function main() {
         ior: globalThis.__threeRbRubyMaterial?.ior,
         clearcoat: globalThis.__threeRbRubyMaterial?.clearcoat
       },
+      sparkleCount: globalThis.__threeRbRubySparkles?.length,
       titleType: globalThis.__threeRbRubyTitle?.type,
       titleGeometryType: globalThis.__threeRbRubyTitleGeometry?.type,
       titlePositionCount: globalThis.__threeRbRubyTitleGeometry?.attributes?.position?.count,
@@ -72,7 +73,7 @@ async function main() {
     if (debug.rubyType !== "Mesh" || debug.rubyGeometryType !== "BufferGeometry") {
       throw new Error(`ruby gemstone was not materialized as expected: ${JSON.stringify(debug, null, 2)}`);
     }
-    if (debug.rubyPositionCount < 240) {
+    if (debug.rubyPositionCount < 220) {
       throw new Error(`ruby gemstone has too few facet vertices: ${JSON.stringify(debug, null, 2)}`);
     }
     if (debug.rubyMaterial.type !== "MeshPhysicalMaterial" || debug.rubyMaterial.transmission < 0.7) {
@@ -80,6 +81,9 @@ async function main() {
     }
     if (debug.titleType !== "Mesh" || debug.titleGeometryType !== "TextGeometry" || !debug.fontLoaded) {
       throw new Error(`title text geometry did not load: ${JSON.stringify(debug, null, 2)}`);
+    }
+    if (debug.sparkleCount < 5) {
+      throw new Error(`ruby sparkles did not materialize: ${JSON.stringify(debug, null, 2)}`);
     }
     if (debug.titlePositionCount < 200 || !debug.renderInfo || debug.renderInfo.triangles < 250) {
       throw new Error(`title did not render enough geometry: ${JSON.stringify(debug, null, 2)}`);

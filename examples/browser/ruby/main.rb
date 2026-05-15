@@ -40,10 +40,10 @@ def add_polygon(vertices, normals, points)
 end
 
 def faceted_ruby_geometry
-  sides = 12
+  sides = 10
   step = Math::PI * 2 / sides
-  top = gem_ring(0.48, 0.7, sides, step / 2)
-  crown = gem_ring(0.98, 0.28, sides, 0)
+  top = gem_ring(0.62, 0.58, sides, step / 2)
+  crown = gem_ring(1.02, 0.18, sides, 0)
   girdle = gem_ring(1.15, -0.08, sides, step / 2)
   pavilion = gem_ring(0.64, -0.48, sides, 0)
   culet = [0, -1.05, 0]
@@ -65,6 +65,29 @@ def faceted_ruby_geometry
   geometry.compute_bounding_box
   geometry.compute_bounding_sphere
   geometry
+end
+
+def build_spark(size, material)
+  spark = Three::Group.new
+  spark.name = "ruby-spark"
+
+  long_ray = Three::Mesh.new(Three::BoxGeometry.new(size, size * 0.08, size * 0.08), material)
+  spark.add(long_ray)
+
+  cross_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.68, size * 0.065, size * 0.065), material)
+  cross_ray.rotation.z = Math::PI / 2
+  spark.add(cross_ray)
+
+  slash_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.52, size * 0.055, size * 0.055), material)
+  slash_ray.rotation.z = Math::PI / 4
+  spark.add(slash_ray)
+
+  core = Three::Mesh.new(
+    Three::SphereGeometry.new(size * 0.075, width_segments: 10, height_segments: 6),
+    material
+  )
+  spark.add(core)
+  spark
 end
 
 begin
@@ -116,18 +139,18 @@ begin
     color: 0xff2d64,
     roughness: 0.03,
     metalness: 0,
-    opacity: 0.88,
+    opacity: 0.78,
     transparent: true,
     clearcoat: 1.0,
     clearcoat_roughness: 0.02,
-    transmission: 0.9,
-    thickness: 0.72,
+    transmission: 0.96,
+    thickness: 0.52,
     ior: 1.77,
     dispersion: 0.32,
     specular_intensity: 1.0,
     specular_color: 0xffeef3,
     attenuation_color: 0xff164b,
-    attenuation_distance: 1.55,
+    attenuation_distance: 2.4,
     side: Three::DoubleSide,
     vertex_colors: false
   )
@@ -139,17 +162,37 @@ begin
   ruby_gem.cast_shadow = true
   scene.add(ruby_gem)
 
-  title_font = Three::Loaders::FontLoader.new.load("/node_modules/three/examples/fonts/helvetiker_bold.typeface.json")
+  spark_materials = [
+    Three::MeshBasicMaterial.new(color: 0xfff8cc, transparent: true, opacity: 0.9),
+    Three::MeshBasicMaterial.new(color: 0xffffff, transparent: true, opacity: 0.84),
+    Three::MeshBasicMaterial.new(color: 0xffd6e2, transparent: true, opacity: 0.78)
+  ]
+  sparkle_specs = [
+    [[-0.84, 1.06, 0.72], 0.24, 0.05],
+    [[0.98, 0.95, 0.78], 0.31, 1.15],
+    [[1.24, 0.34, 0.72], 0.22, 2.3],
+    [[-1.06, 0.18, 0.68], 0.2, 3.1],
+    [[0.34, 1.24, 0.74], 0.18, 4.0]
+  ]
+  sparkles = sparkle_specs.each_with_index.map do |(position, size, phase), index|
+    sparkle = build_spark(size, spark_materials[index % spark_materials.length])
+    sparkle.position.set(*position)
+    sparkle.rotation.z = phase
+    scene.add(sparkle)
+    [sparkle, phase]
+  end
+
+  title_font = Three::Loaders::FontLoader.new.load("/node_modules/three/examples/fonts/helvetiker_regular.typeface.json")
   title_geometry = Three::TextGeometry.new(
     "three-rb",
     font: title_font,
     size: 0.48,
-    depth: 0.13,
+    depth: 0.105,
     curve_segments: 10,
     bevel_enabled: true,
-    bevel_thickness: 0.025,
-    bevel_size: 0.014,
-    bevel_segments: 4
+    bevel_thickness: 0.018,
+    bevel_size: 0.01,
+    bevel_segments: 3
   )
   title_material = Three::MeshPhysicalMaterial.new(
     color: 0x23465f,
@@ -217,6 +260,9 @@ begin
   JS.global[:__threeRbRubyTitle] = renderer.backend.materialize(title)
   JS.global[:__threeRbRubyTitleGeometry] = renderer.backend.materialize(title_geometry)
   JS.global[:__threeRbRubyTitleMaterial] = renderer.backend.materialize(title_material)
+  sparkle_handles = JS.global[:Array].new
+  sparkles.each { |sparkle, _phase| sparkle_handles.call(:push, renderer.backend.materialize(sparkle)) }
+  JS.global[:__threeRbRubySparkles] = sparkle_handles
   JS.global[:__threeRbRubyEnvironment] = renderer.backend.materialize(environment_texture)
   JS.global[:__threeRbRubyFontLoaded] = !!title_font.handle
   JS.global[:__threeRbRubyFrame] = 0
@@ -226,8 +272,18 @@ begin
     frame += 1
     ruby_gem.rotation.y += 0.009
     ruby_gem.rotation.z = Math.sin(frame * 0.012) * 0.045
-    title.rotation.y = Math.sin(frame * 0.014) * 0.035
-    accent.rotation.z = -0.035 + (Math.sin(frame * 0.018) * 0.012)
+    title.rotation.x = -0.08 + (Math.sin(frame * 0.015) * 0.018)
+    title.rotation.y = Math.sin(frame * 0.018) * 0.055
+    title.position.y = -1.18 + (Math.sin(frame * 0.02) * 0.025)
+    accent.rotation.z = -0.035 + (Math.sin(frame * 0.024) * 0.028)
+    accent.position.y = -1.45 + (Math.sin((frame * 0.018) + 1.2) * 0.018)
+    accent.scale.x = 1.0 + (Math.sin(frame * 0.026) * 0.045)
+    sparkles.each_with_index do |(sparkle, phase), index|
+      pulse = (Math.sin((frame * 0.07) + phase) + 1) / 2.0
+      scale = 0.58 + (pulse * 0.78)
+      sparkle.scale.set(scale, scale, scale)
+      sparkle.rotation.z += index.even? ? 0.018 : -0.014
+    end
 
     JS.global[:__threeRbRubyFrame] = frame
     controls.update
