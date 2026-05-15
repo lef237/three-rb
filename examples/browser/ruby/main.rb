@@ -94,6 +94,10 @@ def build_spark(size, material)
   slash_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.38, size * 0.024, size * 0.024), material)
   slash_ray.rotation.z = Math::PI / 4
   spark.add(slash_ray)
+
+  backslash_ray = Three::Mesh.new(Three::BoxGeometry.new(size * 0.34, size * 0.02, size * 0.02), material)
+  backslash_ray.rotation.z = -Math::PI / 4
+  spark.add(backslash_ray)
   spark
 end
 
@@ -135,6 +139,10 @@ begin
   cool_light.position.set(2.4, -0.8, 2.2)
   scene.add(cool_light)
 
+  pin_light = Three::PointLight.new(0xffffff, 3.1, 4.4, 2)
+  pin_light.position.set(-1.6, 2.35, 3.25)
+  scene.add(pin_light)
+
   backdrop_material = Three::MeshBasicMaterial.new(
     color: 0x58c2ff,
     transparent: true,
@@ -149,20 +157,23 @@ begin
 
   ruby_material = Three::MeshPhysicalMaterial.new(
     color: 0xff2d64,
-    roughness: 0.03,
+    roughness: 0.008,
     metalness: 0,
-    opacity: 0.78,
+    opacity: 0.82,
     transparent: true,
     clearcoat: 1.0,
-    clearcoat_roughness: 0.02,
-    transmission: 0.96,
-    thickness: 0.52,
-    ior: 1.77,
-    dispersion: 0.32,
+    clearcoat_roughness: 0.006,
+    transmission: 0.98,
+    thickness: 0.58,
+    ior: 1.84,
+    dispersion: 0.42,
+    iridescence: 0.16,
+    iridescence_ior: 1.36,
+    iridescence_thickness_range: [120, 260],
     specular_intensity: 1.0,
-    specular_color: 0xffeef3,
+    specular_color: 0xffffff,
     attenuation_color: 0xff164b,
-    attenuation_distance: 2.4,
+    attenuation_distance: 2.05,
     side: Three::DoubleSide,
     vertex_colors: false
   )
@@ -175,9 +186,9 @@ begin
   scene.add(ruby_gem)
 
   spark_materials = [
-    Three::MeshBasicMaterial.new(color: 0xffef8a, transparent: true, opacity: 1.0),
-    Three::MeshBasicMaterial.new(color: 0xffcf3f, transparent: true, opacity: 0.96),
-    Three::MeshBasicMaterial.new(color: 0xffffb8, transparent: true, opacity: 0.92)
+    Three::MeshBasicMaterial.new(color: 0xffffff, transparent: true, opacity: 1.0),
+    Three::MeshBasicMaterial.new(color: 0xfff0a8, transparent: true, opacity: 0.98),
+    Three::MeshBasicMaterial.new(color: 0xdaf7ff, transparent: true, opacity: 0.94)
   ]
   sparkle_specs = [
     [[-0.88, 1.08, 0.74], 0.2, 0.05],
@@ -185,7 +196,12 @@ begin
     [[1.22, 0.36, 0.72], 0.18, 2.3],
     [[-1.05, 0.18, 0.68], 0.17, 3.1],
     [[0.34, 1.25, 0.74], 0.15, 4.0],
-    [[-0.32, 1.22, 0.7], 0.13, 5.2]
+    [[-0.32, 1.22, 0.7], 0.13, 5.2],
+    [[-0.48, 0.74, 0.96], 0.105, 0.65],
+    [[0.42, 0.68, 0.98], 0.11, 2.05],
+    [[0.78, 0.36, 0.94], 0.085, 3.75],
+    [[-0.78, 0.26, 0.9], 0.09, 4.7],
+    [[0.08, 0.98, 0.97], 0.078, 5.85]
   ]
   sparkles = sparkle_specs.each_with_index.map do |(position, size, phase), index|
     sparkle = build_spark(size, spark_materials[index % spark_materials.length])
@@ -224,7 +240,7 @@ begin
 
   accent_material = Three::MeshStandardMaterial.new(color: 0xffb3c4, roughness: 0.36, metalness: 0.08)
   accent = Three::Mesh.new(Three::BoxGeometry.new(3.55, 0.035, 0.035), accent_material)
-  accent.position.set(0, -1.45, 0.03)
+  accent.position.set(0, -1.58, 0.03)
   accent.rotation.z = -0.035
   scene.add(accent)
 
@@ -297,15 +313,15 @@ begin
     title_material.specular_intensity = 0.82 + (0.18 * title_twinkle)
     title_material.clearcoat = 0.62 + (0.18 * title_twinkle)
     accent.rotation.z = -0.035 + (Math.sin(frame * 0.018) * 0.008)
-    accent.position.y = -1.45 + (Math.sin((frame * 0.014) + 1.2) * 0.005)
+    accent.position.y = -1.58 + (Math.sin((frame * 0.014) + 1.2) * 0.005)
     accent.scale.x = 1.0 + (Math.sin(frame * 0.018) * 0.014)
     sparkles.each_with_index do |(sparkle, phase, _size), index|
-      flicker = ((Math.sin((frame * 0.19) + phase) + 1) / 2.0) *
-        ((Math.sin((frame * 0.071) + (phase * 1.7)) + 1) / 2.0)
-      burst = flicker**2.6
-      scale = 0.42 + (burst * 1.28)
+      flicker = (Math.sin((frame * 0.19) + phase) + 1) / 2.0
+      shimmer = (Math.sin((frame * 0.071) + (phase * 1.7)) + 1) / 2.0
+      burst = ((flicker * 0.7) + (shimmer * 0.3))**2.2
+      scale = 0.5 + (burst * 1.68)
       sparkle.scale.set(scale, scale, scale)
-      sparkle.visible = burst > 0.006
+      sparkle.visible = burst > 0.004
       sparkle.rotation.z += index.even? ? 0.026 : -0.021
     end
 
