@@ -62,6 +62,12 @@ async function main() {
         ior: globalThis.__threeRbRubyMaterial?.ior,
         clearcoat: globalThis.__threeRbRubyMaterial?.clearcoat
       },
+      backdropMaterial: {
+        type: globalThis.__threeRbRubyBackdropMaterial?.type,
+        color: globalThis.__threeRbRubyBackdropMaterial?.color?.getHex?.(),
+        transparent: globalThis.__threeRbRubyBackdropMaterial?.transparent,
+        opacity: globalThis.__threeRbRubyBackdropMaterial?.opacity
+      },
       sparkleCount: globalThis.__threeRbRubySparkles?.length,
       titleType: globalThis.__threeRbRubyTitle?.type,
       titleGeometryType: globalThis.__threeRbRubyTitleGeometry?.type,
@@ -78,6 +84,14 @@ async function main() {
     }
     if (debug.rubyMaterial.type !== "MeshPhysicalMaterial" || debug.rubyMaterial.transmission < 0.7) {
       throw new Error(`ruby material is not transmissive: ${JSON.stringify(debug, null, 2)}`);
+    }
+    if (
+      debug.backdropMaterial.type !== "MeshBasicMaterial" ||
+      debug.backdropMaterial.color !== 0x58c2ff ||
+      !debug.backdropMaterial.transparent ||
+      debug.backdropMaterial.opacity > 0.12
+    ) {
+      throw new Error(`ruby backdrop is not a subtle transparent blue: ${JSON.stringify(debug, null, 2)}`);
     }
     if (debug.titleType !== "Mesh" || debug.titleGeometryType !== "TextGeometry" || !debug.fontLoaded) {
       throw new Error(`title text geometry did not load: ${JSON.stringify(debug, null, 2)}`);

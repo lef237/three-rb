@@ -135,9 +135,14 @@ begin
   cool_light.position.set(2.4, -0.8, 2.2)
   scene.add(cool_light)
 
+  backdrop_material = Three::MeshBasicMaterial.new(
+    color: 0x58c2ff,
+    transparent: true,
+    opacity: 0.1
+  )
   backdrop = Three::Mesh.new(
     Three::PlaneGeometry.new(7.2, 4.4, width_segments: 1, height_segments: 1),
-    Three::MeshBasicMaterial.new(color: 0xffffff)
+    backdrop_material
   )
   backdrop.position.z = -1.35
   scene.add(backdrop)
@@ -264,6 +269,8 @@ begin
   JS.global[:__threeRbControls] = controls.handle
   JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
   JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
+  JS.global[:__threeRbRubyBackdrop] = renderer.backend.materialize(backdrop)
+  JS.global[:__threeRbRubyBackdropMaterial] = renderer.backend.materialize(backdrop_material)
   JS.global[:__threeRbRubyGem] = renderer.backend.materialize(ruby_gem)
   JS.global[:__threeRbRubyGeometry] = renderer.backend.materialize(ruby_gem.geometry)
   JS.global[:__threeRbRubyMaterial] = renderer.backend.materialize(ruby_material)
