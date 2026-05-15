@@ -240,7 +240,7 @@ begin
 
   accent_material = Three::MeshStandardMaterial.new(color: 0xffb3c4, roughness: 0.36, metalness: 0.08)
   accent = Three::Mesh.new(Three::BoxGeometry.new(3.55, 0.035, 0.035), accent_material)
-  accent.position.set(0, -1.58, 0.03)
+  accent.position.set(0, -1.52, 0.03)
   accent.rotation.z = -0.035
   scene.add(accent)
 
@@ -313,7 +313,7 @@ begin
     title_material.specular_intensity = 0.82 + (0.18 * title_twinkle)
     title_material.clearcoat = 0.62 + (0.18 * title_twinkle)
     accent.rotation.z = -0.035 + (Math.sin(frame * 0.018) * 0.008)
-    accent.position.y = -1.58 + (Math.sin((frame * 0.014) + 1.2) * 0.005)
+    accent.position.y = -1.52 + (Math.sin((frame * 0.014) + 1.2) * 0.005)
     accent.scale.x = 1.0 + (Math.sin(frame * 0.018) * 0.014)
     sparkles.each_with_index do |(sparkle, phase, _size), index|
       flicker = (Math.sin((frame * 0.19) + phase) + 1) / 2.0
