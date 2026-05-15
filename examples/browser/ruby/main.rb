@@ -104,7 +104,7 @@ begin
 
   scene = Three::Scene.new
   camera = Three::PerspectiveCamera.new(42, aspect: 1.0, near: 0.1, far: 100)
-  camera.position.set(0, 0.1, 6.2)
+  camera.position.set(0, 0.1, 6.9)
 
   environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/assets/studio.hdr")
   scene.environment = environment_texture
@@ -195,13 +195,13 @@ begin
     bevel_segments: 3
   )
   title_material = Three::MeshPhysicalMaterial.new(
-    color: 0x23465f,
-    roughness: 0.24,
-    metalness: 0.12,
-    clearcoat: 0.62,
-    clearcoat_roughness: 0.18,
-    specular_intensity: 0.82,
-    specular_color: 0xffffff
+    color: 0x3c8fbd,
+    roughness: 0.2,
+    metalness: 0.08,
+    clearcoat: 0.72,
+    clearcoat_roughness: 0.16,
+    specular_intensity: 0.9,
+    specular_color: 0xe8fbff
   )
   title = Three::Mesh.new(title_geometry, title_material)
   title.position.set(0, -1.18, 0.08)
@@ -272,12 +272,23 @@ begin
     frame += 1
     ruby_gem.rotation.y += 0.009
     ruby_gem.rotation.z = Math.sin(frame * 0.012) * 0.045
+    camera_angle = frame * 0.0035
+    camera_radius = 6.9 + (Math.sin(frame * 0.004) * 0.12)
+    camera.position.set(
+      Math.sin(camera_angle) * 0.36,
+      0.1 + (Math.sin(frame * 0.005) * 0.08),
+      Math.cos(camera_angle) * camera_radius
+    )
     title.rotation.x = -0.08 + (Math.sin(frame * 0.015) * 0.018)
     title.rotation.y = Math.sin(frame * 0.018) * 0.055
     title.position.y = -1.18 + (Math.sin(frame * 0.02) * 0.025)
-    accent.rotation.z = -0.035 + (Math.sin(frame * 0.024) * 0.028)
-    accent.position.y = -1.45 + (Math.sin((frame * 0.018) + 1.2) * 0.018)
-    accent.scale.x = 1.0 + (Math.sin(frame * 0.026) * 0.045)
+    title_twinkle = (Math.sin(frame * 0.048) + 1) / 2.0
+    title_material.color.set_rgb(0.2 + (0.1 * title_twinkle), 0.48 + (0.12 * title_twinkle), 0.68 + (0.16 * title_twinkle))
+    title_material.specular_intensity = 0.78 + (0.18 * title_twinkle)
+    title_material.clearcoat = 0.62 + (0.18 * title_twinkle)
+    accent.rotation.z = -0.035 + (Math.sin(frame * 0.018) * 0.008)
+    accent.position.y = -1.45 + (Math.sin((frame * 0.014) + 1.2) * 0.005)
+    accent.scale.x = 1.0 + (Math.sin(frame * 0.018) * 0.014)
     sparkles.each_with_index do |(sparkle, phase), index|
       pulse = (Math.sin((frame * 0.07) + phase) + 1) / 2.0
       scale = 0.58 + (pulse * 0.78)

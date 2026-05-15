@@ -157,6 +157,8 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "\"three-rb\""
     assert_includes ruby, "build_spark"
     assert_includes ruby, "JS.global[:__threeRbRubySparkles]"
+    assert_includes ruby, "camera.position.set("
+    assert_includes ruby, "title_material.color.set_rgb"
     assert_includes ruby, "Three::Controls::OrbitControls"
     assert_includes ruby, "JS.global[:__threeRbRubyGem]"
     assert_includes ruby, "JS.global[:__threeRbRubyTitle]"
