@@ -34,19 +34,15 @@ export async function bootRubyExample({ main, clearColor }) {
       const renderer = globalThis.__threeRbCurrentRenderer;
       const scene = globalThis.__threeRbCurrentScene;
       const camera = globalThis.__threeRbCurrentCamera;
-      globalThis.requestAnimationFrame(() => {
-        globalThis.__threeRbRenderFrameCount += 1;
-        renderer.setClearColor(clearColor, 1);
-        renderer.render(scene, camera);
-      });
+      globalThis.__threeRbRenderFrameCount += 1;
+      renderer.setClearColor(clearColor, 1);
+      renderer.render(scene, camera);
     };
     globalThis.__threeRbRenderComposer = () => {
       globalThis.__threeRbRenderCount += 1;
       const composer = globalThis.__threeRbCurrentComposer;
-      globalThis.requestAnimationFrame(() => {
-        globalThis.__threeRbRenderFrameCount += 1;
-        composer.render();
-      });
+      globalThis.__threeRbRenderFrameCount += 1;
+      composer.render();
     };
 
     const rubyModule = await compileWasm("/node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm");

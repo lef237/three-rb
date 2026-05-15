@@ -80,7 +80,7 @@ The boot module is responsible for:
 - Loading `/node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm`.
 - Starting the Ruby VM and loading the Ruby entrypoint through `JS::RequireRemote`.
 
-The shared helper also installs optional render helpers used by smoke tests and browser-safe `requestAnimationFrame` rendering. Custom applications can keep that behavior or call directly into three.js through the renderer backend fallback.
+The shared helper also installs optional render helpers used by smoke tests to draw immediately from Ruby renderer calls and expose render counters for deterministic assertions. Custom applications can keep that behavior or call directly into three.js through the renderer backend fallback.
 
 Write a custom boot module when the application has different asset paths, a bundler output path, a smaller addon set, a custom status/error UI, or a deployment layout that does not match the repository root. Keep the same global constructor contract unless the Ruby backend gains a different injection API.
 
