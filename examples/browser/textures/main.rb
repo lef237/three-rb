@@ -7,7 +7,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   camera = Three::OrthographicCamera.new(-2.5, 2.5, 1.6, -1.6, near: 0.1, far: 100)
   camera.position.z = 5
 
-  environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/assets/studio.hdr")
+  environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/textures/assets/studio.hdr")
   scene.environment = environment_texture
 
   scene.add(Three::AmbientLight.new(0xffffff, 0.45))
@@ -16,7 +16,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   key_light.position.set(2.5, 3.0, 4.0)
   scene.add(key_light)
 
-  texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  texture = Three::Loaders::TextureLoader.new.load("/examples/browser/textures/assets/checker.svg")
   texture.wrap_s = Three::RepeatWrapping
   texture.wrap_t = Three::RepeatWrapping
   texture.mag_filter = Three::NearestFilter

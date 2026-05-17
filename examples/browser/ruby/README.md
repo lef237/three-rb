@@ -2,6 +2,8 @@
 
 This browser example is the first visual sample for three-rb. It builds a faceted red gemstone in Ruby with `BufferGeometry`, renders it with `MeshPhysicalMaterial`, and adds an extruded `three-rb` title through the three.js `TextGeometry` addon.
 
+Its HDR environment file lives under `examples/browser/ruby/assets/` with the sample.
+
 Run it from the repository root:
 
 ```sh

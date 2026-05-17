@@ -183,7 +183,9 @@ For standalone projects, install the gem and generate a Ruby-only browser exampl
 three-rb browser examples/browser/quickstart
 ```
 
-The generator copies the browser runtime files, `package.json`, `pnpm-lock.yaml`, and `lib/` into the served project root, then creates `index.html`, `boot.mjs`, `main.rb`, and `README.md` for the example.
+`quickstart` generates an asset-free rotating cube. Use `three-rb browser examples/browser/ruby` to generate the richer Ruby gemstone sample; its HDR asset is copied under `examples/browser/ruby/assets/`.
+
+The generator copies the browser runtime files, `package.json`, `pnpm-lock.yaml`, and `lib/` into the served project root, then creates `index.html`, `boot.mjs`, `main.rb`, and `README.md` for the example. Templates that need local files keep them under the generated example's `assets/` directory.
 
 ## JavaScript Escape Hatch
 

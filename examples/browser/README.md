@@ -2,6 +2,8 @@
 
 These examples are the browser-facing coverage map for three-rb's browser-first alpha. They run Ruby through ruby.wasm, load pnpm-managed three.js packages, and render through `Three::Renderers::ThreeJSRenderer`.
 
+Examples that need fixtures keep those files under their own `assets/` directory so each sample remains self-contained.
+
 ## Run Examples
 
 Install browser dependencies and serve the repository root:

@@ -14,6 +14,7 @@ def usage
 
     Example:
       three-rb browser examples/browser/quickstart
+      three-rb browser examples/browser/ruby
   TEXT
 end
 

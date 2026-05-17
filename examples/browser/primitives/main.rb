@@ -43,7 +43,7 @@ Three::Browser.run(starting: "Starting primitives scene") do |app|
     Three::PointsMaterial.new(color: 0xffcc4d, size: 12, size_attenuation: false)
   )
 
-  sprite_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  sprite_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/primitives/assets/checker.svg")
   sprite_material = Three::SpriteMaterial.new(
     color: 0xffffff,
     map: sprite_texture,

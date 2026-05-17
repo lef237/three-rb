@@ -74,6 +74,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes guide, "app.animation_loop"
     assert_includes guide, "Three::Browser.js"
     assert_includes guide, "three-rb browser examples/browser/quickstart"
+    assert_includes guide, "three-rb browser examples/browser/ruby"
     assert_includes guide, "JavaScript Escape Hatch"
     assert_includes guide, "examples/browser/README.md"
     assert_includes guide, "docs/release-readiness.md"
@@ -124,6 +125,8 @@ class ThreeReleaseReadinessTest < Minitest::Test
 
     assert_includes publishing, "three-rb --help"
     assert_includes publishing, "three-rb browser examples/browser/quickstart"
+    assert_includes publishing, "three-rb browser examples/browser/ruby"
+    assert_includes publishing, "examples/browser/ruby/assets/studio.hdr"
     assert_includes publishing, "generated Ruby entrypoint is Ruby-only"
     assert_includes publishing, "generated Ruby entrypoint used JS bridge"
   end

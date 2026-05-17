@@ -67,10 +67,42 @@ module Three
       end
 
       def write_example_files
-        write_file(example_path("index.html"), index_html, overwrite: @force)
-        write_file(example_path("boot.mjs"), boot_js, overwrite: @force)
-        write_file(example_path("main.rb"), main_rb, overwrite: @force)
-        write_file(example_path("README.md"), readme, overwrite: @force)
+        if ruby_example?
+          copy_ruby_example_files
+        else
+          write_file(example_path("index.html"), index_html, overwrite: @force)
+          write_file(example_path("boot.mjs"), boot_js, overwrite: @force)
+          write_file(example_path("main.rb"), main_rb, overwrite: @force)
+          write_file(example_path("README.md"), readme, overwrite: @force)
+        end
+      end
+
+      def copy_ruby_example_files
+        {
+          "index.html" => "index.html",
+          "boot.mjs" => "boot.mjs",
+          "main.rb" => "main.rb",
+          "assets/studio.hdr" => "assets/studio.hdr"
+        }.each do |source_name, destination_name|
+          copy_generated_file(
+            runtime_path(File.join("examples/browser/ruby", source_name)),
+            example_path(destination_name),
+            overwrite: @force
+          )
+        end
+
+        write_ruby_readme
+      end
+
+      def write_ruby_readme
+        source = runtime_path("examples/browser/ruby/README.md")
+        destination = example_path("README.md")
+        if File.exist?(destination) && File.identical?(source, destination)
+          @skipped << relative_path(destination)
+          return
+        end
+
+        write_file(destination, ruby_readme, overwrite: @force)
       end
 
       def copy_tree(source, destination, overwrite:)
@@ -83,9 +115,29 @@ module Three
       end
 
       def copy_file(source, destination, overwrite:)
+        if File.exist?(destination) && File.identical?(source, destination)
+          @skipped << relative_path(destination)
+          return
+        end
+
         if File.exist?(destination) && !overwrite
           @skipped << relative_path(destination)
           return
+        end
+
+        FileUtils.mkdir_p(File.dirname(destination))
+        FileUtils.cp(source, destination)
+        @created << relative_path(destination)
+      end
+
+      def copy_generated_file(source, destination, overwrite:)
+        if File.exist?(destination) && File.identical?(source, destination)
+          @skipped << relative_path(destination)
+          return
+        end
+
+        if File.exist?(destination) && !overwrite
+          raise ArgumentError, "#{relative_path(destination)} already exists; pass --force to overwrite generated example files"
         end
 
         FileUtils.mkdir_p(File.dirname(destination))
@@ -114,7 +166,9 @@ module Three
       end
 
       def example_files
-        %w[index.html boot.mjs main.rb README.md].map { |name| example_path(name) }
+        names = %w[index.html boot.mjs main.rb README.md]
+        names << "assets/studio.hdr" if ruby_example?
+        names.map { |name| example_path(name) }
       end
 
       def example_path(name)
@@ -153,6 +207,10 @@ module Three
 
       def js_string(text)
         JSON.generate(text)
+      end
+
+      def ruby_example?
+        relative_path(@target) == "examples/browser/ruby"
       end
 
       def index_html
@@ -308,6 +366,29 @@ module Three
           ```
 
           Keep serving the project root. The browser runtime loads `node_modules/`, `lib/`, and this example over HTTP.
+        MARKDOWN
+      end
+
+      def ruby_readme
+        <<~MARKDOWN
+          # three-rb Ruby Example
+
+          This generated browser example runs Ruby through ruby.wasm and renders a faceted red gemstone with a three-dimensional `three-rb` title.
+
+          From the project root:
+
+          ```sh
+          pnpm install
+          ruby -run -e httpd . -p 8000
+          ```
+
+          Open:
+
+          ```text
+          http://localhost:8000/#{relative_path(@target)}/
+          ```
+
+          Keep serving the project root. The browser runtime loads `node_modules/`, `lib/`, and this example's local `assets/` directory over HTTP.
         MARKDOWN
       end
     end

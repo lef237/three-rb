@@ -21,7 +21,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   )
   renderer.set_clear_color(0x11151a, 1)
 
-  gltf = Three::Loaders::GLTFLoader.new(backend: renderer.backend).load("/examples/browser/assets/animated_triangle.gltf")
+  gltf = Three::Loaders::GLTFLoader.new(backend: renderer.backend).load("/examples/browser/gltf/assets/animated_triangle.gltf")
   model = gltf.scene
   model.position.x = -0.75
   model.scale.set(1.2, 1.2, 1.2)
@@ -31,7 +31,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   compressed_gltf = Three::Loaders::GLTFLoader.new(
     backend: renderer.backend,
     draco_decoder_path: draco_decoder_path
-  ).load("/examples/browser/assets/compressed_triangle.gltf")
+  ).load("/examples/browser/gltf/assets/compressed_triangle.gltf")
   compressed_model = compressed_gltf.scene
   compressed_model.position.x = 1.05
   compressed_model.scale.set(0.82, 0.82, 0.82)

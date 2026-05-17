@@ -41,7 +41,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   rig.name = "composition-rig"
   scene.add(rig)
 
-  primary_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  primary_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/composition/assets/checker.svg")
   primary_texture.wrap_s = Three::RepeatWrapping
   primary_texture.wrap_t = Three::RepeatWrapping
   primary_texture.mag_filter = Three::NearestFilter
@@ -164,7 +164,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
     renderer: renderer
   )
 
-  disposable_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  disposable_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/composition/assets/checker.svg")
   disposable_material = Three::MeshBasicMaterial.new(map: disposable_texture)
   renderer.on_dispose(disposable_texture) { app.set(:texture_dispose_event, true) }
   renderer.on_dispose(disposable_material) { app.set(:material_dispose_event, true) }

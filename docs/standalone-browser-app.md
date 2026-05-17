@@ -22,6 +22,8 @@ If you installed through Bundler, run:
 bundle exec three-rb browser examples/browser/quickstart
 ```
 
+Use `three-rb browser examples/browser/ruby` instead when you want the richer Ruby gemstone sample. It generates the same browser runtime shape and keeps its HDR file under `examples/browser/ruby/assets/`.
+
 The generator creates:
 
 - `package.json` and `pnpm-lock.yaml`
@@ -31,6 +33,8 @@ The generator creates:
 - `examples/browser/quickstart/boot.mjs`
 - `examples/browser/quickstart/main.rb`
 - `examples/browser/quickstart/README.md`
+
+For templates that need assets, the generator also creates an `assets/` directory inside the example.
 
 Copying `lib/` puts the installed gem's Ruby source in the served app directory. The browser Ruby VM loads Ruby files over HTTP, so this is the current standalone workflow.
 

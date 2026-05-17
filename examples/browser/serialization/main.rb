@@ -6,7 +6,7 @@ Three::Browser.run(starting: "Exporting Ruby scene") do |app|
   source_scene = Three::Scene.new
   source_scene.name = "serialization-source"
 
-  shared_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
+  shared_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/serialization/assets/checker.svg")
   shared_texture.wrap_s = Three::RepeatWrapping
   shared_texture.wrap_t = Three::RepeatWrapping
   shared_texture.mag_filter = Three::NearestFilter

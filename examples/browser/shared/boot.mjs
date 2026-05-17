@@ -90,7 +90,7 @@ function shouldBypassCache(input) {
   if (pathname.startsWith("/lib/")) return true;
   if (!pathname.startsWith("/examples/browser/")) return false;
 
-  return !pathname.startsWith("/examples/browser/assets/");
+  return !pathname.includes("/assets/");
 }
 
 async function compileWasm(url) {

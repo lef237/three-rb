@@ -137,6 +137,8 @@ pnpm install
 ruby -run -e httpd . -p 8000
 ```
 
+Use `three-rb browser examples/browser/ruby` instead when you want the richer Ruby gemstone sample with its assets kept under `examples/browser/ruby/assets/`.
+
 The generated Ruby entrypoint uses `Three::Browser.run`, so ordinary scene code does not need `require "js"` or `JS.global`.
 
 Run the optional browser smoke tests:

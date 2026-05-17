@@ -7,7 +7,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   camera = Three::PerspectiveCamera.new(45, aspect: 1.0, near: 0.1, far: 100)
   camera.position.set(0, 0.7, 4.0)
 
-  cube_sources = Array.new(6, "/examples/browser/assets/checker.svg")
+  cube_sources = Array.new(6, "/examples/browser/cubemap/assets/checker.svg")
   cube_texture = Three::Loaders::CubeTextureLoader.new.load(cube_sources)
   scene.background = cube_texture
   scene.environment = cube_texture

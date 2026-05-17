@@ -122,7 +122,7 @@ Local source locations:
 
 The existing glTF browser smoke test verifies:
 
-- `Three::Loaders::GLTFLoader` loads `examples/browser/assets/triangle.gltf`.
+- `Three::Loaders::GLTFLoader` loads assets from `examples/browser/gltf/assets/`.
 - The returned `gltf.scene` can be added to a Ruby `Scene`.
 - The loaded JavaScript scene renders through `Three::Renderers::ThreeJSRenderer`.
 - The animation loop can mutate the external root transform.

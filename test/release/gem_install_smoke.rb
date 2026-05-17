@@ -67,6 +67,19 @@ Dir.mktmpdir("three-rb-installed-cli") do |dir|
   assert(!main.include?("require \"js\""), "expected generated Ruby to avoid require js")
   assert(!main.include?("JS.global"), "expected generated Ruby to avoid JS.global")
   assert(boot.include?("examples/browser/quickstart/main"), "expected boot file to load generated Ruby entrypoint")
+
+  stdout, stderr, status = Open3.capture3(executable, "browser", "examples/browser/ruby", chdir: dir)
+  assert(status.success?, "expected three-rb browser ruby example to succeed: #{stderr}")
+  assert(stdout.include?("Created browser example"), "expected ruby generator output")
+
+  ruby_main = File.read(File.join(dir, "examples/browser/ruby/main.rb"))
+  ruby_boot = File.read(File.join(dir, "examples/browser/ruby/boot.mjs"))
+
+  assert(File.file?(File.join(dir, "examples/browser/ruby/assets/studio.hdr")), "expected ruby asset to be generated")
+  assert(ruby_main.include?("faceted_ruby_geometry"), "expected generated ruby example to use gemstone scene")
+  assert(ruby_main.include?("/examples/browser/ruby/assets/studio.hdr"), "expected generated ruby example to use local assets")
+  assert(!ruby_main.include?("/examples/browser/assets/"), "expected generated ruby example to avoid shared assets")
+  assert(ruby_boot.include?("examples/browser/ruby/main"), "expected ruby boot file to load generated Ruby entrypoint")
 end
 
 puts "gem install smoke passed for three-rb #{Three::VERSION}"

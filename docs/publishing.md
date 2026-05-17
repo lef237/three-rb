@@ -136,6 +136,9 @@ three-rb --help
 three-rb browser examples/browser/quickstart
 test -f examples/browser/quickstart/main.rb
 ruby -e 'main = File.read("examples/browser/quickstart/main.rb"); abort "generated Ruby entrypoint used JS bridge" if main.include?("require \"js\"") || main.include?("JS.global"); puts "generated Ruby entrypoint is Ruby-only"'
+three-rb browser examples/browser/ruby
+test -f examples/browser/ruby/main.rb
+test -f examples/browser/ruby/assets/studio.hdr
 ```
 
 Both Ruby commands must print:
@@ -144,7 +147,7 @@ Both Ruby commands must print:
 $VERSION
 ```
 
-The `three-rb browser` command must create `examples/browser/quickstart/main.rb`, and the final Ruby command must print:
+The `three-rb browser` command must create `examples/browser/quickstart/main.rb` and `examples/browser/ruby/main.rb`, and the final Ruby command must print:
 
 ```text
 generated Ruby entrypoint is Ruby-only

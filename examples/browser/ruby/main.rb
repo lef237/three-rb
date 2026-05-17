@@ -106,7 +106,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   camera = Three::PerspectiveCamera.new(42, aspect: 1.0, near: 0.1, far: 100)
   camera.position.set(0, 0.42, 6.9)
 
-  environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/assets/studio.hdr")
+  environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/ruby/assets/studio.hdr")
   scene.environment = environment_texture
 
   scene.add(Three::AmbientLight.new(0xffffff, 0.82))
