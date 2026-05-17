@@ -16,6 +16,7 @@ The `0.1.0` target is complete when all of these are true:
 
 - Scope is frozen to the browser-first alpha surface in this document and `README.md`; no additional material, loader, render-target, postprocessing, WebGPU, XR, native-renderer, or broad compatibility work is required for the release unless an already-advertised example is broken.
 - Public API documentation matches the implemented, tested Ruby API surface loaded by `require "three"`.
+- Ruby-authored browser examples use `Three::Browser` helpers instead of application-level `require "js"` and `JS.global`, and the `three-rb browser` generator can create the same Ruby-only entrypoint shape for standalone apps.
 - Snake-case Ruby methods are the documented API style. Broad camelCase three.js compatibility aliases are deferred until after `0.1.0`.
 - `Three::Exporters::ThreeJSONExporter` and `Three::Loaders::ThreeJSONLoader` continue to round-trip Ruby-authored scenes covered by the saved `test/fixtures/scene_export_v1.json` regression fixture.
 - JavaScript-loaded assets remain opaque `ExternalObject3D` roots for `0.1.0`; transform-level use, renderer traversal helpers, animation mixer usage, and explicit subtree disposal are in scope, while Ruby child mutation inside loaded external roots is out of scope.
@@ -29,6 +30,7 @@ Included in the first public scope:
 
 - Ruby object model for scenes, groups, transforms, cameras, lights, geometries, non-mesh primitives including sprites, common materials including matcap, toon, sprite, and shadow materials, textures, and common math primitives.
 - Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and `three@0.184.0`.
+- `Three::Browser` helpers and the `three-rb browser` executable for generating standalone Ruby-only browser examples.
 - Dirty-tracked synchronization from Ruby objects into three.js handles.
 - JSON export/load for Ruby-authored scenes.
 - JavaScript-delegated browser integrations for textures, cube maps, RGBE environment maps, glTF, DRACO, animation mixers, OrbitControls, raycasting, instancing, shadows, and initial postprocessing with composer/render/bloom/dot-screen/output passes.
@@ -67,7 +69,7 @@ The release is acceptable when:
 - The required gate passes locally and in CI.
 - `CHANGELOG.md` describes the release as unreleased or tagged with the final date.
 - README documents the browser-first alpha scope and unsupported areas.
-- `bundle exec rake release:gem_smoke` proves the built gem can be installed into a temporary `GEM_HOME` and used without the repository `lib/` path.
+- `bundle exec rake release:gem_smoke` proves the built gem can be installed into a temporary `GEM_HOME`, used without the repository `lib/` path, and run the installed `three-rb browser` generator.
 - `bundle exec rake release:preflight` proves the Ruby tests, install smoke, browser smoke tests, and gem build pass without publishing.
 - Browser smoke tests cover every advertised browser example.
 

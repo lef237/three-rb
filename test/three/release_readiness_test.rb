@@ -43,10 +43,13 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes changelog, "physical, matcap, toon, normal, shadow, line, points, and sprite materials"
     assert_includes changelog, "glTF/DRACO"
     assert_includes changelog, "loaded-asset traversal/disposal helpers"
+    assert_includes changelog, "three-rb browser"
+    assert_includes changelog, "avoid application-level"
     assert_includes changelog, "DotScreenPass"
     assert_includes changelog, "OutputPass"
     assert_includes changelog, "Deterministic JSON fixture regression coverage"
-    assert_includes changelog, "Release install smoke and preflight tasks"
+    assert_includes changelog, "installed executable"
+    assert_includes changelog, "generated browser app"
   end
 
   def test_browser_runtime_guide_documents_boot_contract
@@ -74,6 +77,9 @@ class ThreeReleaseReadinessTest < Minitest::Test
     next_work = File.read(File.join(ROOT, "docs/next-work.md"))
 
     assert_includes next_work, "public API and documentation consistency pass"
+    assert_includes next_work, "Ruby-only entrypoints"
+    assert_includes next_work, "three-rb browser"
+    assert_includes next_work, "installed executable"
     assert_includes next_work, "Browser runtime guide"
     assert_includes next_work, "Browser examples overview"
     assert_includes next_work, "Saved JSON export/load fixture regression coverage"

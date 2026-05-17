@@ -8,11 +8,12 @@
 - Mesh, instanced mesh, line, points, and sprite object support.
 - Common material APIs including basic, Lambert, Phong, standard, physical, matcap, toon, normal, shadow, line, points, and sprite materials.
 - Browser rendering through ruby.wasm and a delegated three.js backend.
+- `Three::Browser` helpers and a `three-rb browser` generator for Ruby-only browser entrypoints that avoid application-level `require "js"` and `JS.global` calls.
 - Browser examples and Playwright smoke tests for cube, composition, textures, cubemap, glTF/DRACO, serialization, picking, primitives, and postprocessing.
 - Texture loading, cube textures, RGBE environment textures, glTF loading, DRACO decoder configuration, animation mixers, OrbitControls, instancing, picking, shadows, and loaded-asset traversal/disposal helpers.
 - Initial postprocessing wrappers for `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `DotScreenPass`, and `OutputPass`.
 - Deterministic JSON fixture regression coverage for exporter/loader compatibility.
-- Release install smoke and preflight tasks for validating the built gem outside the repository load path.
+- Release install smoke and preflight tasks for validating the built gem, installed executable, and generated browser app outside the repository load path.
 
 ### Notes
 

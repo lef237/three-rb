@@ -2,7 +2,7 @@
 
 This document is the resume point for the next implementation session. It is intentionally narrower than `docs/implementation-plan.md`: use it to decide what to do next after conversation context is lost.
 
-Last updated: 2026-05-14.
+Last updated: 2026-05-17.
 
 ## Current Position
 
@@ -26,6 +26,9 @@ Recent completed work:
 - `Sprite` / `SpriteMaterial` support with textured billboard marker sync, JSON export/load, resource disposal, and primitives browser smoke coverage.
 - Saved JSON fixture coverage now includes `Sprite` / `SpriteMaterial` so the representative exporter/loader regression fixture matches the current primitive surface.
 - Completed public API and documentation consistency pass for the current browser-first alpha scope.
+- Browser examples were moved to Ruby-only entrypoints that use `Three::Browser` helpers instead of application-level `require "js"` or `JS.global`.
+- Added the `three-rb browser` executable and generator for standalone Ruby-only browser examples.
+- Release install smoke now validates the installed executable and generated browser app shape outside the repository load path.
 - Local release gate and latest `main` CI are green for the `0.1.0` release candidate.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
@@ -39,12 +42,13 @@ This is the best next step because:
 - The representative JSON fixture covers the current primitive/material surface, including `Sprite` / `SpriteMaterial`.
 - The public docs now cover release readiness, publishing, browser example coverage, browser runtime boot contract, and the current implemented API scope.
 - `lib/three/version.rb` already contains `0.1.0`.
-- `CHANGELOG.md` intentionally remains `## 0.1.0 - Unreleased` until the owner confirms the release date, but its contents should continue to reflect the current release-candidate surface.
+- `CHANGELOG.md` currently records `## 0.1.0 - 2026-05-15`; if the release date changes before publishing, update that heading during release metadata finalization.
+- The release candidate now includes the Ruby-only browser generator and installed-generator smoke coverage.
 - Further feature scope should wait until after the `0.1.0` release unless an already-advertised example breaks.
 
 ## Scope
 
-For deferred-release maintenance, keep `CHANGELOG.md`, `docs/release-readiness.md`, and this resume point aligned with the implemented release-candidate surface. Do not date the changelog, tag, push, or publish until the release owner confirms the release window.
+For deferred-release maintenance, keep `CHANGELOG.md`, `docs/release-readiness.md`, and this resume point aligned with the implemented release-candidate surface. Do not tag, push, or publish until the release owner confirms the release window. If the confirmed release date differs from the current changelog heading, update it as release metadata work.
 
 When the owner is ready to publish, follow `docs/publishing.md`: confirm the release date, update `CHANGELOG.md`, run `bundle exec rake release:preflight`, commit the metadata update, publish the gem, tag `v0.1.0`, push `main` and the tag, then verify installation from RubyGems.
 
