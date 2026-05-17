@@ -95,8 +95,12 @@ class ThreeReleaseReadinessTest < Minitest::Test
 
   def test_ci_runs_gem_install_smoke
     ci = File.read(File.join(ROOT, ".github/workflows/ci.yml"))
+    smoke = File.read(File.join(ROOT, "test/release/gem_install_smoke.rb"))
 
     assert_includes ci, "bundle exec rake release:gem_smoke"
+    assert_includes smoke, "three-rb"
+    assert_includes smoke, "Three::Browser.run"
+    assert_includes smoke, "expected generated Ruby to avoid require js"
   end
 
   def test_rakefile_exposes_release_preflight

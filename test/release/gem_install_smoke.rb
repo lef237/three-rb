@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 require "json"
+require "open3"
+require "tmpdir"
 require "three"
 
 def assert(condition, message)
@@ -44,5 +46,27 @@ assert(defined?(Three::SpriteMaterial), "expected sprite material API to load")
 assert(defined?(Three::Postprocessing::EffectComposer), "expected postprocessing API to load")
 assert(defined?(Three::Postprocessing::OutputPass), "expected output pass API to load")
 assert(defined?(Three::Postprocessing::DotScreenPass), "expected dot screen pass API to load")
+
+spec = Gem::Specification.find_by_name("three-rb")
+executable = File.join(Gem.bindir, "three-rb")
+
+assert(spec.executables.include?("three-rb"), "expected three-rb executable in gemspec")
+assert(File.executable?(executable), "expected installed three-rb executable")
+
+Dir.mktmpdir("three-rb-installed-cli") do |dir|
+  stdout, stderr, status = Open3.capture3(executable, "browser", "examples/browser/quickstart", chdir: dir)
+  assert(status.success?, "expected three-rb browser to succeed: #{stderr}")
+  assert(stdout.include?("Created browser example"), "expected generator output")
+
+  main = File.read(File.join(dir, "examples/browser/quickstart/main.rb"))
+  boot = File.read(File.join(dir, "examples/browser/quickstart/boot.mjs"))
+
+  assert(File.file?(File.join(dir, "package.json")), "expected package.json to be generated")
+  assert(File.file?(File.join(dir, "examples/browser/shared/boot.mjs")), "expected shared browser boot to be generated")
+  assert(main.include?("Three::Browser.run"), "expected generated Ruby to use Three::Browser.run")
+  assert(!main.include?("require \"js\""), "expected generated Ruby to avoid require js")
+  assert(!main.include?("JS.global"), "expected generated Ruby to avoid JS.global")
+  assert(boot.include?("examples/browser/quickstart/main"), "expected boot file to load generated Ruby entrypoint")
+end
 
 puts "gem install smoke passed for three-rb #{Three::VERSION}"
