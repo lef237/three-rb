@@ -1,19 +1,8 @@
 # frozen_string_literal: true
 
-require "js"
+require_relative "../../../lib/three"
 
-begin
-  JS.global[:__threeReady].await
-
-  require_relative "../../../lib/three"
-
-  document = JS.global[:document]
-  window = JS.global[:window]
-  viewport = document.call(:querySelector, "#viewport")
-  status = document.call(:querySelector, "#status")
-  status_dot = document.call(:querySelector, "#status-dot")
-  status[:textContent] = "Starting postprocessing scene"
-
+Three::Browser.run(starting: "Starting postprocessing scene") do |app|
   scene = Three::Scene.new
   camera = Three::PerspectiveCamera.new(52, aspect: 1.0, near: 0.1, far: 100)
   camera.position.set(0, 0.15, 5.2)
@@ -65,37 +54,35 @@ begin
   right_accent.position.set(1.25, 0.52, 0.15)
   scene.add(right_accent)
 
-  resize = proc do
-    width = [viewport[:clientWidth].to_i, 1].max
-    height = [viewport[:clientHeight].to_i, 1].max
-
-    camera.aspect = width.to_f / height
+  app.on_resize do |width, height, aspect|
+    camera.aspect = aspect
     camera.update_projection_matrix
     renderer.set_size(width, height)
     composer.set_size(width, height)
   end
-
-  resize.call
-  window.call(:addEventListener, "resize", resize)
   composer.render(scene, camera)
 
-  JS.global[:__threeRbRenderer] = renderer.handle
-  JS.global[:__threeRbPostComposer] = composer.handle
-  JS.global[:__threeRbPostRenderPass] = render_pass.handle
-  JS.global[:__threeRbPostBloomPass] = bloom_pass.handle
-  JS.global[:__threeRbPostDotScreenPass] = dot_screen_pass.handle
-  JS.global[:__threeRbPostOutputPass] = output_pass.handle
-  JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
-  JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
-  JS.global[:__threeRbPostCore] = renderer.backend.materialize(core)
-  JS.global[:__threeRbPostRing] = renderer.backend.materialize(ring)
-  JS.global[:__threeRbPostLeftAccent] = renderer.backend.materialize(left_accent)
-  JS.global[:__threeRbPostRightAccent] = renderer.backend.materialize(right_accent)
-  JS.global[:__threeRbPostFrame] = 0
+  app.expose(
+    {
+      renderer: renderer,
+      post_composer: composer,
+      post_render_pass: render_pass,
+      post_bloom_pass: bloom_pass,
+      post_dot_screen_pass: dot_screen_pass,
+      post_output_pass: output_pass,
+      scene: scene,
+      camera: camera,
+      post_core: core,
+      post_ring: ring,
+      post_left_accent: left_accent,
+      post_right_accent: right_accent,
+      post_frame: 0
+    },
+    renderer: renderer
+  )
 
   renderer.animation_loop do
-    frame = JS.global[:__threeRbPostFrame].to_i + 1
-    JS.global[:__threeRbPostFrame] = frame
+    frame = app.increment(:post_frame)
 
     core.rotation.y += 0.014
     ring.rotation.z += 0.01
@@ -108,10 +95,4 @@ begin
 
     composer.render(scene, camera)
   end
-
-  status[:textContent] = "Running"
-  status_dot[:dataset][:state] = "running"
-rescue StandardError => error
-  JS.global.call(:__threeRbBootFailed, error.message) if JS.global[:__threeRbBootFailed]
-  raise
 end

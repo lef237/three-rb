@@ -1,19 +1,8 @@
 # frozen_string_literal: true
 
-require "js"
+require_relative "../../../lib/three"
 
-begin
-  JS.global[:__threeReady].await
-
-  require_relative "../../../lib/three"
-
-  document = JS.global[:document]
-  window = JS.global[:window]
-  viewport = document.call(:querySelector, "#viewport")
-  status = document.call(:querySelector, "#status")
-  status_dot = document.call(:querySelector, "#status-dot")
-  status[:textContent] = "Starting Ruby scene"
-
+Three::Browser.run(starting: "Starting Ruby scene") do |app|
   scene = Three::Scene.new
   camera = Three::OrthographicCamera.new(-2.5, 2.5, 1.6, -1.6, near: 0.1, far: 100)
   camera.position.z = 5
@@ -91,9 +80,7 @@ begin
   )
   renderer.set_clear_color(0x11161a, 1)
 
-  resize = proc do
-    width = [viewport[:clientWidth].to_i, 1].max
-    height = [viewport[:clientHeight].to_i, 1].max
+  app.resize_renderer(renderer, camera) do |width, height, _aspect|
     view_height = 3.4
     view_width = view_height * width.to_f / height
 
@@ -102,25 +89,26 @@ begin
     camera.top = view_height / 2
     camera.bottom = -view_height / 2
     camera.update_projection_matrix
-    renderer.set_size(width, height)
   end
-
-  resize.call
-  window.call(:addEventListener, "resize", resize)
   renderer.render(scene, camera)
 
-  JS.global[:__threeRbRenderer] = renderer.handle
-  JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
-  JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
-  JS.global[:__threeRbTexturedMesh] = renderer.backend.materialize(mesh)
-  JS.global[:__threeRbTextureMaterial] = renderer.backend.materialize(material)
-  JS.global[:__threeRbMatcapMesh] = renderer.backend.materialize(matcap_mesh)
-  JS.global[:__threeRbMatcapMaterial] = renderer.backend.materialize(matcap_material)
-  JS.global[:__threeRbToonMesh] = renderer.backend.materialize(toon_mesh)
-  JS.global[:__threeRbToonMaterial] = renderer.backend.materialize(toon_material)
-  JS.global[:__threeRbTextureExampleTexture] = renderer.backend.materialize(texture)
-  JS.global[:__threeRbTextureExampleEnvironment] = renderer.backend.materialize(environment_texture)
-  JS.global[:__threeRbTextureExampleFrame] = 0
+  app.expose(
+    {
+      renderer: renderer,
+      scene: scene,
+      camera: camera,
+      textured_mesh: mesh,
+      texture_material: material,
+      matcap_mesh: matcap_mesh,
+      matcap_material: matcap_material,
+      toon_mesh: toon_mesh,
+      toon_material: toon_material,
+      texture_example_texture: texture,
+      texture_example_environment: environment_texture,
+      texture_example_frame: 0
+    },
+    renderer: renderer
+  )
 
   frame = 0
   renderer.animation_loop do
@@ -130,13 +118,7 @@ begin
     matcap_mesh.rotation.x += 0.005
     matcap_mesh.rotation.y -= 0.009
     toon_mesh.rotation.y += 0.012
-    JS.global[:__threeRbTextureExampleFrame] = frame
+    app.set(:texture_example_frame, frame)
     renderer.render(scene, camera)
   end
-
-  status[:textContent] = "Running"
-  status_dot[:dataset][:state] = "running"
-rescue StandardError => error
-  JS.global.call(:__threeRbBootFailed, error.message) if JS.global[:__threeRbBootFailed]
-  raise
 end

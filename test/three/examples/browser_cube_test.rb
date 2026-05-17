@@ -133,10 +133,31 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     ruby = File.read(File.join(EXAMPLE_DIR, "main.rb"))
 
     assert_includes ruby, "require_relative \"../../../lib/three\""
+    assert_includes ruby, "Three::Browser.run"
     assert_includes ruby, "Three::Renderers::ThreeJSRenderer"
     assert_includes ruby, "renderer.animation_loop"
     assert_includes ruby, "renderer.render(scene, camera)"
     assert_includes ruby, "preserveDrawingBuffer: true"
+  end
+
+  def test_simple_browser_examples_hide_js_bridge_from_ruby_entrypoints
+    [
+      EXAMPLE_DIR,
+      TEXTURES_EXAMPLE_DIR,
+      CUBEMAP_EXAMPLE_DIR,
+      SERIALIZATION_EXAMPLE_DIR,
+      PRIMITIVES_EXAMPLE_DIR,
+      POSTPROCESSING_EXAMPLE_DIR
+    ].each do |dir|
+      ruby = File.read(File.join(dir, "main.rb"))
+
+      assert_includes ruby, "Three::Browser.run"
+      refute_includes ruby, "require \"js\""
+      refute_includes ruby, "JS.global"
+      refute_includes ruby, "renderer.backend.materialize"
+      refute_includes ruby, "document.call(:querySelector"
+      refute_includes ruby, "window.call(:addEventListener"
+    end
   end
 
   def test_ruby_example_exercises_gemstone_and_text_title
@@ -217,8 +238,8 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "matcap: texture"
     assert_includes ruby, "Three::MeshToonMaterial"
     assert_includes ruby, "gradient_map: texture"
-    assert_includes ruby, "JS.global[:__threeRbMatcapMaterial]"
-    assert_includes ruby, "JS.global[:__threeRbToonMaterial]"
+    assert_includes ruby, "matcap_material:"
+    assert_includes ruby, "toon_material:"
     assert_includes ruby, "renderer.animation_loop"
   end
 

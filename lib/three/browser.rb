@@ -99,9 +99,24 @@ module Three
 
       def expose(values, renderer: nil, prefix: "__threeRb")
         values.each do |name, value|
-          Browser.global[:"#{prefix}#{camelize(name)}"] = exposed_value(value, renderer)
+          set(name, value, renderer: renderer, prefix: prefix)
         end
         self
+      end
+
+      def set(name, value, renderer: nil, prefix: "__threeRb")
+        Browser.global[global_name(name, prefix)] = exposed_value(value, renderer)
+        self
+      end
+
+      def get(name, prefix: "__threeRb")
+        Browser.global[global_name(name, prefix)]
+      end
+
+      def increment(name, by: 1, prefix: "__threeRb")
+        value = get(name, prefix: prefix).to_i + by
+        set(name, value, prefix: prefix)
+        value
       end
 
       private
@@ -112,6 +127,10 @@ module Three
 
       def camelize(value)
         value.to_s.split("_").map(&:capitalize).join
+      end
+
+      def global_name(name, prefix)
+        :"#{prefix}#{camelize(name)}"
       end
 
       def exposed_value(value, renderer)
