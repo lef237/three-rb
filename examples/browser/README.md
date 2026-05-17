@@ -56,3 +56,5 @@ Run one smoke test by using the command listed in the table below.
 ## Adding Browser Coverage
 
 New browser-facing features should add or extend one of these examples and include deterministic smoke coverage. Prefer extending an existing example when the feature strengthens the same workflow; add a new example when it introduces a distinct API surface such as a new loader family, render target workflow, or postprocessing pipeline.
+
+Keep new Ruby entrypoints Ruby-only: use `Three::Browser.run`, `app.resize_renderer`, `app.on_resize`, `app.element`, and `app.expose` instead of `require "js"` or direct `JS.global` calls. If a feature needs browser or three.js APIs that are not wrapped yet, add a small Ruby helper or backend method first, and isolate direct JavaScript access inside the runtime layer.

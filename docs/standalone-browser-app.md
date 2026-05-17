@@ -4,48 +4,45 @@ This guide shows how to make a small browser app outside the three-rb repository
 
 The current browser runtime is still alpha. A standalone app needs a small JavaScript boot file because the browser must start ruby.wasm, expose three.js constructors, and then load your Ruby file over HTTP.
 
-## Create The App Directory
+## Generate The App
 
-Install the gem, create a new app directory, and copy the runtime files from the installed gem:
+Install the gem, create a project directory, and generate a Ruby-only browser example:
 
 ```sh
 mkdir hello-three-rb
 cd hello-three-rb
 
 gem install three-rb
-gem_dir=$(ruby -e 'puts Gem::Specification.find_by_name("three-rb").full_gem_path')
-
-cp "$gem_dir/package.json" "$gem_dir/pnpm-lock.yaml" .
-cp -R "$gem_dir/lib" .
-mkdir -p examples/browser/shared examples/browser/quickstart
-cp "$gem_dir/examples/browser/shared/boot.mjs" examples/browser/shared/boot.mjs
-cp "$gem_dir/examples/browser/cube/index.html" examples/browser/quickstart/index.html
+three-rb browser examples/browser/quickstart
 ```
 
-If you installed through Bundler instead of `gem install`, use:
+If you installed through Bundler, run:
 
 ```sh
-gem_dir=$(bundle show three-rb)
+bundle exec three-rb browser examples/browser/quickstart
 ```
+
+The generator creates:
+
+- `package.json` and `pnpm-lock.yaml`
+- `lib/`, copied from the installed gem
+- `examples/browser/shared/boot.mjs`
+- `examples/browser/quickstart/index.html`
+- `examples/browser/quickstart/boot.mjs`
+- `examples/browser/quickstart/main.rb`
+- `examples/browser/quickstart/README.md`
 
 Copying `lib/` puts the installed gem's Ruby source in the served app directory. The browser Ruby VM loads Ruby files over HTTP, so this is the current standalone workflow.
 
-## Add The Boot File
+Pass `--force` only when you want to overwrite generated example files:
 
-Create `examples/browser/quickstart/boot.mjs`:
-
-```js
-import { bootRubyExample } from "../shared/boot.mjs";
-
-await bootRubyExample({
-  main: "examples/browser/quickstart/main",
-  clearColor: 0x101418
-});
+```sh
+three-rb browser examples/browser/quickstart --force
 ```
 
-## Add Your Ruby Entrypoint
+## Ruby Entrypoint
 
-Create `examples/browser/quickstart/main.rb`:
+The generated `examples/browser/quickstart/main.rb` is plain Ruby scene code. It does not require `js` or call `JS.global`:
 
 ```ruby
 # frozen_string_literal: true
@@ -81,6 +78,8 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
 end
 ```
 
+Keep ordinary scene code inside `Three::Browser.run`. Use `app.resize_renderer(renderer, camera)` for responsive canvas sizing, and use `renderer.animation_loop` for animation.
+
 ## Run It
 
 Install browser packages, serve the app directory, and open the page:
@@ -97,3 +96,7 @@ http://localhost:8000/examples/browser/quickstart/
 ```
 
 Use `http://localhost:8000/...`; do not open the files with `file://`, because the runtime loads ES modules, wasm, Ruby files, and assets over HTTP.
+
+## When JavaScript Is Still Involved
+
+The generated app still includes a JavaScript boot file. That file imports three.js, registers addon constructors, starts ruby.wasm, and loads the Ruby entrypoint. Application scene code should not need `require "js"` unless it reaches outside the current three-rb browser API into custom browser APIs, unwrapped three.js addons, or application-specific JavaScript integrations.

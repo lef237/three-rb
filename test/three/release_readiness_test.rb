@@ -61,6 +61,9 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes guide, "globalThis.THREE_DOT_SCREEN_PASS"
     assert_includes guide, "globalThis.THREE_OUTPUT_PASS"
     assert_includes guide, "examples/browser/shared/boot.mjs"
+    assert_includes guide, "Three::Browser.run"
+    assert_includes guide, "three-rb browser examples/browser/quickstart"
+    assert_includes guide, "JavaScript Escape Hatch"
     assert_includes guide, "examples/browser/README.md"
     assert_includes guide, "docs/release-readiness.md"
     assert_includes guide, "docs/publishing.md"
@@ -81,6 +84,8 @@ class ThreeReleaseReadinessTest < Minitest::Test
     spec = Gem::Specification.load(File.join(ROOT, "three-rb.gemspec"))
 
     assert_equal "three-rb", spec.name
+    assert_includes spec.files, "exe/three-rb"
+    assert_includes spec.executables, "three-rb"
     assert_equal spec.homepage, spec.metadata.fetch("homepage_uri")
     assert_match(%r{/tree/main\z}, spec.metadata.fetch("source_code_uri"))
     assert_match(%r{/CHANGELOG\.md\z}, spec.metadata.fetch("changelog_uri"))

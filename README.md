@@ -129,6 +129,16 @@ See [Browser Examples](examples/browser/README.md) for the feature coverage map 
 
 The examples load pnpm-managed browser packages from `node_modules/`: `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`, `@ruby/wasm-wasi@2.9.4-2026-05-11-a`, and `three@0.184.0`.
 
+To start a standalone browser app from the installed gem:
+
+```sh
+three-rb browser examples/browser/quickstart
+pnpm install
+ruby -run -e httpd . -p 8000
+```
+
+The generated Ruby entrypoint uses `Three::Browser.run`, so ordinary scene code does not need `require "js"` or `JS.global`.
+
 Run the optional browser smoke tests:
 
 ```sh

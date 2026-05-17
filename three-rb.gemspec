@@ -18,7 +18,9 @@ Gem::Specification.new do |spec|
   spec.metadata["bug_tracker_uri"] = "#{spec.homepage}/issues"
   spec.metadata["rubygems_mfa_required"] = "true"
 
-  spec.files = Dir.glob("{lib,docs,examples}/**/*") + %w[CHANGELOG.md LICENSE README.md package.json pnpm-lock.yaml]
+  spec.files = Dir.glob("{exe,lib,docs,examples}/**/*") + %w[CHANGELOG.md LICENSE README.md package.json pnpm-lock.yaml]
+  spec.bindir = "exe"
+  spec.executables = ["three-rb"]
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "minitest", "~> 6.0"

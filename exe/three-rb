@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "optparse"
+require "three/generators/browser_example"
+
+def usage
+  <<~TEXT
+    Usage:
+      three-rb browser PATH [--force]
+
+    Commands:
+      browser PATH   Generate a Ruby-only browser example at PATH.
+
+    Example:
+      three-rb browser examples/browser/quickstart
+  TEXT
+end
+
+command = ARGV.shift
+
+case command
+when "browser", "browser-example"
+  options = { force: false }
+  parser = OptionParser.new do |opts|
+    opts.banner = "Usage: three-rb #{command} PATH [--force]"
+    opts.on("--force", "Overwrite generated example files") { options[:force] = true }
+    opts.on("-h", "--help", "Show help") do
+      puts opts
+      exit 0
+    end
+  end
+  begin
+    parser.parse!(ARGV)
+  rescue OptionParser::ParseError => error
+    warn error.message
+    warn parser
+    exit 1
+  end
+  target = ARGV.shift
+
+  unless target
+    warn parser
+    exit 1
+  end
+
+  Three::Generators::BrowserExample.new(target: target, force: options[:force]).call
+when "-h", "--help", nil
+  puts usage
+  exit(command ? 0 : 1)
+else
+  warn "Unknown command: #{command}"
+  warn usage
+  exit 1
+end

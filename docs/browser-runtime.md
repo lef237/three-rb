@@ -129,6 +129,42 @@ end
 
 For postprocessing, render through `composer.render(scene, camera)` instead of `renderer.render(scene, camera)` after configuring `Three::Postprocessing::EffectComposer` and its passes.
 
+## Three::Browser API
+
+`Three::Browser` is the public convenience layer for browser entrypoints. It keeps ordinary scene code Ruby-only while the JavaScript boot module handles ruby.wasm and ES module setup.
+
+- `Three::Browser.run(starting: "...") { |app| ... }` waits for the boot module, creates an application helper, updates the status UI, and reports boot failures.
+- `app.resize_renderer(renderer, camera)` reads the default `#viewport`, updates a perspective camera's aspect/projection matrix, calls `renderer.set_size`, and registers a resize listener.
+- `app.resize_renderer(renderer, camera) { |width, height, aspect| ... }` supports custom camera sizing such as orthographic views.
+- `app.on_resize { |width, height, aspect| ... }` registers a lower-level resize callback.
+- `app.element(renderer.dom_element)` wraps a browser element for event handling and pointer coordinate helpers.
+- `element.on("click") { |event| ... }` registers a DOM event without exposing `JS.global`.
+- `element.pointer_ndc(event)` converts pointer events to normalized device coordinates for `Raycaster#set_from_camera`.
+- `app.expose(...)`, `app.set`, `app.get`, and `app.increment` are intended for diagnostics, smoke tests, and small browser-visible state values.
+
+Use these helpers before reaching for `require "js"` in application code.
+
+## Generator
+
+For standalone projects, install the gem and generate a Ruby-only browser example:
+
+```sh
+three-rb browser examples/browser/quickstart
+```
+
+The generator copies the browser runtime files, `package.json`, `pnpm-lock.yaml`, and `lib/` into the served project root, then creates `index.html`, `boot.mjs`, `main.rb`, and `README.md` for the example.
+
+## JavaScript Escape Hatch
+
+Most browser scene code should not need `require "js"` or `JS.global`. JavaScript is still the right layer for:
+
+- The boot module that imports ES modules and starts ruby.wasm.
+- Custom HTML UI outside the helpers in `Three::Browser`.
+- Browser APIs that three-rb does not wrap yet, such as storage, WebSocket, drag/drop, pointer lock, fullscreen, WebXR session setup, or application-specific JavaScript callbacks.
+- three.js addons that do not yet have Ruby wrappers.
+
+When a feature needs direct JavaScript access, prefer adding a small Ruby wrapper or `Three::Browser` helper first. Use direct `require "js"` as an escape hatch for application-specific integrations, and keep it isolated from scene construction code.
+
 ## Current Limits
 
 The browser runtime intentionally does not promise full three.js compatibility yet.
