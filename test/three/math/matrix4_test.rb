@@ -95,4 +95,14 @@ class ThreeMatrix4Test < Minitest::Test
     assert_in_delta(-1.02, matrix.elements[14], 1e-12)
     assert_equal 1, matrix.elements[15]
   end
+
+  def test_on_change_runs_when_matrix_mutates
+    matrix = Three::Matrix4.new
+    called = 0
+    matrix.on_change { called += 1 }
+
+    matrix.make_translation(1, 2, 3)
+
+    assert_equal 1, called
+  end
 end

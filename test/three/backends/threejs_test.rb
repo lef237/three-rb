@@ -109,6 +109,21 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_same first, second
   end
 
+  def test_syncs_manual_object_matrix_when_auto_update_is_disabled
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    object = Three::Object3D.new
+    object.matrix_auto_update = false
+    object.matrix.make_translation(1, 2, 3)
+
+    handle = backend.sync(object)
+
+    assert_equal false, handle[:matrix_auto_update]
+    assert_equal object.matrix.to_a, handle[:matrix]
+    assert handle[:matrix_world_needs_update]
+    refute adapter.calls.any? { |call| call[0] == :set_object_transform }
+  end
+
   def test_materializes_generic_buffer_geometry
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     geometry = Three::BufferGeometry.new

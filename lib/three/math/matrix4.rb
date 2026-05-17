@@ -13,6 +13,7 @@ module Three
         0, 0, 1, 0,
         0, 0, 0, 1
       ]
+      @on_change_callback = proc {}
 
       set(*values) unless values.empty?
     end
@@ -34,6 +35,7 @@ module Three
       @elements[7] = n42
       @elements[11] = n43
       @elements[15] = n44
+      changed!
       self
     end
 
@@ -52,6 +54,7 @@ module Three
 
     def copy(matrix)
       @elements = matrix.elements.dup
+      changed!
       self
     end
 
@@ -59,6 +62,7 @@ module Three
       @elements[12] = matrix.elements[12]
       @elements[13] = matrix.elements[13]
       @elements[14] = matrix.elements[14]
+      changed!
       self
     end
 
@@ -101,6 +105,7 @@ module Three
         @elements[14] = z
       end
 
+      changed!
       self
     end
 
@@ -169,11 +174,13 @@ module Three
       @elements[7] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42
       @elements[11] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43
       @elements[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44
+      changed!
       self
     end
 
     def multiply_scalar(scalar)
       @elements.map! { |value| value * scalar }
+      changed!
       self
     end
 
@@ -215,6 +222,7 @@ module Three
       @elements[3], @elements[12] = @elements[12], @elements[3]
       @elements[7], @elements[13] = @elements[13], @elements[7]
       @elements[11], @elements[14] = @elements[14], @elements[11]
+      changed!
       self
     end
 
@@ -270,6 +278,7 @@ module Three
       @elements[13] = (n11 * t10 - n21 * t8 + n31 * t7) * det_inv
       @elements[14] = (n24 * t2 - n14 * t4 - n34 * t1) * det_inv
       @elements[15] = (n13 * t4 - n23 * t2 + n33 * t1) * det_inv
+      changed!
       self
     end
 
@@ -286,6 +295,7 @@ module Three
       @elements[3] *= vector.x
       @elements[7] *= vector.y
       @elements[11] *= vector.z
+      changed!
       self
     end
 
@@ -313,6 +323,7 @@ module Three
       @elements[7] = 0
       @elements[11] = -1
       @elements[15] = 0
+      changed!
       self
     end
 
@@ -340,6 +351,7 @@ module Three
       @elements[7] = 0
       @elements[11] = 0
       @elements[15] = 1
+      changed!
       self
     end
 
@@ -383,6 +395,7 @@ module Three
       @elements[13] = position.y
       @elements[14] = position.z
       @elements[15] = 1
+      changed!
       self
     end
 
@@ -419,8 +432,16 @@ module Three
 
     def from_array(array, offset = 0)
       16.times { |index| @elements[index] = array[index + offset] }
+      changed!
       self
     end
+
+    def on_change(&callback)
+      @on_change_callback = callback || proc {}
+      self
+    end
+
+    alias _on_change on_change
 
     def to_a
       @elements.dup
@@ -443,6 +464,12 @@ module Three
 
     def inspect
       "#<#{self.class} elements=#{@elements.inspect}>"
+    end
+
+    private
+
+    def changed!
+      @on_change_callback.call
     end
   end
 end

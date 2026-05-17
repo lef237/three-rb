@@ -120,6 +120,17 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert_equal({ "role" => "albedo" }, loaded_material.map.user_data)
   end
 
+  def test_parse_reconstructs_manual_object_matrix
+    object = Three::Object3D.new
+    object.matrix_auto_update = false
+    object.matrix.make_translation(1, 2, 3)
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(object.to_json)
+
+    assert_equal false, loaded.matrix_auto_update
+    assert_equal object.matrix, loaded.matrix
+  end
+
   def test_parse_reconstructs_rgbe_texture_resources
     scene = Three::Scene.new
     scene.environment = Three::RGBETexture.new("/studio.hdr")

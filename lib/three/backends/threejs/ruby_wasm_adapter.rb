@@ -505,6 +505,15 @@ module Three
           object[:scale].call(:set, *scale)
         end
 
+        def set_object_matrix_auto_update(object, value)
+          object[:matrixAutoUpdate] = value
+        end
+
+        def set_object_matrix(object, elements)
+          object[:matrix].call(:fromArray, js_array(elements))
+          object[:matrixWorldNeedsUpdate] = true
+        end
+
         def update_perspective_camera(camera, fov, aspect, near, far, zoom)
           camera[:fov] = fov
           camera[:aspect] = aspect

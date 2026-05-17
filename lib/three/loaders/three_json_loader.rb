@@ -386,6 +386,7 @@ module Three
         object.matrix_auto_update = value(entry, :matrix_auto_update) if has_value?(entry, :matrix_auto_update)
         object.user_data = value(entry, :user_data) || {}
 
+        object.matrix.from_array(value(entry, :matrix)) if value(entry, :matrix)
         object.position.set(*value(entry, :position)) if value(entry, :position)
         object.quaternion.set(*value(entry, :quaternion)) if value(entry, :quaternion)
         object.scale.set(*value(entry, :scale)) if value(entry, :scale)

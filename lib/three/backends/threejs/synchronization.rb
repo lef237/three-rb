@@ -17,7 +17,12 @@ module Three
           end
 
           if object.dirty_field?(:transform)
-            @adapter.set_object_transform(handle, object.position.to_a, object.quaternion.to_a, object.scale.to_a)
+            @adapter.set_object_matrix_auto_update(handle, object.matrix_auto_update)
+            if object.matrix_auto_update
+              @adapter.set_object_transform(handle, object.position.to_a, object.quaternion.to_a, object.scale.to_a)
+            else
+              @adapter.set_object_matrix(handle, object.matrix.to_a)
+            end
           end
 
           if object.dirty_field?(:camera)

@@ -272,6 +272,17 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal({ "role" => "albedo" }, exported[:textures].first[:user_data])
   end
 
+  def test_exports_manual_object_matrix
+    object = Three::Object3D.new
+    object.matrix_auto_update = false
+    object.matrix.make_translation(1, 2, 3)
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(object)
+
+    assert_equal false, exported[:object][:matrix_auto_update]
+    assert_equal object.matrix.to_a, exported[:object][:matrix]
+  end
+
   def test_deterministic_ids_make_equivalent_exports_equal
     build_scene = proc do
       scene = Three::Scene.new

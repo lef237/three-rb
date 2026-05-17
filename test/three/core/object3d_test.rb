@@ -100,6 +100,16 @@ class ThreeObject3DTest < Minitest::Test
     refute object.dirty?
   end
 
+  def test_manual_matrix_changes_mark_transform_dirty
+    object = Three::Object3D.new
+    object.matrix_auto_update = false
+    object.mark_clean!
+
+    object.matrix.make_translation(1, 2, 3)
+
+    assert object.dirty_field?(:transform)
+  end
+
   def test_rotation_and_quaternion_stay_in_sync
     object = Three::Object3D.new
 

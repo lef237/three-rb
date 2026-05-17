@@ -27,8 +27,9 @@ module Three
     attr_reader :layers
     attr_reader :position, :rotation, :quaternion, :scale
     attr_reader :matrix, :matrix_world
+    attr_reader :matrix_auto_update
     attr_reader :name, :type, :up, :visible, :cast_shadow, :receive_shadow
-    attr_accessor :matrix_auto_update, :matrix_world_auto_update, :matrix_world_needs_update
+    attr_accessor :matrix_world_auto_update, :matrix_world_needs_update
     attr_accessor :user_data
 
     def initialize
@@ -52,6 +53,7 @@ module Three
       @matrix_auto_update = DEFAULT_MATRIX_AUTO_UPDATE
       @matrix_world_auto_update = DEFAULT_MATRIX_WORLD_AUTO_UPDATE
       @matrix_world_needs_update = false
+      @suppress_matrix_change = false
       @visible = true
       @cast_shadow = false
       @receive_shadow = false
@@ -59,6 +61,7 @@ module Three
 
       bind_rotation_and_quaternion
       bind_transform_changes
+      bind_matrix_changes
       bind_layer_changes
       mark_dirty!
     end
@@ -91,6 +94,18 @@ module Three
     def receive_shadow=(value)
       @receive_shadow = value
       mark_dirty!(:properties)
+    end
+
+    def matrix=(value)
+      @matrix = coerce_matrix4(value)
+      bind_matrix_changes
+      @matrix_world_needs_update = true
+      mark_dirty!(:transform)
+    end
+
+    def matrix_auto_update=(value)
+      @matrix_auto_update = value
+      mark_dirty!(:transform)
     end
 
     def mark_dirty!(field = :all)
@@ -188,9 +203,13 @@ module Three
     end
 
     def update_matrix
+      @suppress_matrix_change = true
       @matrix.compose(@position, @quaternion, @scale)
+      @suppress_matrix_change = false
       @matrix_world_needs_update = true
       self
+    ensure
+      @suppress_matrix_change = false
     end
 
     def update_matrix_world(force = false)
@@ -324,8 +343,27 @@ module Three
       end
     end
 
+    def bind_matrix_changes
+      @matrix.on_change do
+        next if @suppress_matrix_change
+
+        @matrix_world_needs_update = true
+        mark_dirty!(:transform)
+      end
+    end
+
     def bind_layer_changes
       @layers.on_change { mark_dirty!(:properties) }
+    end
+
+    def coerce_matrix4(value)
+      return value if value.is_a?(Matrix4)
+
+      array = value.to_ary if value.respond_to?(:to_ary)
+      array ||= value.to_a if value.respond_to?(:to_a)
+      return Matrix4.new.from_array(array) if array && array.length >= 16
+
+      raise TypeError, "matrix must be a Three::Matrix4 or an array-like with 16 elements"
     end
   end
 end

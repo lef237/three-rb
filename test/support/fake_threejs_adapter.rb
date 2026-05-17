@@ -555,6 +555,17 @@ class FakeThreeJSAdapter
     object[:scale] = scale
   end
 
+  def set_object_matrix_auto_update(object, value)
+    @calls << [:set_object_matrix_auto_update, object, value]
+    object[:matrix_auto_update] = value
+  end
+
+  def set_object_matrix(object, elements)
+    @calls << [:set_object_matrix, object, elements]
+    object[:matrix] = elements.dup
+    object[:matrix_world_needs_update] = true
+  end
+
   def update_perspective_camera(camera, fov, aspect, near, far, zoom)
     @calls << [:update_perspective_camera, camera, fov, aspect, near, far, zoom]
     camera[:fov] = fov

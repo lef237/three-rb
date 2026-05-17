@@ -58,6 +58,7 @@ module Three
           user_data: object.user_data,
           children: object.children.map { |child| serialize_object(child) }
         }
+        data[:matrix] = object.matrix.to_a unless object.matrix_auto_update
 
         serialize_scene(object, data) if object.is_a?(Scene)
         serialize_camera(object, data) if object.is_a?(Camera)
