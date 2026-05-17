@@ -75,6 +75,7 @@ require_relative "three/postprocessing/unreal_bloom_pass"
 require_relative "three/postprocessing/dot_screen_pass"
 require_relative "three/postprocessing/output_pass"
 require_relative "three/exporters/three_json_exporter"
+require_relative "three/browser"
 
 module Three
 end
