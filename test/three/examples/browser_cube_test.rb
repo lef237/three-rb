@@ -145,7 +145,9 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
       EXAMPLE_DIR,
       TEXTURES_EXAMPLE_DIR,
       CUBEMAP_EXAMPLE_DIR,
+      GLTF_EXAMPLE_DIR,
       SERIALIZATION_EXAMPLE_DIR,
+      PICKING_EXAMPLE_DIR,
       PRIMITIVES_EXAMPLE_DIR,
       POSTPROCESSING_EXAMPLE_DIR
     ].each do |dir|
@@ -264,7 +266,8 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::Clock"
     assert_includes ruby, "mixer.update"
     assert_includes ruby, "scene.add(model)"
-    assert_includes ruby, "renderer.backend.materialize(model)"
+    assert_includes ruby, "gltf_scene: model"
+    assert_includes ruby, "app.set(:dispose_gltf"
     assert_includes ruby, "renderer.animation_loop"
   end
 
@@ -285,7 +288,8 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "raycaster.set_from_camera"
     assert_includes ruby, "raycaster.intersect_objects"
     assert_includes ruby, "selected.material.color.set_hex"
-    assert_includes ruby, "addEventListener, \"click\""
+    assert_includes ruby, "canvas.on(\"click\")"
+    assert_includes ruby, "canvas.pointer_ndc(event)"
   end
 
   def test_primitives_example_exercises_line_and_points

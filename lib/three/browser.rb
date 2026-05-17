@@ -31,6 +31,25 @@ module Three
         @handle.call(:addEventListener, name.to_s, block)
         self
       end
+
+      alias on add_event_listener
+
+      def bounding_client_rect
+        rect = @handle.call(:getBoundingClientRect)
+        {
+          left: rect[:left].to_f,
+          top: rect[:top].to_f,
+          width: rect[:width].to_f,
+          height: rect[:height].to_f
+        }
+      end
+
+      def pointer_ndc(event)
+        rect = bounding_client_rect
+        x = ((event[:clientX].to_f - rect[:left]) / rect[:width]) * 2 - 1
+        y = -(((event[:clientY].to_f - rect[:top]) / rect[:height]) * 2 - 1)
+        [x, y]
+      end
     end
 
     class Application
@@ -47,6 +66,10 @@ module Three
 
       def query(selector)
         Element.new(@document.call(:querySelector, selector))
+      end
+
+      def element(handle)
+        Element.wrap(handle)
       end
 
       def status(message, state: nil)

@@ -1,19 +1,8 @@
 # frozen_string_literal: true
 
-require "js"
+require_relative "../../../lib/three"
 
-begin
-  JS.global[:__threeReady].await
-
-  require_relative "../../../lib/three"
-
-  document = JS.global[:document]
-  window = JS.global[:window]
-  viewport = document.call(:querySelector, "#viewport")
-  status = document.call(:querySelector, "#status")
-  status_dot = document.call(:querySelector, "#status-dot")
-  status[:textContent] = "Starting picking scene"
-
+Three::Browser.run(starting: "Starting picking scene") do |app|
   scene = Three::Scene.new
   camera = Three::PerspectiveCamera.new(60, aspect: 1.0, near: 0.1, far: 100)
   camera.position.z = 4
@@ -40,25 +29,15 @@ begin
   )
   renderer.set_clear_color(0x101418, 1)
 
-  resize = proc do
-    width = [viewport[:clientWidth].to_i, 1].max
-    height = [viewport[:clientHeight].to_i, 1].max
-
-    camera.aspect = width.to_f / height
-    camera.update_projection_matrix
-    renderer.set_size(width, height)
-  end
-
   pointer = Three::Vector2.new
   raycaster = Three::Raycaster.new(backend: renderer.backend)
   pickables = [left_cube, right_cube]
   selected = nil
 
-  pick = proc do |event|
-    rect = renderer.dom_element.call(:getBoundingClientRect)
-    x = ((event[:clientX].to_f - rect[:left].to_f) / rect[:width].to_f) * 2 - 1
-    y = -(((event[:clientY].to_f - rect[:top].to_f) / rect[:height].to_f) * 2 - 1)
-    pointer.set(x, y)
+  app.resize_renderer(renderer, camera)
+  canvas = app.element(renderer.dom_element)
+  canvas.on("click") do |event|
+    pointer.set(*canvas.pointer_ndc(event))
     raycaster.set_from_camera(pointer, camera)
     hits = raycaster.intersect_objects(pickables, recursive: false)
     hit = hits.find(&:object)
@@ -71,43 +50,38 @@ begin
     if hit
       selected = hit.object
       selected.material.color.set_hex(picked_color)
-      JS.global[:__threeRbPickedName] = selected.name
-      JS.global[:__threeRbPickedDistance] = hit.distance
-      JS.global[:__threeRbPickedPoint] = hit.point.to_a
+      app.set(:picked_name, selected.name)
+      app.set(:picked_distance, hit.distance)
+      app.set(:picked_point, hit.point.to_a)
     else
-      JS.global[:__threeRbPickedName] = nil
-      JS.global[:__threeRbPickedDistance] = nil
-      JS.global[:__threeRbPickedPoint] = nil
+      app.set(:picked_name, nil)
+      app.set(:picked_distance, nil)
+      app.set(:picked_point, nil)
     end
 
-    JS.global[:__threeRbPickCount] = JS.global[:__threeRbPickCount].to_i + 1
+    app.increment(:pick_count)
     renderer.render(scene, camera)
   end
-
-  resize.call
-  window.call(:addEventListener, "resize", resize)
-  renderer.dom_element.call(:addEventListener, "click", pick)
   renderer.render(scene, camera)
 
-  JS.global[:__threeRbRenderer] = renderer.handle
-  JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
-  JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
-  JS.global[:__threeRbLeftCube] = renderer.backend.materialize(left_cube)
-  JS.global[:__threeRbRightCube] = renderer.backend.materialize(right_cube)
-  JS.global[:__threeRbRaycaster] = raycaster.handle
-  JS.global[:__threeRbPickCount] = 0
-  JS.global[:__threeRbPickingFrame] = 0
+  app.expose(
+    {
+      renderer: renderer,
+      scene: scene,
+      camera: camera,
+      left_cube: left_cube,
+      right_cube: right_cube,
+      raycaster: raycaster,
+      pick_count: 0,
+      picking_frame: 0
+    },
+    renderer: renderer
+  )
 
   renderer.animation_loop do
-    JS.global[:__threeRbPickingFrame] = JS.global[:__threeRbPickingFrame].to_i + 1
+    app.increment(:picking_frame)
     left_cube.rotation.y += 0.01
     right_cube.rotation.y -= 0.01
     renderer.render(scene, camera)
   end
-
-  status[:textContent] = "Running"
-  status_dot[:dataset][:state] = "running"
-rescue StandardError => error
-  JS.global.call(:__threeRbBootFailed, error.message) if JS.global[:__threeRbBootFailed]
-  raise
 end
