@@ -132,12 +132,22 @@ cd "$tmpdir"
 gem install three-rb -v "$VERSION"
 ruby -e 'require "three"; puts Three::VERSION'
 ruby -e 'require "three-rb"; puts Three::VERSION'
+three-rb --help
+three-rb browser examples/browser/quickstart
+test -f examples/browser/quickstart/main.rb
+ruby -e 'main = File.read("examples/browser/quickstart/main.rb"); abort "generated Ruby entrypoint used JS bridge" if main.include?("require \"js\"") || main.include?("JS.global"); puts "generated Ruby entrypoint is Ruby-only"'
 ```
 
 Both Ruby commands must print:
 
 ```text
 $VERSION
+```
+
+The `three-rb browser` command must create `examples/browser/quickstart/main.rb`, and the final Ruby command must print:
+
+```text
+generated Ruby entrypoint is Ruby-only
 ```
 
 Then update issue tracker or release notes with the published RubyGems URL:

@@ -109,6 +109,15 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes smoke, "expected generated Ruby to avoid require js"
   end
 
+  def test_publishing_verifies_public_browser_generator
+    publishing = File.read(File.join(ROOT, "docs/publishing.md"))
+
+    assert_includes publishing, "three-rb --help"
+    assert_includes publishing, "three-rb browser examples/browser/quickstart"
+    assert_includes publishing, "generated Ruby entrypoint is Ruby-only"
+    assert_includes publishing, "generated Ruby entrypoint used JS bridge"
+  end
+
   def test_rakefile_exposes_release_preflight
     rakefile = File.read(File.join(ROOT, "Rakefile"))
 
