@@ -70,7 +70,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   app.resize_renderer(renderer, camera)
   renderer.render(scene, camera)
 
-  renderer.animation_loop do
+  app.animation_loop(renderer) do
     cube.rotation.x += 0.01
     cube.rotation.y += 0.015
     renderer.render(scene, camera)
@@ -78,7 +78,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
 end
 ```
 
-Keep ordinary scene code inside `Three::Browser.run`. Use `app.resize_renderer(renderer, camera)` for responsive canvas sizing, and use `renderer.animation_loop` for animation.
+Keep ordinary scene code inside `Three::Browser.run`. Use `app.resize_renderer(renderer, camera)` for responsive canvas sizing, `app.animation_loop(renderer)` for animation, and `app.on_key`, `app.on_pointer`, `app.pointer_ndc`, or `app.storage` before reaching for direct JavaScript access.
 
 ## Run It
 
@@ -99,4 +99,4 @@ Use `http://localhost:8000/...`; do not open the files with `file://`, because t
 
 ## When JavaScript Is Still Involved
 
-The generated app still includes a JavaScript boot file. That file imports three.js, registers addon constructors, starts ruby.wasm, and loads the Ruby entrypoint. Application scene code should not need `require "js"` unless it reaches outside the current three-rb browser API into custom browser APIs, unwrapped three.js addons, or application-specific JavaScript integrations.
+The generated app still includes a JavaScript boot file. That file imports three.js, registers addon constructors, starts ruby.wasm, and loads the Ruby entrypoint. Application scene code should not need `require "js"` unless it reaches outside the current three-rb browser API into custom browser APIs, unwrapped three.js addons, or application-specific JavaScript integrations. Use `Three::Browser.js` for that explicit escape hatch and keep it isolated.

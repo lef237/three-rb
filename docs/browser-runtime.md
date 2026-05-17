@@ -117,10 +117,10 @@ end
 
 For responsive layouts, use `app.resize_renderer(renderer, camera)` for perspective cameras. For custom orthographic sizing, pass a block and update the camera before the helper sets the renderer size.
 
-For animation, call `renderer.animation_loop`:
+For animation, prefer `app.animation_loop(renderer)`. It delegates to the renderer's browser animation loop and keeps the entrypoint on the `Three::Browser` API surface:
 
 ```ruby
-renderer.animation_loop do
+app.animation_loop(renderer) do
   mesh.rotation.x += 0.01
   mesh.rotation.y += 0.015
   renderer.render(scene, camera)
@@ -131,18 +131,47 @@ For postprocessing, render through `composer.render(scene, camera)` instead of `
 
 ## Three::Browser API
 
-`Three::Browser` is the public convenience layer for browser entrypoints. It keeps ordinary scene code Ruby-only while the JavaScript boot module handles ruby.wasm and ES module setup.
+`Three::Browser` is the public convenience layer for browser entrypoints. It keeps ordinary scene code Ruby-only while the JavaScript boot module handles ruby.wasm and ES module setup. Treat these methods as the first-choice browser API before reaching for direct JS bridge calls.
+
+Lifecycle and sizing:
 
 - `Three::Browser.run(starting: "...") { |app| ... }` waits for the boot module, creates an application helper, updates the status UI, and reports boot failures.
 - `app.resize_renderer(renderer, camera)` reads the default `#viewport`, updates a perspective camera's aspect/projection matrix, calls `renderer.set_size`, and registers a resize listener.
 - `app.resize_renderer(renderer, camera) { |width, height, aspect| ... }` supports custom camera sizing such as orthographic views.
-- `app.on_resize { |width, height, aspect| ... }` registers a lower-level resize callback.
+- `app.on_resize { |width, height, aspect| ... }` registers a lower-level resize callback and runs it once immediately.
+- `app.animation_loop(renderer) { ... }` delegates to `renderer.animation_loop`.
+- `app.animation_loop { |time| ... }` uses `requestAnimationFrame` directly when a renderer loop is not appropriate.
+
+DOM and events:
+
 - `app.element(renderer.dom_element)` wraps a browser element for event handling and pointer coordinate helpers.
 - `element.on("click") { |event| ... }` registers a DOM event without exposing `JS.global`.
 - `element.pointer_ndc(event)` converts pointer events to normalized device coordinates for `Raycaster#set_from_camera`.
+- `app.pointer_ndc(event, target: "#viewport")` performs the same conversion against a selector, raw element, or `Three::Browser::Element`.
+- `app.on_pointer("click", target: renderer.dom_element) { |event, x, y| ... }` registers a pointer event and yields normalized device coordinates.
+- `app.on_key("keydown", key: "Escape") { |event| ... }` registers keyboard events on `window` by default. Omit `key:` to receive every event.
+
+State and diagnostics:
+
+- `app.storage` wraps `localStorage`; `app.storage(:session)` wraps `sessionStorage`.
+- `storage.set(:name, value)`, `storage.get(:name)`, `storage.delete(:name)`, `storage.clear`, `storage.length`, and `storage.key(index)` cover simple browser storage access.
 - `app.expose(...)`, `app.set`, `app.get`, and `app.increment` are intended for diagnostics, smoke tests, and small browser-visible state values.
 
-Use these helpers before reaching for `require "js"` in application code.
+Escape hatch:
+
+- `Three::Browser.js` returns `JS.global` and is the explicit escape hatch for advanced browser integrations that three-rb does not wrap yet. Keep usage isolated and prefer adding a Ruby helper when the pattern is reusable.
+
+Example pointer picking:
+
+```ruby
+pointer = Three::Vector2.new
+raycaster = Three::Raycaster.new(backend: renderer.backend)
+
+app.on_pointer("click", target: renderer.dom_element) do |_event, x, y|
+  pointer.set(x, y)
+  raycaster.set_from_camera(pointer, camera)
+end
+```
 
 ## Generator
 
@@ -160,10 +189,10 @@ Most browser scene code should not need `require "js"` or `JS.global`. JavaScrip
 
 - The boot module that imports ES modules and starts ruby.wasm.
 - Custom HTML UI outside the helpers in `Three::Browser`.
-- Browser APIs that three-rb does not wrap yet, such as storage, WebSocket, drag/drop, pointer lock, fullscreen, WebXR session setup, or application-specific JavaScript callbacks.
+- Browser APIs that three-rb does not wrap yet, such as WebSocket, drag/drop, pointer lock, fullscreen, WebXR session setup, or application-specific JavaScript callbacks.
 - three.js addons that do not yet have Ruby wrappers.
 
-When a feature needs direct JavaScript access, prefer adding a small Ruby wrapper or `Three::Browser` helper first. Use direct `require "js"` as an escape hatch for application-specific integrations, and keep it isolated from scene construction code.
+When a feature needs direct JavaScript access, prefer adding a small Ruby wrapper or `Three::Browser` helper first. Use `Three::Browser.js` as the explicit escape hatch for application-specific integrations, and keep it isolated from scene construction code.
 
 ## Current Limits
 

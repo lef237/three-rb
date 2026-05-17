@@ -28,6 +28,7 @@ class ThreeBrowserExampleGeneratorTest < Minitest::Test
       assert_includes main, "require_relative \"../../../lib/three\""
       assert_includes main, "Three::Browser.run"
       assert_includes main, "app.resize_renderer(renderer, camera)"
+      assert_includes main, "app.animation_loop(renderer)"
       refute_includes main, "require \"js\""
       refute_includes main, "JS.global"
       assert_includes boot, "import { bootRubyExample } from \"../shared/boot.mjs\""

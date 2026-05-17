@@ -52,6 +52,41 @@ module Three
       end
     end
 
+    class Storage
+      attr_reader :handle
+
+      def initialize(handle)
+        @handle = handle
+      end
+
+      def set(key, value)
+        @handle.call(:setItem, key.to_s, value)
+        self
+      end
+
+      def get(key)
+        @handle.call(:getItem, key.to_s)
+      end
+
+      def delete(key)
+        @handle.call(:removeItem, key.to_s)
+        self
+      end
+
+      def clear
+        @handle.call(:clear)
+        self
+      end
+
+      def length
+        @handle[:length].to_i
+      end
+
+      def key(index)
+        @handle.call(:key, index)
+      end
+    end
+
     class Application
       attr_reader :document, :window
 
@@ -97,6 +132,8 @@ module Three
       end
 
       def on_resize(viewport: "#viewport", &block)
+        raise ArgumentError, "block is required" unless block
+
         viewport_element = viewport.is_a?(Element) ? viewport : query(viewport)
         callback = proc do
           width, height = viewport_element.size
@@ -105,6 +142,59 @@ module Three
 
         callback.call
         @window.call(:addEventListener, "resize", callback)
+        callback
+      end
+
+      def on_key(name = "keydown", key: nil, target: nil, &block)
+        raise ArgumentError, "block is required" unless block
+
+        element = event_target(target || @window)
+        callback = proc do |event|
+          next if key && event[:key].to_s != key.to_s
+
+          block.call(event)
+        end
+        element.on(name, &callback)
+        callback
+      end
+
+      def on_pointer(name = "pointermove", target: "#viewport", &block)
+        raise ArgumentError, "block is required" unless block
+
+        element = event_target(target)
+        callback = proc do |event|
+          block.call(event, *element.pointer_ndc(event))
+        end
+        element.on(name, &callback)
+        callback
+      end
+
+      def pointer_ndc(event, target: "#viewport")
+        event_target(target).pointer_ndc(event)
+      end
+
+      def storage(kind = :local)
+        handle =
+          case kind
+          when :local, "local" then Browser.global[:localStorage]
+          when :session, "session" then Browser.global[:sessionStorage]
+          else kind
+          end
+
+        Storage.new(handle)
+      end
+
+      def animation_loop(renderer = nil, &block)
+        raise ArgumentError, "block is required" unless block
+
+        return renderer.animation_loop(&block) if renderer
+
+        callback = nil
+        callback = proc do |time|
+          block.call(time)
+          @window.call(:requestAnimationFrame, callback)
+        end
+        @window.call(:requestAnimationFrame, callback)
         callback
       end
 
@@ -143,6 +233,14 @@ module Three
       end
 
       private
+
+      def event_target(target)
+        case target
+        when Element then target
+        when String, Symbol then query(target.to_s)
+        else Element.wrap(target)
+        end
+      end
 
       def js_function?(value)
         value.respond_to?(:typeof) && value.typeof == "function"
@@ -208,11 +306,15 @@ module Three
         global[:window]
       end
 
-      def global
+      def js
         require "js"
         JS.global
       rescue LoadError
-        raise Error, "Three::Browser requires ruby.wasm's js gem"
+        raise Error, "Three::Browser.js requires ruby.wasm's js gem"
+      end
+
+      def global
+        js
       end
 
       private

@@ -279,7 +279,7 @@ module Three
             app.resize_renderer(renderer, camera)
             renderer.render(scene, camera)
 
-            renderer.animation_loop do
+            app.animation_loop(renderer) do
               cube.rotation.x += 0.01
               cube.rotation.y += 0.015
               renderer.render(scene, camera)
