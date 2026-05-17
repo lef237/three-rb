@@ -72,6 +72,8 @@ module Three
       def serialize_scene(scene, data)
         data[:background] = serialize_texture_reference(scene.background)
         data[:environment] = serialize_texture_reference(scene.environment)
+        data[:fog] = scene.fog.to_h if scene.fog
+        data[:override_material] = register_material(scene.override_material) if scene.override_material
       end
 
       def serialize_camera(camera, data)

@@ -118,6 +118,18 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal texture_data[:uuid], exported[:object][:environment]
   end
 
+  def test_exports_scene_fog_and_override_material
+    scene = Three::Scene.new
+    scene.fog = Three::Fog.new(0x112233, near: 2, far: 80, name: "mist")
+    scene.override_material = Three::MeshBasicMaterial.new(color: 0xff0000)
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+
+    assert_equal({ type: "Fog", name: "mist", color: 0x112233, near: 2, far: 80 }, exported[:object][:fog])
+    assert_equal scene.override_material.uuid, exported[:object][:override_material]
+    assert_equal [scene.override_material.uuid], exported[:materials].map { |entry| entry[:uuid] }
+  end
+
   def test_exports_mesh_physical_material_resources
     scene = Three::Scene.new
     texture = Three::Texture.new("/texture.png")

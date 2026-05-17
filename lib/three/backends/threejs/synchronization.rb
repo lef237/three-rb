@@ -122,12 +122,26 @@ module Three
         def sync_scene(scene, handle)
           @adapter.set_scene_background(handle, scene.background ? sync(scene.background) : nil)
           @adapter.set_scene_environment(handle, scene.environment ? sync(scene.environment) : nil)
+          @adapter.set_scene_fog(handle, scene.fog ? sync(scene.fog) : nil)
+          @adapter.set_scene_override_material(handle, scene.override_material ? sync(scene.override_material) : nil)
         end
 
         def scene_resource_dirty?(scene)
-          [scene.background, scene.environment].compact.any? do |resource|
+          [scene.background, scene.environment, scene.fog, scene.override_material].compact.any? do |resource|
             resource.respond_to?(:dirty?) && resource.dirty?
           end
+        end
+
+        def sync_fog(fog, handle)
+          return handle unless fog.dirty?
+
+          if fog.is_a?(FogExp2)
+            @adapter.update_fog_exp2(handle, fog.color.hex, fog.density)
+          else
+            @adapter.update_fog(handle, fog.color.hex, fog.near, fog.far)
+          end
+          fog.mark_clean!
+          handle
         end
 
         def sync_camera(object, handle)

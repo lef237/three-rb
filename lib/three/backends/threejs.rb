@@ -29,6 +29,7 @@ require_relative "../objects/line"
 require_relative "../objects/mesh"
 require_relative "../objects/points"
 require_relative "../objects/sprite"
+require_relative "../scenes/fog"
 require_relative "../scenes/scene"
 require_relative "../textures/cube_texture"
 require_relative "../textures/rgbe_texture"
@@ -260,6 +261,8 @@ module Three
         case object
         when Object3D
           sync_object3d(object, handle)
+        when Fog
+          sync_fog(object, handle)
         when BufferGeometry
           sync_geometry(object, handle)
         when Texture

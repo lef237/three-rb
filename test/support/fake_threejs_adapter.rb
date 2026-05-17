@@ -169,6 +169,14 @@ class FakeThreeJSAdapter
     handle(:rgbe_texture, { source: source }.merge(parameters))
   end
 
+  def new_fog(color, near, far)
+    handle(:fog, color: color, near: near, far: far)
+  end
+
+  def new_fog_exp2(color, density)
+    handle(:fog_exp2, color: color, density: density)
+  end
+
   def load_font(source)
     handle(:font, source: source)
   end
@@ -639,6 +647,29 @@ class FakeThreeJSAdapter
   def set_scene_environment(scene, environment)
     @calls << [:set_scene_environment, scene, environment]
     scene[:environment] = environment
+  end
+
+  def set_scene_fog(scene, fog)
+    @calls << [:set_scene_fog, scene, fog]
+    scene[:fog] = fog
+  end
+
+  def set_scene_override_material(scene, material)
+    @calls << [:set_scene_override_material, scene, material]
+    scene[:override_material] = material
+  end
+
+  def update_fog(fog, color, near, far)
+    @calls << [:update_fog, fog, color, near, far]
+    fog[:color] = color
+    fog[:near] = near
+    fog[:far] = far
+  end
+
+  def update_fog_exp2(fog, color, density)
+    @calls << [:update_fog_exp2, fog, color, density]
+    fog[:color] = color
+    fog[:density] = density
   end
 
   def dispose(handle)

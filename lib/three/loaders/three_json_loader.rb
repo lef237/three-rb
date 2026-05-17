@@ -337,7 +337,27 @@ module Three
         scene = Scene.new
         scene.background = @textures[value(entry, :background)] if value(entry, :background)
         scene.environment = @textures[value(entry, :environment)] if value(entry, :environment)
+        scene.fog = build_fog(value(entry, :fog)) if value(entry, :fog)
+        scene.override_material = @materials[value(entry, :override_material)] if value(entry, :override_material)
         scene
+      end
+
+      def build_fog(entry)
+        case value(entry, :type)
+        when "FogExp2"
+          FogExp2.new(
+            value(entry, :color) || 0xffffff,
+            density: has_value?(entry, :density) ? value(entry, :density) : 0.00025,
+            name: value(entry, :name) || ""
+          )
+        else
+          Fog.new(
+            value(entry, :color) || 0xffffff,
+            near: has_value?(entry, :near) ? value(entry, :near) : 1,
+            far: has_value?(entry, :far) ? value(entry, :far) : 1000,
+            name: value(entry, :name) || ""
+          )
+        end
       end
 
       def build_directional_light(entry)

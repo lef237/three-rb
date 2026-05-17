@@ -546,6 +546,41 @@ class ThreeThreeJSBackendTest < Minitest::Test
     refute scene.dirty?
   end
 
+  def test_sync_scene_fog_and_override_material
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    scene.fog = Three::Fog.new(0x112233, near: 2, far: 80)
+    scene.override_material = Three::MeshBasicMaterial.new(color: 0xff0000)
+
+    handle = backend.sync(scene)
+
+    assert_equal :fog, handle[:fog][:type]
+    assert_equal 0x112233, handle[:fog][:color]
+    assert_equal 2, handle[:fog][:near]
+    assert_equal 80, handle[:fog][:far]
+    assert_equal :mesh_basic_material, handle[:override_material][:type]
+    assert adapter.calls.any? { |call| call == [:set_scene_fog, handle, handle[:fog]] }
+    assert adapter.calls.any? { |call| call == [:set_scene_override_material, handle, handle[:override_material]] }
+    refute scene.dirty?
+  end
+
+  def test_sync_updates_dirty_scene_fog_resource
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    scene = Three::Scene.new
+    scene.fog = Three::FogExp2.new(0x112233, density: 0.01)
+    handle = backend.sync(scene)
+    adapter.calls.clear
+
+    scene.fog.density = 0.02
+    backend.sync(scene)
+
+    assert adapter.calls.any? { |call| call == [:update_fog_exp2, handle[:fog], 0x112233, 0.02] }
+    assert adapter.calls.any? { |call| call == [:set_scene_fog, handle, handle[:fog]] }
+    refute scene.fog.dirty?
+  end
+
   def test_sync_updates_dirty_scene_background_texture
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

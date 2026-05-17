@@ -30,6 +30,10 @@ module Three
             @adapter.load_rgbe_texture(object.source, texture_parameters(object))
           when Texture
             @adapter.load_texture(object.source, texture_parameters(object))
+          when FogExp2
+            @adapter.new_fog_exp2(object.color.hex, object.density)
+          when Fog
+            @adapter.new_fog(object.color.hex, object.near, object.far)
           when AmbientLight
             @adapter.new_ambient_light(object.color.hex, object.intensity)
           when DirectionalLight

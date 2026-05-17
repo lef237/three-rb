@@ -143,6 +143,21 @@ class ThreeThreeJSONLoaderTest < Minitest::Test
     assert_equal Three::LinearSRGBColorSpace, loaded.environment.color_space
   end
 
+  def test_parse_reconstructs_scene_fog_and_override_material
+    scene = Three::Scene.new
+    scene.fog = Three::FogExp2.new(0x112233, density: 0.02, name: "haze")
+    scene.override_material = Three::MeshBasicMaterial.new(color: 0xff0000)
+
+    loaded = Three::Loaders::ThreeJSONLoader.new.parse(Three::Exporters::ThreeJSONExporter.new.export(scene))
+
+    assert_instance_of Three::FogExp2, loaded.fog
+    assert_equal "haze", loaded.fog.name
+    assert_equal 0x112233, loaded.fog.color.hex
+    assert_equal 0.02, loaded.fog.density
+    assert_instance_of Three::MeshBasicMaterial, loaded.override_material
+    assert_equal 0xff0000, loaded.override_material.color.hex
+  end
+
   def test_parse_reconstructs_line_and_points
     scene = Three::Scene.new
     texture = Three::Texture.new("/points.png")
