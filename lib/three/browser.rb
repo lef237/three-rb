@@ -183,6 +183,7 @@ module Three
       def run(**options)
         app = nil
         begin
+          install_runtime_extensions
           app = Application.new(**options)
           result = yield app
           app.running!
@@ -215,6 +216,65 @@ module Three
       end
 
       private
+
+      def install_runtime_extensions
+        install_renderer_extensions
+        install_backend_extensions
+        install_adapter_extensions
+      end
+
+      def install_renderer_extensions
+        renderer = Three::Renderers::ThreeJSRenderer
+        unless renderer.method_defined?(:on_dispose)
+          renderer.class_eval do
+            def on_dispose(object, &block)
+              @backend.add_event_listener(object, :dispose, block)
+              self
+            end
+          end
+        end
+
+        return if renderer.method_defined?(:cached?)
+
+        renderer.class_eval do
+          def cached?(object)
+            @backend.cached?(object)
+          end
+        end
+      end
+
+      def install_backend_extensions
+        backend = Three::Backends::ThreeJS
+        unless backend.method_defined?(:add_event_listener)
+          backend.class_eval do
+            def add_event_listener(object, type, callback)
+              raise ArgumentError, "callback is required" unless callback
+
+              @adapter.add_event_listener(materialize(object), type, callback)
+            end
+          end
+        end
+
+        return if backend.method_defined?(:cached?)
+
+        backend.class_eval do
+          def cached?(object)
+            key = cache_key(object)
+            key ? @handles.key?(key) : false
+          end
+        end
+      end
+
+      def install_adapter_extensions
+        adapter = Three::Backends::ThreeJS::RubyWasmAdapter
+        return if adapter.method_defined?(:add_event_listener)
+
+        adapter.class_eval do
+          def add_event_listener(handle, type, callback)
+            handle.call(:addEventListener, type.to_s, callback)
+          end
+        end
+      end
 
       def notify_boot_failed(message)
         failure = global[:__threeRbBootFailed]

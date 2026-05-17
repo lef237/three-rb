@@ -54,15 +54,43 @@ export async function bootRubyExample({ main, clearColor }) {
     globalThis.rubyVM = vm;
 
     setStatus("Starting Ruby VM", "loading");
-    await vm.evalAsync(`
-      require "js/require_remote/relative_shim"
-      JS::RequireRemote.instance.base_url = "/"
-      JS::RequireRemote.instance.load(${JSON.stringify(main)})
-    `);
+    await withNoStoreRubySourceFetch(async () => {
+      await vm.evalAsync(`
+        require "js/require_remote/relative_shim"
+        JS::RequireRemote.instance.base_url = "/"
+        JS::RequireRemote.instance.load(${JSON.stringify(main)})
+      `);
+    });
   } catch (error) {
     bootFailed(error && error.message ? error.message : "Ruby boot failed");
     throw error;
   }
+}
+
+async function withNoStoreRubySourceFetch(callback) {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (input, init = {}) => {
+    if (!shouldBypassCache(input)) return originalFetch(input, init);
+
+    return originalFetch(input, { ...init, cache: "no-store" });
+  };
+
+  try {
+    return await callback();
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+}
+
+function shouldBypassCache(input) {
+  const rawUrl = typeof input === "string" ? input : input?.url;
+  if (!rawUrl) return false;
+
+  const { pathname } = new URL(rawUrl, globalThis.location?.href || "http://localhost/");
+  if (pathname.startsWith("/lib/")) return true;
+  if (!pathname.startsWith("/examples/browser/")) return false;
+
+  return !pathname.startsWith("/examples/browser/assets/");
 }
 
 async function compileWasm(url) {
