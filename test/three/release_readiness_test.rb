@@ -63,6 +63,8 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes guide, "globalThis.THREE_GLTF_LOADER"
     assert_includes guide, "globalThis.THREE_DOT_SCREEN_PASS"
     assert_includes guide, "globalThis.THREE_OUTPUT_PASS"
+    assert_includes guide, "missing `globalThis.THREE_*`"
+    assert_includes guide, "import/assignment lines"
     assert_includes guide, "examples/browser/shared/boot.mjs"
     assert_includes guide, "Three::Browser.run"
     assert_includes guide, "app.on_key"

@@ -33,6 +33,75 @@ module Three
           specularIntensityMap
         ].freeze
 
+        ADDON_CONSTRUCTORS = {
+          orbit_controls: {
+            owner: "Three::Controls::OrbitControls",
+            global: :THREE_ORBIT_CONTROLS,
+            import: 'import { OrbitControls } from "three/addons/controls/OrbitControls.js";',
+            assignment: "globalThis.THREE_ORBIT_CONTROLS = OrbitControls;"
+          },
+          effect_composer: {
+            owner: "Three::Postprocessing::EffectComposer",
+            global: :THREE_EFFECT_COMPOSER,
+            import: 'import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";',
+            assignment: "globalThis.THREE_EFFECT_COMPOSER = EffectComposer;"
+          },
+          render_pass: {
+            owner: "Three::Postprocessing::RenderPass",
+            global: :THREE_RENDER_PASS,
+            import: 'import { RenderPass } from "three/addons/postprocessing/RenderPass.js";',
+            assignment: "globalThis.THREE_RENDER_PASS = RenderPass;"
+          },
+          unreal_bloom_pass: {
+            owner: "Three::Postprocessing::UnrealBloomPass",
+            global: :THREE_UNREAL_BLOOM_PASS,
+            import: 'import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";',
+            assignment: "globalThis.THREE_UNREAL_BLOOM_PASS = UnrealBloomPass;"
+          },
+          dot_screen_pass: {
+            owner: "Three::Postprocessing::DotScreenPass",
+            global: :THREE_DOT_SCREEN_PASS,
+            import: 'import { DotScreenPass } from "three/addons/postprocessing/DotScreenPass.js";',
+            assignment: "globalThis.THREE_DOT_SCREEN_PASS = DotScreenPass;"
+          },
+          output_pass: {
+            owner: "Three::Postprocessing::OutputPass",
+            global: :THREE_OUTPUT_PASS,
+            import: 'import { OutputPass } from "three/addons/postprocessing/OutputPass.js";',
+            assignment: "globalThis.THREE_OUTPUT_PASS = OutputPass;"
+          },
+          gltf_loader: {
+            owner: "Three::Loaders::GLTFLoader",
+            global: :THREE_GLTF_LOADER,
+            import: 'import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";',
+            assignment: "globalThis.THREE_GLTF_LOADER = GLTFLoader;"
+          },
+          draco_loader: {
+            owner: "Three::Loaders::GLTFLoader with DRACO",
+            global: :THREE_DRACO_LOADER,
+            import: 'import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";',
+            assignment: "globalThis.THREE_DRACO_LOADER = DRACOLoader;"
+          },
+          rgbe_loader: {
+            owner: "Three::Loaders::RGBELoader",
+            global: :THREE_RGBE_LOADER,
+            import: 'import { HDRLoader } from "three/addons/loaders/HDRLoader.js";',
+            assignment: "globalThis.THREE_RGBE_LOADER = HDRLoader;"
+          },
+          font_loader: {
+            owner: "Three::Loaders::FontLoader",
+            global: :THREE_FONT_LOADER,
+            import: 'import { FontLoader } from "three/addons/loaders/FontLoader.js";',
+            assignment: "globalThis.THREE_FONT_LOADER = FontLoader;"
+          },
+          text_geometry: {
+            owner: "Three::TextGeometry",
+            global: :THREE_TEXT_GEOMETRY,
+            import: 'import { TextGeometry } from "three/addons/geometries/TextGeometry.js";',
+            assignment: "globalThis.THREE_TEXT_GEOMETRY = TextGeometry;"
+          }
+        }.freeze
+
         def initialize(three: nil)
           @three = three || default_three
         end
@@ -735,83 +804,35 @@ module Three
         end
 
         def orbit_controls_constructor
-          require "js"
-          constructor = JS.global[:THREE_ORBIT_CONTROLS]
-          raise RuntimeError, "Three::Controls::OrbitControls requires globalThis.THREE_ORBIT_CONTROLS" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Controls::OrbitControls requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:orbit_controls)
         end
 
         def effect_composer_constructor
-          require "js"
-          constructor = JS.global[:THREE_EFFECT_COMPOSER]
-          raise RuntimeError, "Three::Postprocessing::EffectComposer requires globalThis.THREE_EFFECT_COMPOSER" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Postprocessing::EffectComposer requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:effect_composer)
         end
 
         def render_pass_constructor
-          require "js"
-          constructor = JS.global[:THREE_RENDER_PASS]
-          raise RuntimeError, "Three::Postprocessing::RenderPass requires globalThis.THREE_RENDER_PASS" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Postprocessing::RenderPass requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:render_pass)
         end
 
         def unreal_bloom_pass_constructor
-          require "js"
-          constructor = JS.global[:THREE_UNREAL_BLOOM_PASS]
-          raise RuntimeError, "Three::Postprocessing::UnrealBloomPass requires globalThis.THREE_UNREAL_BLOOM_PASS" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Postprocessing::UnrealBloomPass requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:unreal_bloom_pass)
         end
 
         def dot_screen_pass_constructor
-          require "js"
-          constructor = JS.global[:THREE_DOT_SCREEN_PASS]
-          raise RuntimeError, "Three::Postprocessing::DotScreenPass requires globalThis.THREE_DOT_SCREEN_PASS" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Postprocessing::DotScreenPass requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:dot_screen_pass)
         end
 
         def output_pass_constructor
-          require "js"
-          constructor = JS.global[:THREE_OUTPUT_PASS]
-          raise RuntimeError, "Three::Postprocessing::OutputPass requires globalThis.THREE_OUTPUT_PASS" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Postprocessing::OutputPass requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:output_pass)
         end
 
         def gltf_loader_constructor
-          require "js"
-          constructor = JS.global[:THREE_GLTF_LOADER]
-          raise RuntimeError, "Three::Loaders::GLTFLoader requires globalThis.THREE_GLTF_LOADER" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Loaders::GLTFLoader requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:gltf_loader)
         end
 
         def draco_loader_constructor
-          require "js"
-          constructor = JS.global[:THREE_DRACO_LOADER]
-          raise RuntimeError, "Three::Loaders::GLTFLoader with DRACO requires globalThis.THREE_DRACO_LOADER" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Loaders::GLTFLoader with DRACO requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:draco_loader)
         end
 
         def configure_draco_loader(loader, decoder_path, decoder_config)
@@ -822,33 +843,39 @@ module Three
         end
 
         def rgbe_loader_constructor
-          require "js"
-          constructor = JS.global[:THREE_RGBE_LOADER]
-          raise RuntimeError, "Three::Loaders::RGBELoader requires globalThis.THREE_RGBE_LOADER" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Loaders::RGBELoader requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:rgbe_loader)
         end
 
         def font_loader_constructor
-          require "js"
-          constructor = JS.global[:THREE_FONT_LOADER]
-          raise RuntimeError, "Three::Loaders::FontLoader requires globalThis.THREE_FONT_LOADER" if constructor.typeof == "undefined"
-
-          constructor
-        rescue LoadError
-          raise RuntimeError, "Three::Loaders::FontLoader requires ruby.wasm's js gem or an injected adapter"
+          addon_constructor(:font_loader)
         end
 
         def text_geometry_constructor
+          addon_constructor(:text_geometry)
+        end
+
+        def addon_constructor(name)
+          addon = ADDON_CONSTRUCTORS.fetch(name)
           require "js"
-          constructor = JS.global[:THREE_TEXT_GEOMETRY]
-          raise RuntimeError, "Three::TextGeometry requires globalThis.THREE_TEXT_GEOMETRY" if constructor.typeof == "undefined"
+          constructor = JS.global[addon.fetch(:global)]
+          raise RuntimeError, missing_addon_constructor_message(addon) if js_undefined?(constructor)
 
           constructor
         rescue LoadError
-          raise RuntimeError, "Three::TextGeometry requires ruby.wasm's js gem or an injected adapter"
+          raise RuntimeError, "#{addon.fetch(:owner)} requires ruby.wasm's js gem or an injected adapter"
+        end
+
+        def js_undefined?(value)
+          value.respond_to?(:typeof) && value.typeof == "undefined"
+        end
+
+        def missing_addon_constructor_message(addon)
+          <<~MESSAGE.chomp
+            #{addon.fetch(:owner)} requires globalThis.#{addon.fetch(:global)}.
+            Add this to boot.mjs before loading Ruby:
+            #{addon.fetch(:import)}
+            #{addon.fetch(:assignment)}
+          MESSAGE
         end
 
         def resolve_canvas(canvas)

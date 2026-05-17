@@ -84,6 +84,8 @@ The shared helper also installs optional render helpers used by smoke tests to d
 
 Write a custom boot module when the application has different asset paths, a bundler output path, a smaller addon set, a custom status/error UI, or a deployment layout that does not match the repository root. Keep the same global constructor contract unless the Ruby backend gains a different injection API.
 
+If a Ruby wrapper needs an addon constructor that the boot module did not register, three-rb raises an error naming the missing `globalThis.THREE_*` value and the import/assignment lines to add to `boot.mjs`.
+
 ## Ruby Entrypoint
 
 The Ruby side should require the library, create a scene inside `Three::Browser.run`, and attach the renderer to the existing canvas. `Three::Browser.run` waits for the JavaScript boot module and handles the example status/error UI, so application scene code does not need to call `JS.global` directly:

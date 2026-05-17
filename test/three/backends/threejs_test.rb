@@ -3,6 +3,18 @@
 require "test_helper"
 
 class ThreeThreeJSBackendTest < Minitest::Test
+  def test_missing_addon_constructor_message_points_to_boot_import
+    adapter = Three::Backends::ThreeJS::RubyWasmAdapter.allocate
+    addon = Three::Backends::ThreeJS::RubyWasmAdapter::ADDON_CONSTRUCTORS.fetch(:orbit_controls)
+
+    message = adapter.send(:missing_addon_constructor_message, addon)
+
+    assert_includes message, "Three::Controls::OrbitControls requires globalThis.THREE_ORBIT_CONTROLS"
+    assert_includes message, "Add this to boot.mjs before loading Ruby"
+    assert_includes message, 'import { OrbitControls } from "three/addons/controls/OrbitControls.js";'
+    assert_includes message, "globalThis.THREE_ORBIT_CONTROLS = OrbitControls;"
+  end
+
   def test_materializes_scene_graph
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)
