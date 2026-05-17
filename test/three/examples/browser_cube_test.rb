@@ -29,6 +29,10 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     "postprocessing" => "test:browser:postprocessing"
   }.freeze
 
+  def browser_example_dirs
+    Dir.glob(File.join(ROOT, "examples/browser/*/main.rb")).map { |path| File.dirname(path) }.sort
+  end
+
   def test_browser_ruby_example_files_exist
     assert_path_exists File.join(RUBY_EXAMPLE_DIR, "index.html")
     assert_path_exists File.join(RUBY_EXAMPLE_DIR, "main.rb")
@@ -117,6 +121,12 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     end
   end
 
+  def test_browser_example_registry_matches_entrypoint_directories
+    actual = browser_example_dirs.map { |dir| File.basename(dir) }
+
+    assert_equal BROWSER_EXAMPLES.keys.sort, actual
+  end
+
   def test_index_loads_pinned_browser_dependencies
     html = File.read(File.join(EXAMPLE_DIR, "index.html"))
 
@@ -141,18 +151,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   end
 
   def test_simple_browser_examples_hide_js_bridge_from_ruby_entrypoints
-    [
-      RUBY_EXAMPLE_DIR,
-      EXAMPLE_DIR,
-      COMPOSITION_EXAMPLE_DIR,
-      TEXTURES_EXAMPLE_DIR,
-      CUBEMAP_EXAMPLE_DIR,
-      GLTF_EXAMPLE_DIR,
-      SERIALIZATION_EXAMPLE_DIR,
-      PICKING_EXAMPLE_DIR,
-      PRIMITIVES_EXAMPLE_DIR,
-      POSTPROCESSING_EXAMPLE_DIR
-    ].each do |dir|
+    browser_example_dirs.each do |dir|
       ruby = File.read(File.join(dir, "main.rb"))
 
       assert_includes ruby, "Three::Browser.run"
