@@ -60,7 +60,7 @@ http://localhost:8000/examples/browser/ruby/
 
 This page runs the Ruby entrypoint at `examples/browser/ruby/main.rb` through ruby.wasm and renders a transparent red gemstone and extruded `three-rb` title with three.js. Use `http://localhost:8000/...`; do not open the files with `file://`, because the browser runtime loads ES modules, wasm, and assets over HTTP.
 
-After the ruby example works, inspect `examples/browser/ruby/main.rb` to see the Ruby scene code. For the smallest possible browser scene, see `examples/browser/cube/main.rb`. For a standalone app directory with your own Ruby entrypoint, see [Standalone Browser App](docs/standalone-browser-app.md).
+After the ruby example works, inspect `examples/browser/ruby/main.rb` to see the Ruby scene code. For the smallest possible browser scene, see `examples/browser/cube/main.rb`. For a standalone app directory with your own Ruby entrypoint, see [Standalone Browser App](docs/standalone-browser-app.md). For Cloudflare Pages deployment, see [Cloudflare Pages Deployment](docs/cloudflare-pages.md).
 
 ## Plain Ruby Check
 
