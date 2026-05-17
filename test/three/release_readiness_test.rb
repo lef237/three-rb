@@ -80,6 +80,8 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes next_work, "Ruby-only entrypoints"
     assert_includes next_work, "three-rb browser"
     assert_includes next_work, "installed executable"
+    assert_includes next_work, "current changelog heading"
+    assert_includes next_work, "publishing checklist"
     assert_includes next_work, "Browser runtime guide"
     assert_includes next_work, "Browser examples overview"
     assert_includes next_work, "Saved JSON export/load fixture regression coverage"

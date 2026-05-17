@@ -64,8 +64,8 @@ Candidate targets, in recommended order when there is no stronger product signal
 
 ## Suggested Implementation Plan
 
-1. While release is deferred, keep the unreleased changelog and release-readiness docs current without changing the version, date, tag, or published artifact.
-2. When release is confirmed, finalize `CHANGELOG.md` with the confirmed release date.
+1. While release is deferred, keep the current changelog heading, release-readiness docs, and publishing checklist aligned with the release candidate without changing the version, tag, or published artifact.
+2. When release is confirmed, adjust `CHANGELOG.md` only if the confirmed release date differs from the current heading.
 3. Run `bundle exec rake release:preflight`.
 4. Commit the release metadata with a message that does not include co-author trailers.
 5. Publish and tag using `docs/publishing.md`.
