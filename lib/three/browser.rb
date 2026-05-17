@@ -157,13 +157,21 @@ module Three
       end
 
       def exposed_value(value, renderer)
-        if renderer && materializable?(value)
+        if value.is_a?(Array)
+          js_array(value, renderer)
+        elsif renderer && materializable?(value)
           renderer.backend.materialize(value)
         elsif value.respond_to?(:handle)
           value.handle
         else
           value
         end
+      end
+
+      def js_array(values, renderer)
+        array = Browser.global[:Array].new
+        values.each { |value| array.call(:push, exposed_value(value, renderer)) }
+        array
       end
 
       def materializable?(value)

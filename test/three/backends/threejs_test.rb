@@ -197,6 +197,20 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 3, handle[:parameters][:bevelSegments]
   end
 
+  def test_materializes_centered_text_geometry_operation
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    font = Three::Font.new({ type: :font, name: "Helvetiker" })
+    geometry = Three::TextGeometry.new("three-rb", font: font)
+
+    geometry.center
+    handle = backend.materialize(geometry)
+
+    assert_equal true, handle[:centered]
+    assert_includes adapter.calls, [:center_geometry, handle]
+    refute geometry.dirty?
+  end
+
   def test_materializes_mesh_normal_material
     backend = Three::Backends::ThreeJS.new(adapter: FakeThreeJSAdapter.new)
     material = Three::MeshNormalMaterial.new(flat_shading: true, wireframe: true)

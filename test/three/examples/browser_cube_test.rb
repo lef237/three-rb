@@ -142,6 +142,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
 
   def test_simple_browser_examples_hide_js_bridge_from_ruby_entrypoints
     [
+      RUBY_EXAMPLE_DIR,
       EXAMPLE_DIR,
       COMPOSITION_EXAMPLE_DIR,
       TEXTURES_EXAMPLE_DIR,
@@ -180,13 +181,15 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::TextGeometry"
     assert_includes ruby, "\"three-rb\""
     assert_includes ruby, "build_spark"
-    assert_includes ruby, "JS.global[:__threeRbRubySparkles]"
+    assert_includes ruby, "ruby_sparkles:"
     assert_includes ruby, "auto_rotate: true"
     assert_includes ruby, "auto_rotate_speed:"
     assert_includes ruby, "title_material.color.set_rgb"
     assert_includes ruby, "Three::Controls::OrbitControls"
-    assert_includes ruby, "JS.global[:__threeRbRubyGem]"
-    assert_includes ruby, "JS.global[:__threeRbRubyTitle]"
+    assert_includes ruby, "ruby_gem:"
+    assert_includes ruby, "ruby_title:"
+    assert_includes ruby, "title_geometry.center"
+    assert_includes ruby, "renderer.tone_mapping = Three::ACESFilmicToneMapping"
     assert_includes ruby, "preserveDrawingBuffer: true"
     assert_includes ruby, "renderer.animation_loop"
   end

@@ -35,6 +35,20 @@ class ThreeThreeJSRendererTest < Minitest::Test
     assert_equal [:set_clear_color, renderer.handle, 0x101418, 1], adapter.calls.last
   end
 
+  def test_sets_tone_mapping_options
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+
+    renderer.tone_mapping = Three::ACESFilmicToneMapping
+    renderer.tone_mapping_exposure = 1.45
+
+    assert_equal Three::ACESFilmicToneMapping, renderer.handle[:tone_mapping]
+    assert_equal 1.45, renderer.handle[:tone_mapping_exposure]
+    assert_includes adapter.calls, [:set_renderer_tone_mapping, renderer.handle, Three::ACESFilmicToneMapping]
+    assert_includes adapter.calls, [:set_renderer_tone_mapping_exposure, renderer.handle, 1.45]
+  end
+
   def test_configures_shadow_map_from_initializer_and_method
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

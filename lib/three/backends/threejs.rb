@@ -95,6 +95,14 @@ module Three
         @adapter.set_clear_color(renderer_handle, color, alpha)
       end
 
+      def set_renderer_tone_mapping(renderer_handle, value)
+        @adapter.set_renderer_tone_mapping(renderer_handle, value)
+      end
+
+      def set_renderer_tone_mapping_exposure(renderer_handle, value)
+        @adapter.set_renderer_tone_mapping_exposure(renderer_handle, value)
+      end
+
       def set_renderer_shadow_map(renderer_handle, enabled: nil, type: nil, auto_update: nil)
         @adapter.set_renderer_shadow_map(renderer_handle, enabled: enabled, type: type, auto_update: auto_update)
       end
@@ -249,6 +257,7 @@ module Three
         return @handles[key] if key && @handles.key?(key)
 
         handle = build_handle(object)
+        sync_geometry_operations(object, handle) if object.is_a?(BufferGeometry)
         @handles[key] = handle if key
         register_object_handle(object, handle)
         mark_clean_after_materialize(object)

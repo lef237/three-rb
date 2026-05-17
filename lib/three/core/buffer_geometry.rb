@@ -99,6 +99,18 @@ module Three
       self
     end
 
+    def center
+      @centered = true
+      mark_dirty!(:geometry_operations)
+      self
+    end
+
+    alias center! center
+
+    def centered?
+      @centered == true
+    end
+
     def compute_bounding_box
       position = get_attribute(:position)
       @bounding_box = nil

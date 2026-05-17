@@ -33,6 +33,16 @@ module Three
         self
       end
 
+      def tone_mapping=(value)
+        @backend.set_renderer_tone_mapping(@handle, value)
+        value
+      end
+
+      def tone_mapping_exposure=(value)
+        @backend.set_renderer_tone_mapping_exposure(@handle, value)
+        value
+      end
+
       def configure_shadow_map(enabled: nil, type: nil, auto_update: nil)
         @backend.set_renderer_shadow_map(@handle, enabled: enabled, type: type, auto_update: auto_update)
         self

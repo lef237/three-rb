@@ -11,7 +11,7 @@ A browser page using three-rb needs four pieces:
 1. An HTTP-served page with a canvas element.
 2. An import map or bundler setup that resolves ruby.wasm, three.js, and three.js addon modules.
 3. A JavaScript boot module that exposes the required three.js constructors to Ruby and starts ruby.wasm.
-4. A Ruby entrypoint that waits for three.js, requires `three`, creates a scene, and renders through `Three::Renderers::ThreeJSRenderer`.
+4. A Ruby entrypoint that requires `three`, creates a scene inside `Three::Browser.run`, and renders through `Three::Renderers::ThreeJSRenderer`.
 
 Do not use `file://` for browser runs. The examples assume an HTTP server because browser module loading, wasm loading, and asset loading all need stable URL resolution.
 
@@ -86,38 +86,36 @@ Write a custom boot module when the application has different asset paths, a bun
 
 ## Ruby Entrypoint
 
-The Ruby side should wait for the JavaScript boot module, require the library, create a scene, and attach the renderer to the existing canvas:
+The Ruby side should require the library, create a scene inside `Three::Browser.run`, and attach the renderer to the existing canvas. `Three::Browser.run` waits for the JavaScript boot module and handles the example status/error UI, so application scene code does not need to call `JS.global` directly:
 
 ```ruby
-require "js"
-
-JS.global[:__threeReady].await
-
 require_relative "../../../lib/three"
 
-scene = Three::Scene.new
-camera = Three::PerspectiveCamera.new(70, aspect: 1.0, near: 0.1, far: 100)
-camera.position.z = 3
+Three::Browser.run(starting: "Starting Ruby scene") do |app|
+  scene = Three::Scene.new
+  camera = Three::PerspectiveCamera.new(70, aspect: 1.0, near: 0.1, far: 100)
+  camera.position.z = 3
 
-mesh = Three::Mesh.new(
-  Three::BoxGeometry.new(1, 1, 1),
-  Three::MeshBasicMaterial.new(color: 0x4ed08f)
-)
-scene.add(mesh)
+  mesh = Three::Mesh.new(
+    Three::BoxGeometry.new(1, 1, 1),
+    Three::MeshBasicMaterial.new(color: 0x4ed08f)
+  )
+  scene.add(mesh)
 
-renderer = Three::Renderers::ThreeJSRenderer.new(
-  canvas: "#scene",
-  antialias: true,
-  alpha: false
-)
+  renderer = Three::Renderers::ThreeJSRenderer.new(
+    canvas: "#scene",
+    antialias: true,
+    alpha: false
+  )
 
-renderer.set_size(640, 480)
-renderer.render(scene, camera)
+  app.resize_renderer(renderer, camera)
+  renderer.render(scene, camera)
+end
 ```
 
 `canvas:` may be a CSS selector string or a JavaScript canvas object. Selector strings are resolved with `document.querySelector`.
 
-For responsive layouts, follow the browser examples: read the containing element's client width and height, update the camera aspect/projection matrix, call `renderer.set_size(width, height)`, and listen for `resize`.
+For responsive layouts, use `app.resize_renderer(renderer, camera)` for perspective cameras. For custom orthographic sizing, pass a block and update the camera before the helper sets the renderer size.
 
 For animation, call `renderer.animation_loop`:
 
@@ -138,6 +136,7 @@ The browser runtime intentionally does not promise full three.js compatibility y
 - There is no Ruby-native OpenGL, Vulkan, WebGPU, or software renderer.
 - Rendering is delegated to three.js through ruby.wasm.
 - Addon wrappers only work when their JavaScript constructors are registered on `globalThis`.
+- The JavaScript boot module is still required to import ES modules and start ruby.wasm, even though ordinary Ruby scene entrypoints can stay Ruby-only.
 - The first public scope does not include stable APIs for every loader, material, render target, postprocessing pass, WebGPU, or XR workflow.
 - `examples/browser/shared/boot.mjs` is a reference implementation for this repository's examples, not a separate stable package.
 - `preserveDrawingBuffer: true` is useful for deterministic canvas smoke tests, but applications do not need it by default.

@@ -37,4 +37,10 @@ module Three
   PCFShadowMap = 1
   PCFSoftShadowMap = 2
   VSMShadowMap = 3
+
+  NoToneMapping = 0
+  LinearToneMapping = 1
+  ReinhardToneMapping = 2
+  CineonToneMapping = 3
+  ACESFilmicToneMapping = 4
 end

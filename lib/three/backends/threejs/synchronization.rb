@@ -191,7 +191,10 @@ module Three
         end
 
         def sync_geometry(geometry, handle)
-          return handle if built_in_geometry?(geometry)
+          if built_in_geometry?(geometry)
+            sync_geometry_operations(geometry, handle)
+            return handle
+          end
           return handle unless geometry_dirty?(geometry)
 
           if geometry.dirty_field?(:all) || geometry.dirty_field?(:index) || geometry.index&.dirty?
@@ -222,8 +225,17 @@ module Three
             @adapter.set_geometry_draw_range(handle, geometry.draw_range[:start], geometry.draw_range[:count])
           end
 
+          sync_geometry_operations(geometry, handle)
           geometry.mark_clean!
           handle
+        end
+
+        def sync_geometry_operations(geometry, handle)
+          return unless geometry.respond_to?(:centered?) && geometry.centered?
+          return unless geometry.dirty_field?(:geometry_operations)
+
+          @adapter.center_geometry(handle)
+          geometry.mark_clean!(:geometry_operations)
         end
 
         def geometry_dirty?(geometry)

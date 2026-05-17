@@ -54,6 +54,16 @@ class FakeThreeJSAdapter
     @calls << [:set_clear_color, renderer, color, alpha]
   end
 
+  def set_renderer_tone_mapping(renderer, value)
+    @calls << [:set_renderer_tone_mapping, renderer, value]
+    renderer[:tone_mapping] = value
+  end
+
+  def set_renderer_tone_mapping_exposure(renderer, value)
+    @calls << [:set_renderer_tone_mapping_exposure, renderer, value]
+    renderer[:tone_mapping_exposure] = value
+  end
+
   def set_renderer_shadow_map(renderer, enabled: nil, type: nil, auto_update: nil)
     @calls << [:set_renderer_shadow_map, renderer, { enabled: enabled, type: type, auto_update: auto_update }]
     renderer[:shadow_map] ||= {}
@@ -496,6 +506,11 @@ class FakeThreeJSAdapter
   def set_geometry_draw_range(geometry, start, count)
     @calls << [:set_geometry_draw_range, geometry, start, count]
     geometry[:draw_range] = { start: start, count: count }
+  end
+
+  def center_geometry(geometry)
+    @calls << [:center_geometry, geometry]
+    geometry[:centered] = true
   end
 
   def new_mesh_basic_material(parameters)

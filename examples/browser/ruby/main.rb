@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "js"
+require_relative "../../../lib/three"
 
 def gem_ring(radius, y, sides, offset)
   sides.times.map do |index|
@@ -101,18 +101,7 @@ def build_spark(size, material)
   spark
 end
 
-begin
-  JS.global[:__threeReady].await
-
-  require_relative "../../../lib/three"
-
-  document = JS.global[:document]
-  window = JS.global[:window]
-  viewport = document.call(:querySelector, "#viewport")
-  status = document.call(:querySelector, "#status")
-  status_dot = document.call(:querySelector, "#status-dot")
-  status[:textContent] = "Starting Ruby scene"
-
+Three::Browser.run(starting: "Starting Ruby scene") do |app|
   scene = Three::Scene.new
   camera = Three::PerspectiveCamera.new(42, aspect: 1.0, near: 0.1, far: 100)
   camera.position.set(0, 0.42, 6.9)
@@ -221,6 +210,7 @@ begin
     bevel_size: 0.01,
     bevel_segments: 3
   )
+  title_geometry.center
   title_material = Three::MeshPhysicalMaterial.new(
     color: 0x55ace0,
     roughness: 0.18,
@@ -251,9 +241,8 @@ begin
     shadow_map_type: Three::PCFSoftShadowMap
   )
   renderer.set_clear_color(0xffffff, 1)
-  renderer.handle[:toneMapping] = JS.global[:THREE][:ACESFilmicToneMapping]
-  renderer.handle[:toneMappingExposure] = 1.45
-  renderer.backend.materialize(title_geometry).call(:center)
+  renderer.tone_mapping = Three::ACESFilmicToneMapping
+  renderer.tone_mapping_exposure = 1.45
 
   controls = Three::Controls::OrbitControls.new(
     camera,
@@ -266,37 +255,30 @@ begin
   )
   controls.target.set(0, 0.34, 0.08)
 
-  resize = proc do
-    width = [viewport[:clientWidth].to_i, 1].max
-    height = [viewport[:clientHeight].to_i, 1].max
-
-    camera.aspect = width.to_f / height
-    camera.update_projection_matrix
-    renderer.set_size(width, height)
-  end
-
-  resize.call
-  window.call(:addEventListener, "resize", resize)
+  app.resize_renderer(renderer, camera)
   renderer.render(scene, camera)
 
-  JS.global[:__threeRbRenderer] = renderer.handle
-  JS.global[:__threeRbControls] = controls.handle
-  JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
-  JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
-  JS.global[:__threeRbRubyBackdrop] = renderer.backend.materialize(backdrop)
-  JS.global[:__threeRbRubyBackdropMaterial] = renderer.backend.materialize(backdrop_material)
-  JS.global[:__threeRbRubyGem] = renderer.backend.materialize(ruby_gem)
-  JS.global[:__threeRbRubyGeometry] = renderer.backend.materialize(ruby_gem.geometry)
-  JS.global[:__threeRbRubyMaterial] = renderer.backend.materialize(ruby_material)
-  JS.global[:__threeRbRubyTitle] = renderer.backend.materialize(title)
-  JS.global[:__threeRbRubyTitleGeometry] = renderer.backend.materialize(title_geometry)
-  JS.global[:__threeRbRubyTitleMaterial] = renderer.backend.materialize(title_material)
-  sparkle_handles = JS.global[:Array].new
-  sparkles.each { |sparkle, _phase| sparkle_handles.call(:push, renderer.backend.materialize(sparkle)) }
-  JS.global[:__threeRbRubySparkles] = sparkle_handles
-  JS.global[:__threeRbRubyEnvironment] = renderer.backend.materialize(environment_texture)
-  JS.global[:__threeRbRubyFontLoaded] = !!title_font.handle
-  JS.global[:__threeRbRubyFrame] = 0
+  app.expose(
+    {
+      renderer: renderer,
+      controls: controls,
+      scene: scene,
+      camera: camera,
+      ruby_backdrop: backdrop,
+      ruby_backdrop_material: backdrop_material,
+      ruby_gem: ruby_gem,
+      ruby_geometry: ruby_gem.geometry,
+      ruby_material: ruby_material,
+      ruby_title: title,
+      ruby_title_geometry: title_geometry,
+      ruby_title_material: title_material,
+      ruby_sparkles: sparkles.map(&:first),
+      ruby_environment: environment_texture,
+      ruby_font_loaded: true,
+      ruby_frame: 0
+    },
+    renderer: renderer
+  )
 
   frame = 0
   renderer.animation_loop do
@@ -324,14 +306,8 @@ begin
       sparkle.rotation.z += index.even? ? 0.026 : -0.021
     end
 
-    JS.global[:__threeRbRubyFrame] = frame
+    app.set(:ruby_frame, frame)
     controls.update
     renderer.render(scene, camera)
   end
-
-  status[:textContent] = "Running"
-  status_dot[:dataset][:state] = "running"
-rescue StandardError => error
-  JS.global.call(:__threeRbBootFailed, error.message) if JS.global[:__threeRbBootFailed]
-  raise
 end

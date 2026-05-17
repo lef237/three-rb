@@ -55,6 +55,14 @@ module Three
           renderer.call(:setClearColor, color, alpha)
         end
 
+        def set_renderer_tone_mapping(renderer, value)
+          renderer[:toneMapping] = value
+        end
+
+        def set_renderer_tone_mapping_exposure(renderer, value)
+          renderer[:toneMappingExposure] = value
+        end
+
         def set_renderer_shadow_map(renderer, enabled: nil, type: nil, auto_update: nil)
           shadow_map = renderer[:shadowMap]
           shadow_map[:enabled] = enabled unless enabled.nil?
@@ -446,6 +454,10 @@ module Three
 
         def set_geometry_draw_range(geometry, start, count)
           geometry.call(:setDrawRange, start, count)
+        end
+
+        def center_geometry(geometry)
+          geometry.call(:center)
         end
 
         def new_mesh_basic_material(parameters)

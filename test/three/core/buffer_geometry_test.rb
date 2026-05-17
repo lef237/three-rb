@@ -68,6 +68,15 @@ class ThreeBufferGeometryTest < Minitest::Test
     assert_in_delta Math.sqrt(12), geometry.bounding_sphere[:radius], 1e-12
   end
 
+  def test_center_marks_geometry_operation_dirty
+    geometry = Three::BufferGeometry.new
+    geometry.mark_clean!
+
+    assert_same geometry, geometry.center
+    assert geometry.centered?
+    assert geometry.dirty_field?(:geometry_operations)
+  end
+
   def test_dispose_event
     geometry = Three::BufferGeometry.new
     called = false
