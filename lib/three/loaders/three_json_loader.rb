@@ -22,17 +22,20 @@ module Three
       end
 
       def build_texture(entry)
-        case value(entry, :type)
-        when "CubeTexture"
-          CubeTexture.new(
-            value(entry, :sources) || value(entry, :source),
-            **texture_parameters(entry)
-          )
-        when "RGBETexture"
-          RGBETexture.new(value(entry, :source), **texture_parameters(entry))
-        else
-          Texture.new(value(entry, :source), **texture_parameters(entry))
-        end
+        texture =
+          case value(entry, :type)
+          when "CubeTexture"
+            CubeTexture.new(
+              value(entry, :sources) || value(entry, :source),
+              **texture_parameters(entry)
+            )
+          when "RGBETexture"
+            RGBETexture.new(value(entry, :source), **texture_parameters(entry))
+          else
+            Texture.new(value(entry, :source), **texture_parameters(entry))
+          end
+        texture.user_data = value(entry, :user_data) || {}
+        texture
       end
 
       def texture_parameters(entry)
@@ -57,25 +60,25 @@ module Three
         case value(entry, :type)
         when "BoxGeometry"
           parameters = value(entry, :parameters) || {}
-          BoxGeometry.new(
+          apply_geometry_properties(BoxGeometry.new(
             value(parameters, :width) || 1,
             value(parameters, :height) || 1,
             value(parameters, :depth) || 1,
             width_segments: value(parameters, :width_segments) || 1,
             height_segments: value(parameters, :height_segments) || 1,
             depth_segments: value(parameters, :depth_segments) || 1
-          )
+          ), entry)
         when "PlaneGeometry"
           parameters = value(entry, :parameters) || {}
-          PlaneGeometry.new(
+          apply_geometry_properties(PlaneGeometry.new(
             value(parameters, :width) || 1,
             value(parameters, :height) || 1,
             width_segments: value(parameters, :width_segments) || 1,
             height_segments: value(parameters, :height_segments) || 1
-          )
+          ), entry)
         when "SphereGeometry"
           parameters = value(entry, :parameters) || {}
-          SphereGeometry.new(
+          apply_geometry_properties(SphereGeometry.new(
             value(parameters, :radius) || 1,
             width_segments: value(parameters, :width_segments) || 32,
             height_segments: value(parameters, :height_segments) || 16,
@@ -83,7 +86,7 @@ module Three
             phi_length: value(parameters, :phi_length) || Math::PI * 2,
             theta_start: value(parameters, :theta_start) || 0,
             theta_length: value(parameters, :theta_length) || Math::PI
-          )
+          ), entry)
         else
           build_buffer_geometry(entry)
         end
@@ -91,7 +94,6 @@ module Three
 
       def build_buffer_geometry(entry)
         geometry = BufferGeometry.new
-        geometry.name = value(entry, :name) if value(entry, :name)
         geometry.set_index(build_buffer_attribute(value(entry, :index))) if value(entry, :index)
 
         (value(entry, :attributes) || {}).each do |name, attribute_entry|
@@ -106,7 +108,27 @@ module Three
           )
         end
 
+        apply_geometry_properties(geometry, entry)
+      end
+
+      def apply_geometry_properties(geometry, entry)
+        geometry.name = value(entry, :name) if value(entry, :name)
+        geometry.user_data = value(entry, :user_data) || {}
+        draw_range = value(entry, :draw_range)
+        if draw_range
+          geometry.set_draw_range(
+            deserialize_number(value(draw_range, :start)),
+            deserialize_number(value(draw_range, :count))
+          )
+        end
         geometry
+      end
+
+      def deserialize_number(value)
+        return Float::INFINITY if value == "Infinity"
+        return -Float::INFINITY if value == "-Infinity"
+
+        value
       end
 
       def build_buffer_attribute(entry)
@@ -129,34 +151,37 @@ module Three
 
       def build_material(entry)
         parameters = material_parameters(entry)
-        case value(entry, :type)
-        when "MeshBasicMaterial"
-          MeshBasicMaterial.new(parameters)
-        when "LineBasicMaterial"
-          LineBasicMaterial.new(parameters)
-        when "MeshLambertMaterial"
-          MeshLambertMaterial.new(parameters)
-        when "MeshMatcapMaterial"
-          MeshMatcapMaterial.new(parameters)
-        when "MeshNormalMaterial"
-          MeshNormalMaterial.new(parameters)
-        when "MeshPhongMaterial"
-          MeshPhongMaterial.new(parameters)
-        when "MeshPhysicalMaterial"
-          MeshPhysicalMaterial.new(parameters)
-        when "MeshStandardMaterial"
-          MeshStandardMaterial.new(parameters)
-        when "MeshToonMaterial"
-          MeshToonMaterial.new(parameters)
-        when "PointsMaterial"
-          PointsMaterial.new(parameters)
-        when "ShadowMaterial"
-          ShadowMaterial.new(parameters)
-        when "SpriteMaterial"
-          SpriteMaterial.new(parameters)
-        else
-          Material.new(parameters)
-        end
+        material =
+          case value(entry, :type)
+          when "MeshBasicMaterial"
+            MeshBasicMaterial.new(parameters)
+          when "LineBasicMaterial"
+            LineBasicMaterial.new(parameters)
+          when "MeshLambertMaterial"
+            MeshLambertMaterial.new(parameters)
+          when "MeshMatcapMaterial"
+            MeshMatcapMaterial.new(parameters)
+          when "MeshNormalMaterial"
+            MeshNormalMaterial.new(parameters)
+          when "MeshPhongMaterial"
+            MeshPhongMaterial.new(parameters)
+          when "MeshPhysicalMaterial"
+            MeshPhysicalMaterial.new(parameters)
+          when "MeshStandardMaterial"
+            MeshStandardMaterial.new(parameters)
+          when "MeshToonMaterial"
+            MeshToonMaterial.new(parameters)
+          when "PointsMaterial"
+            PointsMaterial.new(parameters)
+          when "ShadowMaterial"
+            ShadowMaterial.new(parameters)
+          when "SpriteMaterial"
+            SpriteMaterial.new(parameters)
+          else
+            Material.new(parameters)
+          end
+        material.user_data = value(entry, :user_data) || {}
+        material
       end
 
       def material_parameters(entry)

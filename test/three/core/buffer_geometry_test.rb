@@ -46,6 +46,15 @@ class ThreeBufferGeometryTest < Minitest::Test
     assert_equal "named-geometry", geometry.to_h[:name]
   end
 
+  def test_to_h_includes_draw_range_and_user_data
+    geometry = Three::BufferGeometry.new
+    geometry.set_draw_range(2, 4)
+    geometry.user_data = { "purpose" => "partial-draw" }
+
+    assert_equal({ start: 2, count: 4 }, geometry.to_h[:draw_range])
+    assert_equal({ "purpose" => "partial-draw" }, geometry.to_h[:user_data])
+  end
+
   def test_compute_bounding_box_and_sphere
     geometry = Three::BufferGeometry.new
     geometry.set_attribute(:position, Three::Float32BufferAttribute.new([-1, -2, -3, 3, 2, 1], 3))

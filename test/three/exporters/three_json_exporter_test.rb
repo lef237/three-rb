@@ -252,6 +252,26 @@ class ThreeThreeJSONExporterTest < Minitest::Test
     assert_equal 1, parsed.fetch("materials").length
   end
 
+  def test_exports_resource_user_data_and_geometry_draw_range
+    scene = Three::Scene.new
+    texture = Three::Texture.new("/texture.png")
+    texture.user_data = { "role" => "albedo" }
+    geometry = Three::BufferGeometry.new
+    geometry.user_data = { "role" => "partial-geometry" }
+    geometry.set_draw_range(1, 2)
+    geometry.set_attribute(:position, Three::Float32BufferAttribute.new([0, 0, 0, 1, 0, 0, 0, 1, 0], 3))
+    material = Three::MeshBasicMaterial.new(map: texture)
+    material.user_data = { "role" => "surface" }
+    scene.add(Three::Mesh.new(geometry, material))
+
+    exported = Three::Exporters::ThreeJSONExporter.new.export(scene)
+
+    assert_equal({ start: 1, count: 2 }, exported[:geometries].first[:draw_range])
+    assert_equal({ "role" => "partial-geometry" }, exported[:geometries].first[:user_data])
+    assert_equal({ "role" => "surface" }, exported[:materials].first[:user_data])
+    assert_equal({ "role" => "albedo" }, exported[:textures].first[:user_data])
+  end
+
   def test_deterministic_ids_make_equivalent_exports_equal
     build_scene = proc do
       scene = Three::Scene.new

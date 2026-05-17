@@ -153,8 +153,10 @@ module Three
         index: @index&.to_h,
         attributes: @attributes.transform_values(&:to_h),
         groups: @groups.map(&:dup),
+        draw_range: serialize_draw_range(@draw_range),
         bounding_box: serialize_bounds(@bounding_box),
-        bounding_sphere: serialize_sphere(@bounding_sphere)
+        bounding_sphere: serialize_sphere(@bounding_sphere),
+        user_data: @user_data
       }
     end
 
@@ -170,6 +172,20 @@ module Three
       return nil unless sphere
 
       { center: sphere[:center].to_a, radius: sphere[:radius] }
+    end
+
+    def serialize_draw_range(draw_range)
+      {
+        start: serialize_number(draw_range[:start]),
+        count: serialize_number(draw_range[:count])
+      }
+    end
+
+    def serialize_number(value)
+      return "Infinity" if value == Float::INFINITY
+      return "-Infinity" if value == -Float::INFINITY
+
+      value
     end
 
     def bind_attribute_change(attribute)

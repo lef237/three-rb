@@ -40,4 +40,14 @@ class ThreeBufferAttributeTest < Minitest::Test
     assert_equal :uint16, Three::Uint16BufferAttribute.new([1, 2, 3], 1).component_type
     assert_equal :uint32, Three::Uint32BufferAttribute.new([70_000], 1).component_type
   end
+
+  def test_clone_preserves_generic_component_type
+    attribute = Three::BufferAttribute.new([1, 2, 3], 1, false, component_type: :int16)
+
+    clone = attribute.clone
+
+    assert_instance_of Three::BufferAttribute, clone
+    assert_equal :int16, clone.component_type
+    assert_equal [1, 2, 3], clone.array
+  end
 end

@@ -159,7 +159,8 @@ module Three
         center: @center.to_a,
         rotation: @rotation,
         matrix_auto_update: @matrix_auto_update,
-        matrix: @matrix.to_a
+        matrix: @matrix.to_a,
+        user_data: @user_data
       }
     end
 

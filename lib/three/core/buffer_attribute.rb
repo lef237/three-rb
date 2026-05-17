@@ -84,7 +84,11 @@ module Three
     end
 
     def clone
-      self.class.new(@array, @item_size, @normalized)
+      if instance_of?(BufferAttribute)
+        self.class.new(@array, @item_size, @normalized, component_type: @component_type)
+      else
+        self.class.new(@array, @item_size, @normalized)
+      end
     end
 
     def get_component(index, component)

@@ -793,8 +793,13 @@
           "material_index": 5
         }
       ],
+      "draw_range": {
+        "start": 0,
+        "count": "Infinity"
+      },
       "bounding_box": null,
       "bounding_sphere": null,
+      "user_data": {},
       "parameters": {
         "width": 1.2,
         "height": 0.8,
@@ -831,8 +836,13 @@
         }
       },
       "groups": [],
+      "draw_range": {
+        "start": 0,
+        "count": "Infinity"
+      },
       "bounding_box": null,
-      "bounding_sphere": null
+      "bounding_sphere": null,
+      "user_data": {}
     },
     {
       "uuid": "geometry-2",
@@ -907,8 +917,13 @@
         }
       },
       "groups": [],
+      "draw_range": {
+        "start": 0,
+        "count": "Infinity"
+      },
       "bounding_box": null,
       "bounding_sphere": null,
+      "user_data": {},
       "parameters": {
         "width": 0.3,
         "height": 0.3,
@@ -927,6 +942,7 @@
       "transparent": false,
       "visible": true,
       "vertex_colors": false,
+      "user_data": {},
       "color": 10079487,
       "roughness": 0.38,
       "metalness": 0.12,
@@ -989,6 +1005,7 @@
       "transparent": false,
       "visible": true,
       "vertex_colors": false,
+      "user_data": {},
       "color": 16746564,
       "linewidth": 2,
       "linecap": "round",
@@ -1004,6 +1021,7 @@
       "transparent": false,
       "visible": true,
       "vertex_colors": false,
+      "user_data": {},
       "color": 6741503,
       "map": "texture-0",
       "alpha_map": null,
@@ -1020,6 +1038,7 @@
       "transparent": true,
       "visible": true,
       "vertex_colors": false,
+      "user_data": {},
       "color": 16763981,
       "map": "texture-0",
       "alpha_map": null,
@@ -1036,6 +1055,7 @@
       "transparent": false,
       "visible": true,
       "vertex_colors": false,
+      "user_data": {},
       "color": 16777215,
       "map": "texture-0",
       "wireframe": false,
@@ -1080,7 +1100,8 @@
         0,
         0,
         1
-      ]
+      ],
+      "user_data": {}
     },
     {
       "uuid": "texture-1",
@@ -1117,7 +1138,8 @@
         0,
         0,
         1
-      ]
+      ],
+      "user_data": {}
     },
     {
       "uuid": "texture-2",
@@ -1154,7 +1176,8 @@
         0,
         0,
         1
-      ]
+      ],
+      "user_data": {}
     },
     {
       "uuid": "texture-3",
@@ -1191,7 +1214,8 @@
         0,
         0,
         1
-      ]
+      ],
+      "user_data": {}
     }
   ]
 }

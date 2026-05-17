@@ -140,7 +140,8 @@ module Three
         opacity: @opacity,
         transparent: @transparent,
         visible: @visible,
-        vertex_colors: @vertex_colors
+        vertex_colors: @vertex_colors,
+        user_data: @user_data
       }
     end
 
