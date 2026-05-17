@@ -70,6 +70,12 @@ class FakeThreeJSAdapter
     @calls << [:render, renderer, scene, camera]
   end
 
+  def add_event_listener(handle, type, callback)
+    @calls << [:add_event_listener, handle, type, callback]
+    handle[:listeners] ||= Hash.new { |hash, key| hash[key] = [] }
+    handle[:listeners][type.to_s] << callback
+  end
+
   def new_effect_composer(renderer)
     handle(:effect_composer, renderer: renderer, passes: [], size: nil)
   end

@@ -1,19 +1,8 @@
 # frozen_string_literal: true
 
-require "js"
+require_relative "../../../lib/three"
 
-begin
-  JS.global[:__threeReady].await
-
-  require_relative "../../../lib/three"
-
-  document = JS.global[:document]
-  window = JS.global[:window]
-  viewport = document.call(:querySelector, "#viewport")
-  status = document.call(:querySelector, "#status")
-  status_dot = document.call(:querySelector, "#status-dot")
-  status[:textContent] = "Starting Ruby scene"
-
+Three::Browser.run(starting: "Starting Ruby scene") do |app|
   scene = Three::Scene.new
   camera = Three::OrthographicCamera.new(-3, 3, 1.8, -1.8, near: 0.1, far: 100)
   camera.position.z = 5
@@ -131,9 +120,7 @@ begin
   )
   controls.target.set(0, 0, 0)
 
-  resize = proc do
-    width = [viewport[:clientWidth].to_i, 1].max
-    height = [viewport[:clientHeight].to_i, 1].max
+  app.resize_renderer(renderer, camera) do |width, height, _aspect|
     view_height = 3.8
     view_width = view_height * width.to_f / height
 
@@ -142,51 +129,50 @@ begin
     camera.top = view_height / 2
     camera.bottom = -view_height / 2
     camera.update_projection_matrix
-    renderer.set_size(width, height)
   end
-
-  resize.call
-  window.call(:addEventListener, "resize", resize)
   renderer.render(scene, camera)
 
-  JS.global[:__threeRbRenderer] = renderer.handle
-  JS.global[:__threeRbControls] = controls.handle
-  JS.global[:__threeRbScene] = renderer.backend.materialize(scene)
-  JS.global[:__threeRbCamera] = renderer.backend.materialize(camera)
-  JS.global[:__threeRbAmbientLight] = renderer.backend.materialize(ambient_light)
-  JS.global[:__threeRbDirectionalLight] = renderer.backend.materialize(key_light)
-  JS.global[:__threeRbPointLight] = renderer.backend.materialize(point_light)
-  JS.global[:__threeRbHemisphereLight] = renderer.backend.materialize(hemisphere_light)
-  JS.global[:__threeRbPlane] = renderer.backend.materialize(backdrop)
-  JS.global[:__threeRbShadowCatcher] = renderer.backend.materialize(shadow_catcher)
-  JS.global[:__threeRbShadowMaterial] = renderer.backend.materialize(shadow_material)
-  JS.global[:__threeRbRig] = renderer.backend.materialize(rig)
-  JS.global[:__threeRbPrimaryMesh] = renderer.backend.materialize(primary)
-  JS.global[:__threeRbSatelliteMesh] = renderer.backend.materialize(satellite)
-  JS.global[:__threeRbSphereMesh] = renderer.backend.materialize(orb)
-  JS.global[:__threeRbPhongMesh] = renderer.backend.materialize(highlight)
-  JS.global[:__threeRbInstancedMesh] = renderer.backend.materialize(instanced_field)
-  JS.global[:__threeRbInstancedMaterial] = renderer.backend.materialize(instanced_material)
-  JS.global[:__threeRbTexture] = renderer.backend.materialize(primary_texture)
-  JS.global[:__threeRbChangingMaterial] = renderer.backend.materialize(primary_material)
-  JS.global[:__threeRbLambertMaterial] = renderer.backend.materialize(primary_material)
-  JS.global[:__threeRbNormalMaterial] = renderer.backend.materialize(satellite_material)
-  JS.global[:__threeRbStandardMaterial] = renderer.backend.materialize(orb_material)
-  JS.global[:__threeRbPhongMaterial] = renderer.backend.materialize(highlight_material)
-  JS.global[:__threeRbMaterialDisposeEvent] = false
-  JS.global[:__threeRbTextureDisposeEvent] = false
+  app.expose(
+    {
+      renderer: renderer,
+      controls: controls,
+      scene: scene,
+      camera: camera,
+      ambient_light: ambient_light,
+      directional_light: key_light,
+      point_light: point_light,
+      hemisphere_light: hemisphere_light,
+      plane: backdrop,
+      shadow_catcher: shadow_catcher,
+      shadow_material: shadow_material,
+      rig: rig,
+      primary_mesh: primary,
+      satellite_mesh: satellite,
+      sphere_mesh: orb,
+      phong_mesh: highlight,
+      instanced_mesh: instanced_field,
+      instanced_material: instanced_material,
+      texture: primary_texture,
+      changing_material: primary_material,
+      lambert_material: primary_material,
+      normal_material: satellite_material,
+      standard_material: orb_material,
+      phong_material: highlight_material,
+      material_dispose_event: false,
+      texture_dispose_event: false
+    },
+    renderer: renderer
+  )
 
   disposable_texture = Three::Loaders::TextureLoader.new.load("/examples/browser/assets/checker.svg")
   disposable_material = Three::MeshBasicMaterial.new(map: disposable_texture)
-  disposable_texture_handle = renderer.backend.materialize(disposable_texture)
-  disposable_material_handle = renderer.backend.materialize(disposable_material)
-  disposable_texture_handle.call(:addEventListener, "dispose", proc { JS.global[:__threeRbTextureDisposeEvent] = true })
-  disposable_material_handle.call(:addEventListener, "dispose", proc { JS.global[:__threeRbMaterialDisposeEvent] = true })
+  renderer.on_dispose(disposable_texture) { app.set(:texture_dispose_event, true) }
+  renderer.on_dispose(disposable_material) { app.set(:material_dispose_event, true) }
   renderer.dispose(disposable_material, dispose_textures: true)
-  JS.global[:__threeRbMaterialHandleCachedAfterDispose] = renderer.backend.handles.key?(disposable_material.uuid)
-  JS.global[:__threeRbTextureHandleCachedAfterDispose] = renderer.backend.handles.key?(disposable_texture.uuid)
-  JS.global[:__threeRbInitialMaterialColor] = primary_material.color.hex
-  JS.global[:__threeRbCompositionFrame] = 0
+  app.set(:material_handle_cached_after_dispose, renderer.cached?(disposable_material))
+  app.set(:texture_handle_cached_after_dispose, renderer.cached?(disposable_texture))
+  app.set(:initial_material_color, primary_material.color.hex)
+  app.set(:composition_frame, 0)
 
   frame = 0
   renderer.animation_loop do
@@ -203,14 +189,8 @@ begin
     pulse = (Math.sin(frame * 0.045) + 1) / 2.0
     primary_material.color.set_rgb(0.25 + (0.35 * pulse), 0.55 + (0.25 * pulse), 0.42)
 
-    JS.global[:__threeRbCompositionFrame] = frame
+    app.set(:composition_frame, frame)
     controls.update
     renderer.render(scene, camera)
   end
-
-  status[:textContent] = "Running"
-  status_dot[:dataset][:state] = "running"
-rescue StandardError => error
-  JS.global.call(:__threeRbBootFailed, error.message) if JS.global[:__threeRbBootFailed]
-  raise
 end

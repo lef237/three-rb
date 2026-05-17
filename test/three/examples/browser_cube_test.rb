@@ -143,6 +143,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   def test_simple_browser_examples_hide_js_bridge_from_ruby_entrypoints
     [
       EXAMPLE_DIR,
+      COMPOSITION_EXAMPLE_DIR,
       TEXTURES_EXAMPLE_DIR,
       CUBEMAP_EXAMPLE_DIR,
       GLTF_EXAMPLE_DIR,
@@ -215,7 +216,9 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "instanced_field.set_matrix_at"
     assert_includes ruby, "instanced_field.set_color_at"
     assert_includes ruby, "primary_material.color.set_rgb"
-    assert_includes ruby, "JS.global[:__threeRbShadowMaterial]"
+    assert_includes ruby, "shadow_material:"
+    assert_includes ruby, "renderer.on_dispose"
+    assert_includes ruby, "renderer.cached?"
     assert_includes ruby, "renderer.animation_loop"
   end
 

@@ -285,6 +285,17 @@ module Three
         handle
       end
 
+      def add_event_listener(object, type, callback)
+        raise ArgumentError, "callback is required" unless callback
+
+        @adapter.add_event_listener(materialize(object), type, callback)
+      end
+
+      def cached?(object)
+        key = cache_key(object)
+        key ? @handles.key?(key) : false
+      end
+
       def traverse_handles(object, &block)
         return enum_for(:traverse_handles, object) unless block
 

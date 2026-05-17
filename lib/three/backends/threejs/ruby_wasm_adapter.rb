@@ -78,6 +78,10 @@ module Three
           end
         end
 
+        def add_event_listener(handle, type, callback)
+          handle.call(:addEventListener, type.to_s, callback)
+        end
+
         def new_effect_composer(renderer)
           effect_composer_constructor.new(renderer)
         end

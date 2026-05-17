@@ -109,6 +109,29 @@ class ThreeThreeJSRendererTest < Minitest::Test
     ], adapter.calls
   end
 
+  def test_on_dispose_registers_backend_dispose_listener
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+    material = Three::MeshBasicMaterial.new
+    callback = proc {}
+
+    assert_same renderer, renderer.on_dispose(material, &callback)
+
+    assert_equal [:add_event_listener, backend.materialize(material), :dispose, callback], adapter.calls.last
+  end
+
+  def test_cached_reports_backend_handle_cache
+    adapter = FakeThreeJSAdapter.new
+    backend = Three::Backends::ThreeJS.new(adapter: adapter)
+    renderer = Three::Renderers::ThreeJSRenderer.new(backend: backend)
+    material = Three::MeshBasicMaterial.new
+
+    refute renderer.cached?(material)
+    backend.materialize(material)
+    assert renderer.cached?(material)
+  end
+
   def test_traverse_handles_delegates_to_backend
     adapter = FakeThreeJSAdapter.new
     backend = Three::Backends::ThreeJS.new(adapter: adapter)

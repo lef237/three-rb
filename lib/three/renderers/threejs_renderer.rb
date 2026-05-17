@@ -55,6 +55,15 @@ module Three
         self
       end
 
+      def on_dispose(object, &block)
+        @backend.add_event_listener(object, :dispose, block)
+        self
+      end
+
+      def cached?(object)
+        @backend.cached?(object)
+      end
+
       def traverse_handles(object, &block)
         return enum_for(:traverse_handles, object) unless block
 
