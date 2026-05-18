@@ -6,6 +6,8 @@ Published to RubyGems as `three-rb`; require it in Ruby as `three`.
 
 ![three-rb](https://github.com/user-attachments/assets/150a3639-459d-4836-bbde-411eef146c61)
 
+YouTube Demo: https://youtu.be/6JTtSg1pRp0
+
 ## Status
 
 This project is in browser-first alpha. The current code covers the gem foundation, math primitives, scene graph basics, geometry/material objects, dirty-tracked backend sync, JSON export/load, browser examples, and a three.js backend/renderer bridge through ruby.wasm.
