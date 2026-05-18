@@ -4,6 +4,8 @@ Ruby 3D Library.
 
 Published to RubyGems as `three-rb`; require it in Ruby as `three`.
 
+![three-rb](https://github.com/user-attachments/assets/2358dc07-cbba-4ec7-a179-b5e31f3257cc)
+
 ## Status
 
 This project is in browser-first alpha. The current code covers the gem foundation, math primitives, scene graph basics, geometry/material objects, dirty-tracked backend sync, JSON export/load, browser examples, and a three.js backend/renderer bridge through ruby.wasm.
