@@ -4,7 +4,7 @@ Ruby 3D Library.
 
 Published to RubyGems as `three-rb`; require it in Ruby as `three`.
 
-![three-rb](https://github.com/user-attachments/assets/2358dc07-cbba-4ec7-a179-b5e31f3257cc)
+![three-rb](https://github.com/user-attachments/assets/150a3639-459d-4836-bbde-411eef146c61)
 
 ## Status
 
