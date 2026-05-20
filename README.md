@@ -119,6 +119,7 @@ If `ruby -run -e httpd` reports that `webrick` is not found, run `gem install we
 ```text
 http://localhost:8000/examples/browser/ruby/
 http://localhost:8000/examples/browser/cube/
+http://localhost:8000/examples/browser/dango/
 http://localhost:8000/examples/browser/composition/
 http://localhost:8000/examples/browser/textures/
 http://localhost:8000/examples/browser/cubemap/

@@ -7,6 +7,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   ROOT = File.expand_path("../../..", __dir__)
   RUBY_EXAMPLE_DIR = File.join(ROOT, "examples/browser/ruby")
   EXAMPLE_DIR = File.join(ROOT, "examples/browser/cube")
+  DANGO_EXAMPLE_DIR = File.join(ROOT, "examples/browser/dango")
   COMPOSITION_EXAMPLE_DIR = File.join(ROOT, "examples/browser/composition")
   TEXTURES_EXAMPLE_DIR = File.join(ROOT, "examples/browser/textures")
   CUBEMAP_EXAMPLE_DIR = File.join(ROOT, "examples/browser/cubemap")
@@ -19,6 +20,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
   BROWSER_EXAMPLES = {
     "ruby" => "test:browser:ruby",
     "cube" => "test:browser:cube",
+    "dango" => "test:browser:dango",
     "composition" => "test:browser:composition",
     "textures" => "test:browser:textures",
     "cubemap" => "test:browser:cubemap",
@@ -45,6 +47,13 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_path_exists File.join(EXAMPLE_DIR, "main.rb")
     assert_path_exists File.join(EXAMPLE_DIR, "README.md")
     assert_path_exists File.join(EXAMPLE_DIR, "smoke_test.mjs")
+  end
+
+  def test_browser_dango_example_files_exist
+    assert_path_exists File.join(DANGO_EXAMPLE_DIR, "index.html")
+    assert_path_exists File.join(DANGO_EXAMPLE_DIR, "main.rb")
+    assert_path_exists File.join(DANGO_EXAMPLE_DIR, "README.md")
+    assert_path_exists File.join(DANGO_EXAMPLE_DIR, "smoke_test.mjs")
   end
 
   def test_browser_composition_example_files_exist
@@ -224,6 +233,30 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "renderer.animation_loop"
   end
 
+  def test_dango_example_exercises_primitive_scene_composition
+    ruby = File.read(File.join(DANGO_EXAMPLE_DIR, "main.rb"))
+
+    assert_includes ruby, "Three::OrthographicCamera"
+    assert_includes ruby, "Three::HemisphereLight"
+    assert_includes ruby, "Three::DirectionalLight"
+    assert_includes ruby, "Three::PointLight"
+    assert_includes ruby, "Three::ShadowMaterial"
+    assert_includes ruby, "Three::PlaneGeometry"
+    assert_includes ruby, "Three::BoxGeometry"
+    assert_includes ruby, "Three::SphereGeometry"
+    assert_includes ruby, "Three::Group"
+    assert_includes ruby, "Three::MeshPhongMaterial"
+    assert_includes ruby, "Three::MeshLambertMaterial"
+    assert_includes ruby, "Three::Controls::OrbitControls"
+    assert_includes ruby, "shadow_map_enabled: true"
+    assert_includes ruby, "cast_shadow = true"
+    assert_includes ruby, "receive_shadow = true"
+    assert_includes ruby, "dango_group.add(mesh)"
+    assert_includes ruby, "dango_mochi: mochi"
+    assert_includes ruby, "app.increment(:dango_frame)"
+    assert_includes ruby, "renderer.animation_loop"
+  end
+
   def test_textures_example_exercises_texture_settings
     ruby = File.read(File.join(TEXTURES_EXAMPLE_DIR, "main.rb"))
 
@@ -337,9 +370,10 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/3.4-wasm-wasi")
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/wasm-wasi")
     assert_equal "0.184.0", package.fetch("dependencies").fetch("three")
-    assert_equal "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing", package.fetch("scripts").fetch("test:browser")
+    assert_equal "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:dango && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing", package.fetch("scripts").fetch("test:browser")
     assert_equal "node examples/browser/ruby/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:ruby")
     assert_equal "node examples/browser/cube/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cube")
+    assert_equal "node examples/browser/dango/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:dango")
     assert_equal "node examples/browser/composition/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:composition")
     assert_equal "node examples/browser/textures/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:textures")
     assert_equal "node examples/browser/cubemap/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cubemap")
