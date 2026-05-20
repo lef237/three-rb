@@ -107,6 +107,13 @@ async function main() {
     if (!Array.isArray(state.group.rotation) || Math.abs(state.group.rotation[2] + 0.22) > 1e-12) {
       throw new Error(`dango group did not keep the expected skewer angle: ${JSON.stringify(state)}`);
     }
+    if (
+      !Array.isArray(state.group.position) ||
+      Math.abs(state.group.position[1] + 0.47) > 0.08 ||
+      Math.abs(state.group.position[2] + 0.39) > 1e-12
+    ) {
+      throw new Error(`dango group is not centered over the plate depth: ${JSON.stringify(state)}`);
+    }
     if (!Array.isArray(state.mochi) || state.mochi.length !== 3) {
       throw new Error(`expected three mochi meshes: ${JSON.stringify(state)}`);
     }
