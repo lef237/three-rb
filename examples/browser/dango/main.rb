@@ -138,7 +138,7 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
   dango_group = Three::Group.new
   dango_group.name = "dango-skewer"
   dango_group.rotation.z = -0.22
-  dango_group.position.set(0, 0.07, -0.69)
+  dango_group.position.set(0, 0.18, -0.75)
   scene.add(dango_group)
 
   skewer_material = Three::MeshLambertMaterial.new(color: 0xcbb281)
@@ -247,7 +247,7 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
     frame = app.increment(:dango_frame)
     dango_group.rotation.y = 0
     dango_group.rotation.x = -0.05 + (Math.sin(frame * 0.017) * 0.035)
-    dango_group.position.y = 0.07 + (Math.sin(frame * 0.03) * 0.02)
+    dango_group.position.y = 0.18 + (Math.sin(frame * 0.03) * 0.02)
     plate.rotation.z = Math.sin(frame * 0.012) * 0.018
 
     controls.update
