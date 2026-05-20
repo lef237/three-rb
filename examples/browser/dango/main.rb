@@ -66,6 +66,14 @@ def dango_skewer_geometry(length, radius, radial_segments: 18)
   geometry
 end
 
+def dango_plate_part(size, material, position: nil, cast_shadow: true)
+  mesh = Three::Mesh.new(Three::BoxGeometry.new(*size), material)
+  mesh.position.set(*position) if position
+  mesh.cast_shadow = cast_shadow
+  mesh.receive_shadow = true
+  mesh
+end
+
 Three::Browser.run(starting: "Starting dango scene") do |app|
   scene = Three::Scene.new
   camera = Three::OrthographicCamera.new(-3.2, 3.2, 2.0, -2.0, near: 0.1, far: 100)
@@ -99,41 +107,17 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
   scene.add(plate)
 
   plate_floor_material = Three::MeshLambertMaterial.new(color: 0xfff7ea)
-  plate_floor = Three::Mesh.new(Three::BoxGeometry.new(3.72, 0.08, 0.82), plate_floor_material)
-  plate_floor.receive_shadow = true
-  plate.add(plate_floor)
-
   plate_rim_material = Three::MeshLambertMaterial.new(color: 0xf1d8ad)
-  plate_front_rim = Three::Mesh.new(Three::BoxGeometry.new(4.08, 0.14, 0.12), plate_rim_material)
-  plate_front_rim.position.set(0, 0.055, -0.48)
-  plate_front_rim.cast_shadow = true
-  plate_front_rim.receive_shadow = true
-  plate.add(plate_front_rim)
-
-  plate_back_rim = Three::Mesh.new(Three::BoxGeometry.new(4.08, 0.14, 0.12), plate_rim_material)
-  plate_back_rim.position.set(0, 0.055, 0.48)
-  plate_back_rim.cast_shadow = true
-  plate_back_rim.receive_shadow = true
-  plate.add(plate_back_rim)
-
-  plate_left_rim = Three::Mesh.new(Three::BoxGeometry.new(0.14, 0.14, 0.82), plate_rim_material)
-  plate_left_rim.position.set(-1.98, 0.055, 0)
-  plate_left_rim.cast_shadow = true
-  plate_left_rim.receive_shadow = true
-  plate.add(plate_left_rim)
-
-  plate_right_rim = Three::Mesh.new(Three::BoxGeometry.new(0.14, 0.14, 0.82), plate_rim_material)
-  plate_right_rim.position.set(1.98, 0.055, 0)
-  plate_right_rim.cast_shadow = true
-  plate_right_rim.receive_shadow = true
-  plate.add(plate_right_rim)
-
   plate_foot_material = Three::MeshLambertMaterial.new(color: 0xd3b680)
-  plate_foot = Three::Mesh.new(Three::BoxGeometry.new(2.72, 0.08, 0.34), plate_foot_material)
-  plate_foot.position.set(0, -0.12, -0.04)
-  plate_foot.cast_shadow = true
-  plate_foot.receive_shadow = true
-  plate.add(plate_foot)
+  plate_parts = {
+    floor: dango_plate_part([3.72, 0.08, 0.82], plate_floor_material, cast_shadow: false),
+    front_rim: dango_plate_part([4.08, 0.14, 0.12], plate_rim_material, position: [0, 0.055, -0.48]),
+    back_rim: dango_plate_part([4.08, 0.14, 0.12], plate_rim_material, position: [0, 0.055, 0.48]),
+    left_rim: dango_plate_part([0.14, 0.14, 0.82], plate_rim_material, position: [-1.98, 0.055, 0]),
+    right_rim: dango_plate_part([0.14, 0.14, 0.82], plate_rim_material, position: [1.98, 0.055, 0]),
+    foot: dango_plate_part([2.72, 0.08, 0.34], plate_foot_material, position: [0, -0.12, -0.04])
+  }
+  plate_parts.each_value { |part| plate.add(part) }
 
   dango_group = Three::Group.new
   dango_group.name = "dango-skewer"
@@ -228,12 +212,12 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
       dango_skewer_tip: skewer_tip,
       dango_mochi: mochi,
       dango_plate: plate,
-      dango_plate_floor: plate_floor,
-      dango_plate_front_rim: plate_front_rim,
-      dango_plate_back_rim: plate_back_rim,
-      dango_plate_left_rim: plate_left_rim,
-      dango_plate_right_rim: plate_right_rim,
-      dango_plate_foot: plate_foot,
+      dango_plate_floor: plate_parts[:floor],
+      dango_plate_front_rim: plate_parts[:front_rim],
+      dango_plate_back_rim: plate_parts[:back_rim],
+      dango_plate_left_rim: plate_parts[:left_rim],
+      dango_plate_right_rim: plate_parts[:right_rim],
+      dango_plate_foot: plate_parts[:foot],
       dango_shadow: shadow_catcher,
       dango_key_light: key_light,
       dango_hemisphere_light: hemisphere_light,
