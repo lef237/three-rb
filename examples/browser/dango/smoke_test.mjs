@@ -67,6 +67,7 @@ async function main() {
         type: globalThis.__threeRbDangoPlate?.type,
         name: globalThis.__threeRbDangoPlate?.name,
         children: globalThis.__threeRbDangoPlate?.children?.length,
+        position: globalThis.__threeRbDangoPlate?.position?.toArray?.(),
         rotation: globalThis.__threeRbDangoPlate?.rotation?.toArray?.(),
         floorType: globalThis.__threeRbDangoPlateFloor?.type,
         floorGeometryType: globalThis.__threeRbDangoPlateFloor?.geometry?.type,
@@ -162,6 +163,9 @@ async function main() {
       state.plate.type !== "Group" ||
       state.plate.name !== "dango-plate" ||
       state.plate.children !== 6 ||
+      !Array.isArray(state.plate.position) ||
+      state.plate.position[0] !== 0 ||
+      state.plate.position[2] !== 0.04 ||
       !Array.isArray(state.plate.rotation) ||
       state.plate.rotation[0] >= -0.4 ||
       state.plate.floorType !== "Mesh" ||

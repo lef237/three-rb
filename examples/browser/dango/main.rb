@@ -94,7 +94,7 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
 
   plate = Three::Group.new
   plate.name = "dango-plate"
-  plate.position.set(0, -1.15, -0.52)
+  plate.position.set(0, -1.15, 0.04)
   plate.rotation.x = -0.52
   scene.add(plate)
 
