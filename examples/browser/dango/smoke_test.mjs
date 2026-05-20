@@ -46,25 +46,44 @@ async function main() {
       })),
       skewer: {
         type: globalThis.__threeRbDangoSkewer?.type,
-        geometryType: globalThis.__threeRbDangoSkewer?.geometry?.type,
-        materialType: globalThis.__threeRbDangoSkewer?.material?.type,
-        color: globalThis.__threeRbDangoSkewer?.material?.color?.getHex?.(),
-        castShadow: globalThis.__threeRbDangoSkewer?.castShadow,
-        width: globalThis.__threeRbDangoSkewer?.geometry?.parameters?.width,
-        position: globalThis.__threeRbDangoSkewer?.position?.toArray?.()
+        name: globalThis.__threeRbDangoSkewer?.name,
+        children: globalThis.__threeRbDangoSkewer?.children?.length,
+        position: globalThis.__threeRbDangoSkewer?.position?.toArray?.(),
+        coreType: globalThis.__threeRbDangoSkewerCore?.type,
+        coreGeometryType: globalThis.__threeRbDangoSkewerCore?.geometry?.type,
+        coreWidth: globalThis.__threeRbDangoSkewerCore?.geometry?.parameters?.width,
+        corePosition: globalThis.__threeRbDangoSkewerCore?.position?.toArray?.(),
+        coreColor: globalThis.__threeRbDangoSkewerCore?.material?.color?.getHex?.(),
+        coreCastShadow: globalThis.__threeRbDangoSkewerCore?.castShadow,
+        tipType: globalThis.__threeRbDangoSkewerTip?.type,
+        tipGeometryType: globalThis.__threeRbDangoSkewerTip?.geometry?.type,
+        tipWidth: globalThis.__threeRbDangoSkewerTip?.geometry?.parameters?.width,
+        tipPosition: globalThis.__threeRbDangoSkewerTip?.position?.toArray?.(),
+        tipColor: globalThis.__threeRbDangoSkewerTip?.material?.color?.getHex?.(),
+        tipCastShadow: globalThis.__threeRbDangoSkewerTip?.castShadow
       },
       plate: {
         type: globalThis.__threeRbDangoPlate?.type,
         name: globalThis.__threeRbDangoPlate?.name,
         children: globalThis.__threeRbDangoPlate?.children?.length,
-        rimType: globalThis.__threeRbDangoPlateRim?.type,
-        rimGeometryType: globalThis.__threeRbDangoPlateRim?.geometry?.type,
-        wellType: globalThis.__threeRbDangoPlateWell?.type,
-        wellGeometryType: globalThis.__threeRbDangoPlateWell?.geometry?.type,
+        rotation: globalThis.__threeRbDangoPlate?.rotation?.toArray?.(),
+        floorType: globalThis.__threeRbDangoPlateFloor?.type,
+        floorGeometryType: globalThis.__threeRbDangoPlateFloor?.geometry?.type,
+        frontRimType: globalThis.__threeRbDangoPlateFrontRim?.type,
+        frontRimGeometryType: globalThis.__threeRbDangoPlateFrontRim?.geometry?.type,
+        backRimType: globalThis.__threeRbDangoPlateBackRim?.type,
+        backRimGeometryType: globalThis.__threeRbDangoPlateBackRim?.geometry?.type,
+        leftRimType: globalThis.__threeRbDangoPlateLeftRim?.type,
+        leftRimGeometryType: globalThis.__threeRbDangoPlateLeftRim?.geometry?.type,
+        rightRimType: globalThis.__threeRbDangoPlateRightRim?.type,
+        rightRimGeometryType: globalThis.__threeRbDangoPlateRightRim?.geometry?.type,
         footType: globalThis.__threeRbDangoPlateFoot?.type,
         footGeometryType: globalThis.__threeRbDangoPlateFoot?.geometry?.type,
-        rimReceiveShadow: globalThis.__threeRbDangoPlateRim?.receiveShadow,
-        wellReceiveShadow: globalThis.__threeRbDangoPlateWell?.receiveShadow,
+        floorReceiveShadow: globalThis.__threeRbDangoPlateFloor?.receiveShadow,
+        frontRimReceiveShadow: globalThis.__threeRbDangoPlateFrontRim?.receiveShadow,
+        backRimReceiveShadow: globalThis.__threeRbDangoPlateBackRim?.receiveShadow,
+        leftRimReceiveShadow: globalThis.__threeRbDangoPlateLeftRim?.receiveShadow,
+        rightRimReceiveShadow: globalThis.__threeRbDangoPlateRightRim?.receiveShadow,
         footReceiveShadow: globalThis.__threeRbDangoPlateFoot?.receiveShadow
       },
       lights: {
@@ -83,8 +102,8 @@ async function main() {
     if (state.group.type !== "Group" || state.group.name !== "dango-skewer" || state.group.children !== 4) {
       throw new Error(`dango group did not materialize correctly: ${JSON.stringify(state)}`);
     }
-    if (!Array.isArray(state.group.rotation) || Math.abs(state.group.rotation[1]) <= 0.001) {
-      throw new Error(`dango group did not animate: ${JSON.stringify(state)}`);
+    if (!Array.isArray(state.group.rotation) || Math.abs(state.group.rotation[2] + 0.22) > 1e-12) {
+      throw new Error(`dango group did not keep the expected skewer angle: ${JSON.stringify(state)}`);
     }
     if (!Array.isArray(state.mochi) || state.mochi.length !== 3) {
       throw new Error(`expected three mochi meshes: ${JSON.stringify(state)}`);
@@ -109,31 +128,55 @@ async function main() {
     });
 
     if (
-      state.skewer.type !== "Mesh" ||
-      state.skewer.geometryType !== "BoxGeometry" ||
-      state.skewer.materialType !== "MeshLambertMaterial" ||
-      state.skewer.color !== 0xcbb281 ||
-      state.skewer.castShadow !== true ||
-      typeof state.skewer.width !== "number" ||
-      state.skewer.width < 3.4 ||
-      state.skewer.width > 3.8 ||
+      state.skewer.type !== "Group" ||
+      state.skewer.name !== "dango-skewer-rod" ||
+      state.skewer.children !== 2 ||
       !Array.isArray(state.skewer.position) ||
-      state.skewer.position[0] <= 0.2
+      state.skewer.position[0] !== 0 ||
+      state.skewer.coreType !== "Mesh" ||
+      state.skewer.coreGeometryType !== "BoxGeometry" ||
+      state.skewer.coreColor !== 0xcbb281 ||
+      state.skewer.coreCastShadow !== true ||
+      typeof state.skewer.coreWidth !== "number" ||
+      state.skewer.coreWidth < 2.4 ||
+      state.skewer.coreWidth > 2.7 ||
+      !Array.isArray(state.skewer.corePosition) ||
+      state.skewer.corePosition[0] !== 0 ||
+      state.skewer.tipType !== "Mesh" ||
+      state.skewer.tipGeometryType !== "BoxGeometry" ||
+      state.skewer.tipColor !== 0xcbb281 ||
+      state.skewer.tipCastShadow !== true ||
+      typeof state.skewer.tipWidth !== "number" ||
+      state.skewer.tipWidth < 0.6 ||
+      state.skewer.tipWidth > 0.8 ||
+      !Array.isArray(state.skewer.tipPosition) ||
+      state.skewer.tipPosition[0] <= 1.6
     ) {
       throw new Error(`skewer did not materialize correctly: ${JSON.stringify(state)}`);
     }
     if (
       state.plate.type !== "Group" ||
       state.plate.name !== "dango-plate" ||
-      state.plate.children !== 3 ||
-      state.plate.rimType !== "Mesh" ||
-      state.plate.rimGeometryType !== "SphereGeometry" ||
-      state.plate.wellType !== "Mesh" ||
-      state.plate.wellGeometryType !== "SphereGeometry" ||
+      state.plate.children !== 6 ||
+      !Array.isArray(state.plate.rotation) ||
+      state.plate.rotation[0] >= -0.4 ||
+      state.plate.floorType !== "Mesh" ||
+      state.plate.floorGeometryType !== "BoxGeometry" ||
+      state.plate.frontRimType !== "Mesh" ||
+      state.plate.frontRimGeometryType !== "BoxGeometry" ||
+      state.plate.backRimType !== "Mesh" ||
+      state.plate.backRimGeometryType !== "BoxGeometry" ||
+      state.plate.leftRimType !== "Mesh" ||
+      state.plate.leftRimGeometryType !== "BoxGeometry" ||
+      state.plate.rightRimType !== "Mesh" ||
+      state.plate.rightRimGeometryType !== "BoxGeometry" ||
       state.plate.footType !== "Mesh" ||
       state.plate.footGeometryType !== "BoxGeometry" ||
-      state.plate.rimReceiveShadow !== true ||
-      state.plate.wellReceiveShadow !== true ||
+      state.plate.floorReceiveShadow !== true ||
+      state.plate.frontRimReceiveShadow !== true ||
+      state.plate.backRimReceiveShadow !== true ||
+      state.plate.leftRimReceiveShadow !== true ||
+      state.plate.rightRimReceiveShadow !== true ||
       state.plate.footReceiveShadow !== true
     ) {
       throw new Error(`plate did not materialize correctly: ${JSON.stringify(state)}`);
@@ -146,7 +189,7 @@ async function main() {
     ) {
       throw new Error(`dango lights did not materialize correctly: ${JSON.stringify(state)}`);
     }
-    if (state.controls.autoRotate !== true || state.controls.enableDamping !== true) {
+    if (state.controls.autoRotate !== false || state.controls.enableDamping !== true) {
       throw new Error(`orbit controls did not expose expected settings: ${JSON.stringify(state)}`);
     }
     if (!state.renderInfo || state.renderInfo.triangles < 2_000 || !state.frame) {

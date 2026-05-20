@@ -30,41 +30,68 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
 
   plate = Three::Group.new
   plate.name = "dango-plate"
-  plate.position.set(0, -1.1, -0.43)
+  plate.position.set(0, -1.15, -0.52)
+  plate.rotation.x = -0.52
   scene.add(plate)
 
-  plate_rim_material = Three::MeshLambertMaterial.new(color: 0xf4ddb8)
-  plate_rim = Three::Mesh.new(Three::SphereGeometry.new(1.0, width_segments: 64, height_segments: 16), plate_rim_material)
-  plate_rim.scale.set(2.12, 0.22, 0.14)
-  plate_rim.cast_shadow = true
-  plate_rim.receive_shadow = true
-  plate.add(plate_rim)
+  plate_floor_material = Three::MeshLambertMaterial.new(color: 0xfff7ea)
+  plate_floor = Three::Mesh.new(Three::BoxGeometry.new(3.72, 0.08, 0.82), plate_floor_material)
+  plate_floor.receive_shadow = true
+  plate.add(plate_floor)
 
-  plate_well_material = Three::MeshLambertMaterial.new(color: 0xfff6e6)
-  plate_well = Three::Mesh.new(Three::SphereGeometry.new(1.0, width_segments: 64, height_segments: 12), plate_well_material)
-  plate_well.position.set(0, 0.065, 0.12)
-  plate_well.scale.set(1.58, 0.085, 0.055)
-  plate_well.receive_shadow = true
-  plate.add(plate_well)
+  plate_rim_material = Three::MeshLambertMaterial.new(color: 0xf1d8ad)
+  plate_front_rim = Three::Mesh.new(Three::BoxGeometry.new(4.08, 0.14, 0.12), plate_rim_material)
+  plate_front_rim.position.set(0, 0.055, -0.48)
+  plate_front_rim.cast_shadow = true
+  plate_front_rim.receive_shadow = true
+  plate.add(plate_front_rim)
 
-  plate_foot_material = Three::MeshLambertMaterial.new(color: 0xd8bd90)
-  plate_foot = Three::Mesh.new(Three::BoxGeometry.new(2.34, 0.085, 0.16), plate_foot_material)
-  plate_foot.position.set(0, -0.205, -0.055)
+  plate_back_rim = Three::Mesh.new(Three::BoxGeometry.new(4.08, 0.14, 0.12), plate_rim_material)
+  plate_back_rim.position.set(0, 0.055, 0.48)
+  plate_back_rim.cast_shadow = true
+  plate_back_rim.receive_shadow = true
+  plate.add(plate_back_rim)
+
+  plate_left_rim = Three::Mesh.new(Three::BoxGeometry.new(0.14, 0.14, 0.82), plate_rim_material)
+  plate_left_rim.position.set(-1.98, 0.055, 0)
+  plate_left_rim.cast_shadow = true
+  plate_left_rim.receive_shadow = true
+  plate.add(plate_left_rim)
+
+  plate_right_rim = Three::Mesh.new(Three::BoxGeometry.new(0.14, 0.14, 0.82), plate_rim_material)
+  plate_right_rim.position.set(1.98, 0.055, 0)
+  plate_right_rim.cast_shadow = true
+  plate_right_rim.receive_shadow = true
+  plate.add(plate_right_rim)
+
+  plate_foot_material = Three::MeshLambertMaterial.new(color: 0xd3b680)
+  plate_foot = Three::Mesh.new(Three::BoxGeometry.new(2.72, 0.08, 0.34), plate_foot_material)
+  plate_foot.position.set(0, -0.12, -0.04)
   plate_foot.cast_shadow = true
   plate_foot.receive_shadow = true
   plate.add(plate_foot)
 
   dango_group = Three::Group.new
   dango_group.name = "dango-skewer"
-  dango_group.rotation.z = -0.34
+  dango_group.rotation.z = -0.22
   dango_group.position.y = 0.32
   scene.add(dango_group)
 
   skewer_material = Three::MeshLambertMaterial.new(color: 0xcbb281)
-  skewer = Three::Mesh.new(Three::BoxGeometry.new(3.64, 0.06, 0.06), skewer_material)
-  skewer.position.set(0.34, 0, -0.22)
-  skewer.cast_shadow = true
+  skewer = Three::Group.new
+  skewer.name = "dango-skewer-rod"
   dango_group.add(skewer)
+
+  skewer_core = Three::Mesh.new(Three::BoxGeometry.new(2.58, 0.06, 0.06), skewer_material)
+  skewer_core.position.z = -0.08
+  skewer_core.cast_shadow = true
+  skewer.add(skewer_core)
+
+  skewer_tip = Three::Mesh.new(Three::BoxGeometry.new(0.72, 0.06, 0.06), skewer_material)
+  skewer_tip.position.x = 1.82
+  skewer_tip.position.z = 0.04
+  skewer_tip.cast_shadow = true
+  skewer.add(skewer_tip)
 
   mochi_geometry = Three::SphereGeometry.new(0.58, width_segments: 48, height_segments: 24)
   mochi_specs = [
@@ -104,8 +131,7 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
     enable_damping: true,
     damping_factor: 0.08,
     enable_pan: false,
-    auto_rotate: true,
-    auto_rotate_speed: 0.55,
+    auto_rotate: false,
     min_zoom: 0.82,
     max_zoom: 1.65
   )
@@ -135,10 +161,15 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
       camera: camera,
       dango_group: dango_group,
       dango_skewer: skewer,
+      dango_skewer_core: skewer_core,
+      dango_skewer_tip: skewer_tip,
       dango_mochi: mochi,
       dango_plate: plate,
-      dango_plate_rim: plate_rim,
-      dango_plate_well: plate_well,
+      dango_plate_floor: plate_floor,
+      dango_plate_front_rim: plate_front_rim,
+      dango_plate_back_rim: plate_back_rim,
+      dango_plate_left_rim: plate_left_rim,
+      dango_plate_right_rim: plate_right_rim,
       dango_plate_foot: plate_foot,
       dango_shadow: shadow_catcher,
       dango_key_light: key_light,
@@ -151,7 +182,7 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
 
   renderer.animation_loop do
     frame = app.increment(:dango_frame)
-    dango_group.rotation.y = Math.sin(frame * 0.025) * 0.18
+    dango_group.rotation.y = 0
     dango_group.rotation.x = -0.05 + (Math.sin(frame * 0.017) * 0.035)
     dango_group.position.y = 0.32 + (Math.sin(frame * 0.03) * 0.035)
     plate.rotation.z = Math.sin(frame * 0.012) * 0.018
