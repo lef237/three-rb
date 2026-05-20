@@ -52,13 +52,13 @@ async function main() {
         position: globalThis.__threeRbDangoSkewer?.position?.toArray?.(),
         coreType: globalThis.__threeRbDangoSkewerCore?.type,
         coreGeometryType: globalThis.__threeRbDangoSkewerCore?.geometry?.type,
-        coreWidth: globalThis.__threeRbDangoSkewerCore?.geometry?.parameters?.width,
+        corePositionCount: globalThis.__threeRbDangoSkewerCore?.geometry?.attributes?.position?.count,
         corePosition: globalThis.__threeRbDangoSkewerCore?.position?.toArray?.(),
         coreColor: globalThis.__threeRbDangoSkewerCore?.material?.color?.getHex?.(),
         coreCastShadow: globalThis.__threeRbDangoSkewerCore?.castShadow,
         tipType: globalThis.__threeRbDangoSkewerTip?.type,
         tipGeometryType: globalThis.__threeRbDangoSkewerTip?.geometry?.type,
-        tipWidth: globalThis.__threeRbDangoSkewerTip?.geometry?.parameters?.width,
+        tipPositionCount: globalThis.__threeRbDangoSkewerTip?.geometry?.attributes?.position?.count,
         tipPosition: globalThis.__threeRbDangoSkewerTip?.position?.toArray?.(),
         tipColor: globalThis.__threeRbDangoSkewerTip?.material?.color?.getHex?.(),
         tipCastShadow: globalThis.__threeRbDangoSkewerTip?.castShadow
@@ -138,23 +138,19 @@ async function main() {
       !Array.isArray(state.skewer.position) ||
       state.skewer.position[0] !== 0 ||
       state.skewer.coreType !== "Mesh" ||
-      state.skewer.coreGeometryType !== "BoxGeometry" ||
+      state.skewer.coreGeometryType !== "BufferGeometry" ||
       state.skewer.coreColor !== 0xcbb281 ||
       state.skewer.coreCastShadow !== true ||
-      typeof state.skewer.coreWidth !== "number" ||
-      state.skewer.coreWidth < 2.4 ||
-      state.skewer.coreWidth > 2.7 ||
+      state.skewer.corePositionCount < 70 ||
       !Array.isArray(state.skewer.corePosition) ||
       state.skewer.corePosition[0] !== 0 ||
       state.skewer.corePosition[1] !== 0 ||
       state.skewer.corePosition[2] !== 0.04 ||
       state.skewer.tipType !== "Mesh" ||
-      state.skewer.tipGeometryType !== "BoxGeometry" ||
+      state.skewer.tipGeometryType !== "BufferGeometry" ||
       state.skewer.tipColor !== 0xcbb281 ||
       state.skewer.tipCastShadow !== true ||
-      typeof state.skewer.tipWidth !== "number" ||
-      state.skewer.tipWidth < 0.6 ||
-      state.skewer.tipWidth > 0.8 ||
+      state.skewer.tipPositionCount < 70 ||
       !Array.isArray(state.skewer.tipPosition) ||
       state.skewer.tipPosition[0] <= 1.6 ||
       state.skewer.tipPosition[1] !== 0 ||

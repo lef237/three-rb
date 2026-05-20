@@ -2,6 +2,70 @@
 
 require_relative "../../../lib/three"
 
+def dango_skewer_geometry(length, radius, radial_segments: 18)
+  geometry = Three::BufferGeometry.new
+  half_length = length / 2.0
+  vertices = []
+  normals = []
+  uvs = []
+  indices = []
+
+  (radial_segments + 1).times do |index|
+    angle = (Math::PI * 2 * index) / radial_segments
+    y = Math.cos(angle) * radius
+    z = Math.sin(angle) * radius
+    normal_y = Math.cos(angle)
+    normal_z = Math.sin(angle)
+
+    vertices.push(-half_length, y, z, half_length, y, z)
+    normals.push(0, normal_y, normal_z, 0, normal_y, normal_z)
+    u = index.to_f / radial_segments
+    uvs.push(u, 0, u, 1)
+  end
+
+  radial_segments.times do |index|
+    left = index * 2
+    right = left + 1
+    next_left = left + 2
+    next_right = left + 3
+    indices.push(left, next_left, right, right, next_left, next_right)
+  end
+
+  left_center = vertices.length / 3
+  vertices.push(-half_length, 0, 0)
+  normals.push(-1, 0, 0)
+  uvs.push(0.5, 0.5)
+  (radial_segments + 1).times do |index|
+    angle = (Math::PI * 2 * index) / radial_segments
+    vertices.push(-half_length, Math.cos(angle) * radius, Math.sin(angle) * radius)
+    normals.push(-1, 0, 0)
+    uvs.push((Math.cos(angle) + 1) / 2.0, (Math.sin(angle) + 1) / 2.0)
+  end
+  radial_segments.times do |index|
+    indices.push(left_center, left_center + index + 2, left_center + index + 1)
+  end
+
+  right_center = vertices.length / 3
+  vertices.push(half_length, 0, 0)
+  normals.push(1, 0, 0)
+  uvs.push(0.5, 0.5)
+  (radial_segments + 1).times do |index|
+    angle = (Math::PI * 2 * index) / radial_segments
+    vertices.push(half_length, Math.cos(angle) * radius, Math.sin(angle) * radius)
+    normals.push(1, 0, 0)
+    uvs.push((Math.cos(angle) + 1) / 2.0, (Math.sin(angle) + 1) / 2.0)
+  end
+  radial_segments.times do |index|
+    indices.push(right_center, right_center + index + 1, right_center + index + 2)
+  end
+
+  geometry.set_index(indices)
+  geometry.set_attribute(:position, Three::Float32BufferAttribute.new(vertices, 3))
+  geometry.set_attribute(:normal, Three::Float32BufferAttribute.new(normals, 3))
+  geometry.set_attribute(:uv, Three::Float32BufferAttribute.new(uvs, 2))
+  geometry
+end
+
 Three::Browser.run(starting: "Starting dango scene") do |app|
   scene = Three::Scene.new
   camera = Three::OrthographicCamera.new(-3.2, 3.2, 2.0, -2.0, near: 0.1, far: 100)
@@ -82,12 +146,12 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
   skewer.name = "dango-skewer-rod"
   dango_group.add(skewer)
 
-  skewer_core = Three::Mesh.new(Three::BoxGeometry.new(2.58, 0.06, 0.06), skewer_material)
+  skewer_core = Three::Mesh.new(dango_skewer_geometry(2.58, 0.034), skewer_material)
   skewer_core.position.z = 0.04
   skewer_core.cast_shadow = true
   skewer.add(skewer_core)
 
-  skewer_tip = Three::Mesh.new(Three::BoxGeometry.new(0.72, 0.06, 0.06), skewer_material)
+  skewer_tip = Three::Mesh.new(dango_skewer_geometry(0.72, 0.034), skewer_material)
   skewer_tip.position.x = 1.82
   skewer_tip.position.z = 0.04
   skewer_tip.cast_shadow = true
