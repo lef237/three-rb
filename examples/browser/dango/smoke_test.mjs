@@ -49,7 +49,8 @@ async function main() {
         geometryType: globalThis.__threeRbDangoSkewer?.geometry?.type,
         materialType: globalThis.__threeRbDangoSkewer?.material?.type,
         color: globalThis.__threeRbDangoSkewer?.material?.color?.getHex?.(),
-        castShadow: globalThis.__threeRbDangoSkewer?.castShadow
+        castShadow: globalThis.__threeRbDangoSkewer?.castShadow,
+        width: globalThis.__threeRbDangoSkewer?.geometry?.parameters?.width
       },
       plate: {
         type: globalThis.__threeRbDangoPlate?.type,
@@ -79,14 +80,14 @@ async function main() {
       throw new Error(`expected three mochi meshes: ${JSON.stringify(state)}`);
     }
 
-    const expectedColors = [0xf3a6b8, 0xf8f3e5, 0x88b96a];
+    const expectedColors = [0xf8cfd7, 0xfffaed, 0xc0dca4];
     state.mochi.forEach((mesh, index) => {
       if (
         mesh.type !== "Mesh" ||
         mesh.geometryType !== "SphereGeometry" ||
         mesh.materialType !== "MeshPhongMaterial" ||
         mesh.color !== expectedColors[index] ||
-        mesh.shininess !== 24 ||
+        mesh.shininess !== 14 ||
         mesh.castShadow !== true ||
         mesh.receiveShadow !== true
       ) {
@@ -101,12 +102,14 @@ async function main() {
       state.skewer.type !== "Mesh" ||
       state.skewer.geometryType !== "BoxGeometry" ||
       state.skewer.materialType !== "MeshLambertMaterial" ||
-      state.skewer.color !== 0xb48950 ||
-      state.skewer.castShadow !== true
+      state.skewer.color !== 0xcbb281 ||
+      state.skewer.castShadow !== true ||
+      typeof state.skewer.width !== "number" ||
+      state.skewer.width >= 3
     ) {
       throw new Error(`skewer did not materialize correctly: ${JSON.stringify(state)}`);
     }
-    if (state.plate.type !== "Mesh" || state.plate.geometryType !== "BoxGeometry" || state.plate.receiveShadow !== true) {
+    if (state.plate.type !== "Mesh" || state.plate.geometryType !== "SphereGeometry" || state.plate.receiveShadow !== true) {
       throw new Error(`plate did not materialize correctly: ${JSON.stringify(state)}`);
     }
     if (
