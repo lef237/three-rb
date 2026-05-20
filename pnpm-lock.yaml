@@ -12,8 +12,8 @@ importers:
         specifier: 0.4.2
         version: 0.4.2
       '@ruby/3.4-wasm-wasi':
-        specifier: 2.9.4-2026-05-11-a
-        version: 2.9.4-2026-05-11-a
+        specifier: 2.9.4-2026-05-20-a
+        version: 2.9.4-2026-05-20-a
       '@ruby/wasm-wasi':
         specifier: 2.9.4-2026-05-11-a
         version: 2.9.4-2026-05-11-a
@@ -30,11 +30,14 @@ packages:
   '@bjorn3/browser_wasi_shim@0.4.2':
     resolution: {integrity: sha512-/iHkCVUG3VbcbmEHn5iIUpIrh7a7WPiwZ3sHy4HZKZzBdSadwdddYDZAII2zBvQYV0Lfi8naZngPCN7WPHI/hA==}
 
-  '@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a':
-    resolution: {integrity: sha512-qI32iuHxb1onVbbbfnZHOI109P13ZpvQf4KEMk4XyzVIDKYNHzJzwvRcZm6uPjtv9ekLeJBSSeqqImRP/sDNqQ==}
+  '@ruby/3.4-wasm-wasi@2.9.4-2026-05-20-a':
+    resolution: {integrity: sha512-GR/HiR8tjD5l+L8OId85iDs5NYIDtHP9HjEDJwnZWmn+TaER9c6zgtFch+Gudbayp0WjU3g6qWXmzGmBHFLMOA==}
 
   '@ruby/wasm-wasi@2.9.4-2026-05-11-a':
     resolution: {integrity: sha512-DpS1BJFYldhSmy1gGa0GwD4cYw8qTu6FblQq6JVF0VVh+3ONPcvMGPHpVvwPeMve4tEsMkM6hOyTO8HshTcQ8Q==}
+
+  '@ruby/wasm-wasi@2.9.4-2026-05-20-a':
+    resolution: {integrity: sha512-T19at8PTLWJKVZQHDtOlvpLQe8DwF8m4pfzMVosXF6QyHWgRXPi9LhLN8QODnzKTrVMXg5oqWs5gZJfG91vAbw==}
 
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
@@ -61,11 +64,16 @@ snapshots:
 
   '@bjorn3/browser_wasi_shim@0.4.2': {}
 
-  '@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a':
+  '@ruby/3.4-wasm-wasi@2.9.4-2026-05-20-a':
     dependencies:
-      '@ruby/wasm-wasi': 2.9.4-2026-05-11-a
+      '@ruby/wasm-wasi': 2.9.4-2026-05-20-a
 
   '@ruby/wasm-wasi@2.9.4-2026-05-11-a':
+    dependencies:
+      '@bjorn3/browser_wasi_shim': 0.4.2
+      tslib: 2.8.1
+
+  '@ruby/wasm-wasi@2.9.4-2026-05-20-a':
     dependencies:
       '@bjorn3/browser_wasi_shim': 0.4.2
       tslib: 2.8.1
