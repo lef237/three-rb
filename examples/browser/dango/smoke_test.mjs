@@ -37,6 +37,9 @@ async function main() {
         type: mesh?.type,
         name: mesh?.name,
         geometryType: mesh?.geometry?.type,
+        geometryRadius: mesh?.geometry?.parameters?.radius,
+        geometryWidthSegments: mesh?.geometry?.parameters?.widthSegments,
+        geometryHeightSegments: mesh?.geometry?.parameters?.heightSegments,
         materialType: mesh?.material?.type,
         color: mesh?.material?.color?.getHex?.(),
         shininess: mesh?.material?.shininess,
@@ -109,8 +112,8 @@ async function main() {
     }
     if (
       !Array.isArray(state.group.position) ||
-      Math.abs(state.group.position[1] + 0.47) > 0.08 ||
-      Math.abs(state.group.position[2] + 0.39) > 1e-12
+      Math.abs(state.group.position[1] - 0.07) > 0.05 ||
+      Math.abs(state.group.position[2] + 0.69) > 1e-12
     ) {
       throw new Error(`dango group is not centered over the plate depth: ${JSON.stringify(state)}`);
     }
@@ -123,6 +126,9 @@ async function main() {
       if (
         mesh.type !== "Mesh" ||
         mesh.geometryType !== "SphereGeometry" ||
+        mesh.geometryRadius !== 0.56 ||
+        mesh.geometryWidthSegments !== 96 ||
+        mesh.geometryHeightSegments !== 48 ||
         mesh.materialType !== "MeshPhongMaterial" ||
         mesh.color !== expectedColors[index] ||
         mesh.shininess !== 14 ||
@@ -131,8 +137,8 @@ async function main() {
       ) {
         throw new Error(`mochi mesh ${index} did not materialize correctly: ${JSON.stringify(state)}`);
       }
-      if (!Array.isArray(mesh.scale) || mesh.scale[0] !== 1 || mesh.scale[1] !== 0.96 || mesh.scale[2] !== 0.88) {
-        throw new Error(`mochi mesh ${index} scale did not sync: ${JSON.stringify(state)}`);
+      if (!Array.isArray(mesh.scale) || mesh.scale[0] !== 1 || mesh.scale[1] !== 1 || mesh.scale[2] !== 1) {
+        throw new Error(`mochi mesh ${index} is not spherical: ${JSON.stringify(state)}`);
       }
       if (!Array.isArray(mesh.position) || mesh.position[1] !== 0 || mesh.position[2] !== 0.04) {
         throw new Error(`mochi mesh ${index} position did not sync: ${JSON.stringify(state)}`);
