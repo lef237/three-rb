@@ -2,62 +2,63 @@
 
 require_relative "../../../lib/three"
 
-def dango_skewer_geometry(length, radius, radial_segments: 18)
-  geometry = Three::BufferGeometry.new
-  half_length = length / 2.0
-  vertices = []
-  normals = []
-  uvs = []
-  indices = []
-
-  (radial_segments + 1).times do |index|
+def dango_ring_points(radial_segments)
+  (0..radial_segments).map do |index|
     angle = (Math::PI * 2 * index) / radial_segments
-    y = Math.cos(angle) * radius
-    z = Math.sin(angle) * radius
-    normal_y = Math.cos(angle)
-    normal_z = Math.sin(angle)
+    [Math.cos(angle), Math.sin(angle), index.to_f / radial_segments]
+  end
+end
+
+def append_dango_skewer_body(vertices, normals, uvs, indices, half_length, radius, ring_points)
+  ring_points.each do |cosine, sine, u|
+    y = cosine * radius
+    z = sine * radius
 
     vertices.push(-half_length, y, z, half_length, y, z)
-    normals.push(0, normal_y, normal_z, 0, normal_y, normal_z)
-    u = index.to_f / radial_segments
+    normals.push(0, cosine, sine, 0, cosine, sine)
     uvs.push(u, 0, u, 1)
   end
 
-  radial_segments.times do |index|
+  (ring_points.length - 1).times do |index|
     left = index * 2
     right = left + 1
     next_left = left + 2
     next_right = left + 3
     indices.push(left, next_left, right, right, next_left, next_right)
   end
+end
 
-  left_center = vertices.length / 3
-  vertices.push(-half_length, 0, 0)
-  normals.push(-1, 0, 0)
+def append_dango_skewer_cap(vertices, normals, uvs, indices, x, radius, ring_points, normal_x:, reverse: false)
+  center = vertices.length / 3
+  vertices.push(x, 0, 0)
+  normals.push(normal_x, 0, 0)
   uvs.push(0.5, 0.5)
-  (radial_segments + 1).times do |index|
-    angle = (Math::PI * 2 * index) / radial_segments
-    vertices.push(-half_length, Math.cos(angle) * radius, Math.sin(angle) * radius)
-    normals.push(-1, 0, 0)
-    uvs.push((Math.cos(angle) + 1) / 2.0, (Math.sin(angle) + 1) / 2.0)
-  end
-  radial_segments.times do |index|
-    indices.push(left_center, left_center + index + 2, left_center + index + 1)
+
+  ring_points.each do |cosine, sine, _u|
+    vertices.push(x, cosine * radius, sine * radius)
+    normals.push(normal_x, 0, 0)
+    uvs.push((cosine + 1) / 2.0, (sine + 1) / 2.0)
   end
 
-  right_center = vertices.length / 3
-  vertices.push(half_length, 0, 0)
-  normals.push(1, 0, 0)
-  uvs.push(0.5, 0.5)
-  (radial_segments + 1).times do |index|
-    angle = (Math::PI * 2 * index) / radial_segments
-    vertices.push(half_length, Math.cos(angle) * radius, Math.sin(angle) * radius)
-    normals.push(1, 0, 0)
-    uvs.push((Math.cos(angle) + 1) / 2.0, (Math.sin(angle) + 1) / 2.0)
+  (ring_points.length - 1).times do |index|
+    first = center + index + 1
+    second = center + index + 2
+    reverse ? indices.push(center, second, first) : indices.push(center, first, second)
   end
-  radial_segments.times do |index|
-    indices.push(right_center, right_center + index + 1, right_center + index + 2)
-  end
+end
+
+def dango_skewer_geometry(length, radius, radial_segments: 18)
+  geometry = Three::BufferGeometry.new
+  half_length = length / 2.0
+  ring_points = dango_ring_points(radial_segments)
+  vertices = []
+  normals = []
+  uvs = []
+  indices = []
+
+  append_dango_skewer_body(vertices, normals, uvs, indices, half_length, radius, ring_points)
+  append_dango_skewer_cap(vertices, normals, uvs, indices, -half_length, radius, ring_points, normal_x: -1, reverse: true)
+  append_dango_skewer_cap(vertices, normals, uvs, indices, half_length, radius, ring_points, normal_x: 1)
 
   geometry.set_index(indices)
   geometry.set_attribute(:position, Three::Float32BufferAttribute.new(vertices, 3))
@@ -74,13 +75,8 @@ def dango_plate_part(size, material, position: nil, cast_shadow: true)
   mesh
 end
 
-Three::Browser.run(starting: "Starting dango scene") do |app|
-  scene = Three::Scene.new
-  camera = Three::OrthographicCamera.new(-3.2, 3.2, 2.0, -2.0, near: 0.1, far: 100)
-  camera.position.z = 6
-
+def dango_lights
   hemisphere_light = Three::HemisphereLight.new(0xfffbf2, 0xd7ddb8, 0.68)
-  scene.add(hemisphere_light)
 
   key_light = Three::DirectionalLight.new(0xffffff, 1.05)
   key_light.position.set(-2.4, 3.0, 5.2)
@@ -88,80 +84,88 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
   key_light.shadow_map_size = [1024, 1024]
   key_light.shadow_bias = -0.00008
   key_light.set_shadow_camera(left: -3.6, right: 3.6, top: 2.4, bottom: -2.4, near: 0.5, far: 12)
-  scene.add(key_light)
 
   fill_light = Three::PointLight.new(0xffe6d0, 0.52, 7, 2)
   fill_light.position.set(2.6, -1.2, 3.0)
-  scene.add(fill_light)
 
-  shadow_material = Three::ShadowMaterial.new(color: 0x8c806d, opacity: 0.12)
-  shadow_catcher = Three::Mesh.new(Three::PlaneGeometry.new(6.0, 3.6), shadow_material)
-  shadow_catcher.position.z = -0.72
-  shadow_catcher.receive_shadow = true
-  scene.add(shadow_catcher)
+  { hemisphere: hemisphere_light, key: key_light, fill: fill_light }
+end
 
+def dango_shadow_catcher
+  material = Three::ShadowMaterial.new(color: 0x8c806d, opacity: 0.12)
+  mesh = Three::Mesh.new(Three::PlaneGeometry.new(6.0, 3.6), material)
+  mesh.position.z = -0.72
+  mesh.receive_shadow = true
+  mesh
+end
+
+def dango_plate
   plate = Three::Group.new
   plate.name = "dango-plate"
   plate.position.set(0, -1.15, 0.04)
   plate.rotation.x = -0.52
-  scene.add(plate)
 
-  plate_floor_material = Three::MeshLambertMaterial.new(color: 0xfff7ea)
-  plate_rim_material = Three::MeshLambertMaterial.new(color: 0xf1d8ad)
-  plate_foot_material = Three::MeshLambertMaterial.new(color: 0xd3b680)
-  plate_parts = {
-    floor: dango_plate_part([3.72, 0.08, 0.82], plate_floor_material, cast_shadow: false),
-    front_rim: dango_plate_part([4.08, 0.14, 0.12], plate_rim_material, position: [0, 0.055, -0.48]),
-    back_rim: dango_plate_part([4.08, 0.14, 0.12], plate_rim_material, position: [0, 0.055, 0.48]),
-    left_rim: dango_plate_part([0.14, 0.14, 0.82], plate_rim_material, position: [-1.98, 0.055, 0]),
-    right_rim: dango_plate_part([0.14, 0.14, 0.82], plate_rim_material, position: [1.98, 0.055, 0]),
-    foot: dango_plate_part([2.72, 0.08, 0.34], plate_foot_material, position: [0, -0.12, -0.04])
+  floor_material = Three::MeshLambertMaterial.new(color: 0xfff7ea)
+  rim_material = Three::MeshLambertMaterial.new(color: 0xf1d8ad)
+  foot_material = Three::MeshLambertMaterial.new(color: 0xd3b680)
+  parts = {
+    floor: dango_plate_part([3.72, 0.08, 0.82], floor_material, cast_shadow: false),
+    front_rim: dango_plate_part([4.08, 0.14, 0.12], rim_material, position: [0, 0.055, -0.48]),
+    back_rim: dango_plate_part([4.08, 0.14, 0.12], rim_material, position: [0, 0.055, 0.48]),
+    left_rim: dango_plate_part([0.14, 0.14, 0.82], rim_material, position: [-1.98, 0.055, 0]),
+    right_rim: dango_plate_part([0.14, 0.14, 0.82], rim_material, position: [1.98, 0.055, 0]),
+    foot: dango_plate_part([2.72, 0.08, 0.34], foot_material, position: [0, -0.12, -0.04])
   }
-  plate_parts.each_value { |part| plate.add(part) }
+  parts.each_value { |part| plate.add(part) }
 
-  dango_group = Three::Group.new
-  dango_group.name = "dango-skewer"
-  dango_group.rotation.z = -0.22
-  dango_group.position.set(0, 0.18, -0.75)
-  scene.add(dango_group)
+  [plate, parts]
+end
 
-  skewer_material = Three::MeshLambertMaterial.new(color: 0xcbb281)
+def dango_skewer_mesh(length, material, position)
+  mesh = Three::Mesh.new(dango_skewer_geometry(length, 0.034), material)
+  mesh.position.set(*position)
+  mesh.cast_shadow = true
+  mesh
+end
+
+def dango_skewer
+  material = Three::MeshLambertMaterial.new(color: 0xcbb281)
   skewer = Three::Group.new
   skewer.name = "dango-skewer-rod"
-  dango_group.add(skewer)
 
-  skewer_core = Three::Mesh.new(dango_skewer_geometry(2.58, 0.034), skewer_material)
-  skewer_core.position.z = 0.04
-  skewer_core.cast_shadow = true
-  skewer.add(skewer_core)
+  core = dango_skewer_mesh(2.58, material, [0, 0, 0.04])
+  tip = dango_skewer_mesh(0.72, material, [1.82, 0, 0.04])
+  skewer.add(core, tip)
 
-  skewer_tip = Three::Mesh.new(dango_skewer_geometry(0.72, 0.034), skewer_material)
-  skewer_tip.position.x = 1.82
-  skewer_tip.position.z = 0.04
-  skewer_tip.cast_shadow = true
-  skewer.add(skewer_tip)
+  [skewer, core, tip]
+end
 
-  mochi_geometry = Three::SphereGeometry.new(0.56, width_segments: 96, height_segments: 48)
-  mochi_specs = [
-    { name: "sakura", x: -0.98, color: 0xf8cfd7, specular: 0xf4dce1 },
-    { name: "plain", x: 0.0, color: 0xfffaed, specular: 0xe8dfc8 },
-    { name: "matcha", x: 0.98, color: 0xc0dca4, specular: 0xddebd0 }
-  ]
-  mochi = mochi_specs.map do |spec|
-    material = Three::MeshPhongMaterial.new(
-      color: spec[:color],
-      specular: spec[:specular],
-      shininess: 14
-    )
-    mesh = Three::Mesh.new(mochi_geometry, material)
-    mesh.name = "#{spec[:name]}-dango"
-    mesh.position.set(spec[:x], 0, 0.04)
+def dango_mochi
+  geometry = Three::SphereGeometry.new(0.56, width_segments: 96, height_segments: 48)
+  [
+    ["sakura", -0.98, 0xf8cfd7, 0xf4dce1],
+    ["plain", 0.0, 0xfffaed, 0xe8dfc8],
+    ["matcha", 0.98, 0xc0dca4, 0xddebd0]
+  ].map do |name, x, color, specular|
+    material = Three::MeshPhongMaterial.new(color: color, specular: specular, shininess: 14)
+    mesh = Three::Mesh.new(geometry, material)
+    mesh.name = "#{name}-dango"
+    mesh.position.set(x, 0, 0.04)
     mesh.cast_shadow = true
     mesh.receive_shadow = true
-    dango_group.add(mesh)
     mesh
   end
+end
 
+def dango_skewer_group
+  group = Three::Group.new
+  group.name = "dango-skewer"
+  group.rotation.z = -0.22
+  group.position.set(0, 0.18, -0.75)
+  group
+end
+
+def dango_renderer
   renderer = Three::Renderers::ThreeJSRenderer.new(
     canvas: "#scene",
     antialias: true,
@@ -171,7 +175,10 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
     shadow_map_type: Three::PCFSoftShadowMap
   )
   renderer.set_clear_color(0xfaf5ec, 1)
+  renderer
+end
 
+def dango_controls(camera, renderer)
   controls = Three::Controls::OrbitControls.new(
     camera,
     renderer: renderer,
@@ -183,6 +190,37 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
     max_zoom: 1.65
   )
   controls.target.set(0, -0.18, 0)
+  controls
+end
+
+Three::Browser.run(starting: "Starting dango scene") do |app|
+  scene = Three::Scene.new
+  camera = Three::OrthographicCamera.new(-3.2, 3.2, 2.0, -2.0, near: 0.1, far: 100)
+  camera.position.z = 6
+
+  lights = dango_lights
+  hemisphere_light = lights[:hemisphere]
+  key_light = lights[:key]
+  fill_light = lights[:fill]
+  scene.add(hemisphere_light, key_light, fill_light)
+
+  shadow_catcher = dango_shadow_catcher
+  scene.add(shadow_catcher)
+
+  plate, plate_parts = dango_plate
+  scene.add(plate)
+
+  dango_group = dango_skewer_group
+  scene.add(dango_group)
+
+  skewer, skewer_core, skewer_tip = dango_skewer
+  dango_group.add(skewer)
+
+  mochi = dango_mochi
+  mochi.each { |mesh| dango_group.add(mesh) }
+
+  renderer = dango_renderer
+  controls = dango_controls(camera, renderer)
 
   app.resize_renderer(renderer, camera) do |width, height, _aspect|
     view_height = 4.05
