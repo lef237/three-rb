@@ -42,6 +42,7 @@ async function main() {
         shininess: mesh?.material?.shininess,
         castShadow: mesh?.castShadow,
         receiveShadow: mesh?.receiveShadow,
+        position: mesh?.position?.toArray?.(),
         scale: mesh?.scale?.toArray?.()
       })),
       skewer: {
@@ -125,6 +126,9 @@ async function main() {
       if (!Array.isArray(mesh.scale) || mesh.scale[0] !== 1 || mesh.scale[1] !== 0.96 || mesh.scale[2] !== 0.88) {
         throw new Error(`mochi mesh ${index} scale did not sync: ${JSON.stringify(state)}`);
       }
+      if (!Array.isArray(mesh.position) || mesh.position[1] !== 0 || mesh.position[2] !== 0.04) {
+        throw new Error(`mochi mesh ${index} position did not sync: ${JSON.stringify(state)}`);
+      }
     });
 
     if (
@@ -142,6 +146,8 @@ async function main() {
       state.skewer.coreWidth > 2.7 ||
       !Array.isArray(state.skewer.corePosition) ||
       state.skewer.corePosition[0] !== 0 ||
+      state.skewer.corePosition[1] !== 0 ||
+      state.skewer.corePosition[2] !== 0.04 ||
       state.skewer.tipType !== "Mesh" ||
       state.skewer.tipGeometryType !== "BoxGeometry" ||
       state.skewer.tipColor !== 0xcbb281 ||
@@ -150,7 +156,9 @@ async function main() {
       state.skewer.tipWidth < 0.6 ||
       state.skewer.tipWidth > 0.8 ||
       !Array.isArray(state.skewer.tipPosition) ||
-      state.skewer.tipPosition[0] <= 1.6
+      state.skewer.tipPosition[0] <= 1.6 ||
+      state.skewer.tipPosition[1] !== 0 ||
+      state.skewer.tipPosition[2] !== 0.04
     ) {
       throw new Error(`skewer did not materialize correctly: ${JSON.stringify(state)}`);
     }

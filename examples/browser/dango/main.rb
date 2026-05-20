@@ -83,7 +83,7 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
   dango_group.add(skewer)
 
   skewer_core = Three::Mesh.new(Three::BoxGeometry.new(2.58, 0.06, 0.06), skewer_material)
-  skewer_core.position.z = -0.08
+  skewer_core.position.z = 0.04
   skewer_core.cast_shadow = true
   skewer.add(skewer_core)
 
