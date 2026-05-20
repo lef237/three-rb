@@ -50,12 +50,22 @@ async function main() {
         materialType: globalThis.__threeRbDangoSkewer?.material?.type,
         color: globalThis.__threeRbDangoSkewer?.material?.color?.getHex?.(),
         castShadow: globalThis.__threeRbDangoSkewer?.castShadow,
-        width: globalThis.__threeRbDangoSkewer?.geometry?.parameters?.width
+        width: globalThis.__threeRbDangoSkewer?.geometry?.parameters?.width,
+        position: globalThis.__threeRbDangoSkewer?.position?.toArray?.()
       },
       plate: {
         type: globalThis.__threeRbDangoPlate?.type,
-        geometryType: globalThis.__threeRbDangoPlate?.geometry?.type,
-        receiveShadow: globalThis.__threeRbDangoPlate?.receiveShadow
+        name: globalThis.__threeRbDangoPlate?.name,
+        children: globalThis.__threeRbDangoPlate?.children?.length,
+        rimType: globalThis.__threeRbDangoPlateRim?.type,
+        rimGeometryType: globalThis.__threeRbDangoPlateRim?.geometry?.type,
+        wellType: globalThis.__threeRbDangoPlateWell?.type,
+        wellGeometryType: globalThis.__threeRbDangoPlateWell?.geometry?.type,
+        footType: globalThis.__threeRbDangoPlateFoot?.type,
+        footGeometryType: globalThis.__threeRbDangoPlateFoot?.geometry?.type,
+        rimReceiveShadow: globalThis.__threeRbDangoPlateRim?.receiveShadow,
+        wellReceiveShadow: globalThis.__threeRbDangoPlateWell?.receiveShadow,
+        footReceiveShadow: globalThis.__threeRbDangoPlateFoot?.receiveShadow
       },
       lights: {
         keyType: globalThis.__threeRbDangoKeyLight?.type,
@@ -105,11 +115,27 @@ async function main() {
       state.skewer.color !== 0xcbb281 ||
       state.skewer.castShadow !== true ||
       typeof state.skewer.width !== "number" ||
-      state.skewer.width >= 3
+      state.skewer.width < 3.4 ||
+      state.skewer.width > 3.8 ||
+      !Array.isArray(state.skewer.position) ||
+      state.skewer.position[0] <= 0.2
     ) {
       throw new Error(`skewer did not materialize correctly: ${JSON.stringify(state)}`);
     }
-    if (state.plate.type !== "Mesh" || state.plate.geometryType !== "SphereGeometry" || state.plate.receiveShadow !== true) {
+    if (
+      state.plate.type !== "Group" ||
+      state.plate.name !== "dango-plate" ||
+      state.plate.children !== 3 ||
+      state.plate.rimType !== "Mesh" ||
+      state.plate.rimGeometryType !== "SphereGeometry" ||
+      state.plate.wellType !== "Mesh" ||
+      state.plate.wellGeometryType !== "SphereGeometry" ||
+      state.plate.footType !== "Mesh" ||
+      state.plate.footGeometryType !== "BoxGeometry" ||
+      state.plate.rimReceiveShadow !== true ||
+      state.plate.wellReceiveShadow !== true ||
+      state.plate.footReceiveShadow !== true
+    ) {
       throw new Error(`plate did not materialize correctly: ${JSON.stringify(state)}`);
     }
     if (

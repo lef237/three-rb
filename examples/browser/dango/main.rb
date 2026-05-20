@@ -28,13 +28,31 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
   shadow_catcher.receive_shadow = true
   scene.add(shadow_catcher)
 
-  plate_material = Three::MeshLambertMaterial.new(color: 0xfff0d6)
-  plate = Three::Mesh.new(Three::SphereGeometry.new(1.0, width_segments: 64, height_segments: 16), plate_material)
-  plate.position.set(0, -1.08, -0.42)
-  plate.scale.set(2.05, 0.23, 0.08)
-  plate.cast_shadow = true
-  plate.receive_shadow = true
+  plate = Three::Group.new
+  plate.name = "dango-plate"
+  plate.position.set(0, -1.1, -0.43)
   scene.add(plate)
+
+  plate_rim_material = Three::MeshLambertMaterial.new(color: 0xf4ddb8)
+  plate_rim = Three::Mesh.new(Three::SphereGeometry.new(1.0, width_segments: 64, height_segments: 16), plate_rim_material)
+  plate_rim.scale.set(2.12, 0.22, 0.14)
+  plate_rim.cast_shadow = true
+  plate_rim.receive_shadow = true
+  plate.add(plate_rim)
+
+  plate_well_material = Three::MeshLambertMaterial.new(color: 0xfff6e6)
+  plate_well = Three::Mesh.new(Three::SphereGeometry.new(1.0, width_segments: 64, height_segments: 12), plate_well_material)
+  plate_well.position.set(0, 0.065, 0.12)
+  plate_well.scale.set(1.58, 0.085, 0.055)
+  plate_well.receive_shadow = true
+  plate.add(plate_well)
+
+  plate_foot_material = Three::MeshLambertMaterial.new(color: 0xd8bd90)
+  plate_foot = Three::Mesh.new(Three::BoxGeometry.new(2.34, 0.085, 0.16), plate_foot_material)
+  plate_foot.position.set(0, -0.205, -0.055)
+  plate_foot.cast_shadow = true
+  plate_foot.receive_shadow = true
+  plate.add(plate_foot)
 
   dango_group = Three::Group.new
   dango_group.name = "dango-skewer"
@@ -43,8 +61,8 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
   scene.add(dango_group)
 
   skewer_material = Three::MeshLambertMaterial.new(color: 0xcbb281)
-  skewer = Three::Mesh.new(Three::BoxGeometry.new(2.78, 0.06, 0.06), skewer_material)
-  skewer.position.z = -0.2
+  skewer = Three::Mesh.new(Three::BoxGeometry.new(3.64, 0.06, 0.06), skewer_material)
+  skewer.position.set(0.34, 0, -0.22)
   skewer.cast_shadow = true
   dango_group.add(skewer)
 
@@ -119,6 +137,9 @@ Three::Browser.run(starting: "Starting dango scene") do |app|
       dango_skewer: skewer,
       dango_mochi: mochi,
       dango_plate: plate,
+      dango_plate_rim: plate_rim,
+      dango_plate_well: plate_well,
+      dango_plate_foot: plate_foot,
       dango_shadow: shadow_catcher,
       dango_key_light: key_light,
       dango_hemisphere_light: hemisphere_light,
