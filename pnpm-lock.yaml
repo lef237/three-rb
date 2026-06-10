@@ -15,8 +15,8 @@ importers:
         specifier: 2.9.4-2026-05-11-a
         version: 2.9.4-2026-05-11-a
       '@ruby/wasm-wasi':
-        specifier: 2.9.4-2026-05-11-a
-        version: 2.9.4-2026-05-11-a
+        specifier: 2.9.4-2026-06-09-a
+        version: 2.9.4-2026-06-09-a
       three:
         specifier: 0.184.0
         version: 0.184.0
@@ -35,6 +35,9 @@ packages:
 
   '@ruby/wasm-wasi@2.9.4-2026-05-11-a':
     resolution: {integrity: sha512-DpS1BJFYldhSmy1gGa0GwD4cYw8qTu6FblQq6JVF0VVh+3ONPcvMGPHpVvwPeMve4tEsMkM6hOyTO8HshTcQ8Q==}
+
+  '@ruby/wasm-wasi@2.9.4-2026-06-09-a':
+    resolution: {integrity: sha512-41Hjk1V3UAdLfG4fET2JISvGf3/JnNPbA9jyINckdJU/8unDFDFEiMUmWGLOIGuOYGUodS89a8iQ28MHLdNYaA==}
 
   fsevents@2.3.2:
     resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
@@ -66,6 +69,11 @@ snapshots:
       '@ruby/wasm-wasi': 2.9.4-2026-05-11-a
 
   '@ruby/wasm-wasi@2.9.4-2026-05-11-a':
+    dependencies:
+      '@bjorn3/browser_wasi_shim': 0.4.2
+      tslib: 2.8.1
+
+  '@ruby/wasm-wasi@2.9.4-2026-06-09-a':
     dependencies:
       '@bjorn3/browser_wasi_shim': 0.4.2
       tslib: 2.8.1
