@@ -18,8 +18,8 @@ importers:
         specifier: 2.9.4-2026-05-11-a
         version: 2.9.4-2026-05-11-a
       three:
-        specifier: 0.184.0
-        version: 0.184.0
+        specifier: 0.185.0
+        version: 0.185.0
     devDependencies:
       playwright:
         specifier: ^1.60.0
@@ -51,8 +51,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  three@0.184.0:
-    resolution: {integrity: sha512-wtTRjG92pM5eUg/KuUnHsqSAlPM296brTOcLgMRqEeylYTh/CdtvKUvCyyCQTzFuStieWxvZb8mVTMvdPyUpxg==}
+  three@0.185.0:
+    resolution: {integrity: sha512-+yRrcRO2iZa8uzvNNl0d7cL4huhgKgBvVJ0njcTe8xFqZ6DMAFZdCKDP91SEAuj25bNAj7k1QQdf+srZywVK6w==}
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
@@ -81,6 +81,6 @@ snapshots:
     optionalDependencies:
       fsevents: 2.3.2
 
-  three@0.184.0: {}
+  three@0.185.0: {}
 
   tslib@2.8.1: {}

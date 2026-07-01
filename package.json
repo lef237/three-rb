@@ -25,7 +25,7 @@
     "@bjorn3/browser_wasi_shim": "0.4.2",
     "@ruby/3.4-wasm-wasi": "2.9.4-2026-05-11-a",
     "@ruby/wasm-wasi": "2.9.4-2026-05-11-a",
-    "three": "0.184.0"
+    "three": "0.185.0"
   },
   "devDependencies": {
     "playwright": "^1.60.0"
