@@ -238,9 +238,11 @@ module Three
                   position: absolute;
                   top: 16px;
                   left: 16px;
-                  display: flex;
+                  display: grid;
+                  grid-template-columns: auto minmax(0, 1fr);
                   align-items: center;
                   gap: 8px;
+                  min-width: min(360px, calc(100% - 32px));
                   padding: 8px 10px;
                   border: 1px solid rgba(255, 255, 255, 0.14);
                   border-radius: 6px;
@@ -257,6 +259,27 @@ module Three
                 }
                 .status-dot[data-state="running"] { background: #4ed08f; }
                 .status-dot[data-state="error"] { background: #f15b5b; }
+                .status-dot[data-state="loading"] { animation: status-dot-pulse 1.2s ease-in-out infinite; }
+                @keyframes status-dot-pulse {
+                  0%, 100% { opacity: 1; transform: scale(1); }
+                  50% { opacity: 0.4; transform: scale(0.75); }
+                }
+                .progress {
+                  grid-column: 1 / -1;
+                  width: 100%;
+                  height: 4px;
+                  overflow: hidden;
+                  border-radius: 999px;
+                  background: rgba(255, 255, 255, 0.16);
+                }
+                .progress-bar {
+                  width: 4%;
+                  height: 100%;
+                  border-radius: inherit;
+                  background: linear-gradient(90deg, #55ace0, #4ed08f);
+                  transition: width 180ms ease;
+                }
+                .progress[hidden] { display: none; }
               </style>
               <script type="importmap">
                 {
@@ -271,10 +294,22 @@ module Three
               <script type="module">
                 const status = document.querySelector("#status");
                 const statusDot = document.querySelector("#status-dot");
+                const progress = document.querySelector("#progress");
+                const progressBar = document.querySelector("#progress-bar");
 
-                globalThis.__threeRbSetStatus = (message, state) => {
+                globalThis.__threeRbSetStatus = (message, state, percent) => {
                   if (status) status.textContent = message;
                   if (statusDot) statusDot.dataset.state = state;
+                  if (progress && progressBar) {
+                    if (state === "running" || state === "error") {
+                      progress.hidden = true;
+                    } else {
+                      progress.hidden = false;
+                      if (Number.isFinite(percent)) {
+                        progressBar.style.width = `${Math.max(4, Math.min(100, percent))}%`;
+                      }
+                    }
+                  }
                 };
                 globalThis.__threeRbBootFailed = (message) => globalThis.__threeRbSetStatus(message, "error");
                 globalThis.addEventListener("error", (event) => globalThis.__threeRbBootFailed(event.message || "Browser error"));
@@ -282,7 +317,12 @@ module Three
                   const reason = event.reason;
                   globalThis.__threeRbBootFailed(reason && reason.message ? reason.message : "Ruby boot failed");
                 });
-                globalThis.__threeRbSetStatus("Loading ruby.wasm", "loading");
+                globalThis.setTimeout(() => {
+                  if (status && statusDot && statusDot.dataset.state === "loading") {
+                    status.textContent = "Still loading after 30 seconds. Try reloading the page.";
+                  }
+                }, 30000);
+                globalThis.__threeRbSetStatus("Loading ruby.wasm", "loading", 4);
               </script>
               <script type="module" src="./boot.mjs"></script>
             </head>
@@ -290,8 +330,11 @@ module Three
               <main id="viewport">
                 <canvas id="scene" data-testid="scene-canvas"></canvas>
                 <div class="hud" aria-live="polite">
-                  <span class="status-dot" id="status-dot"></span>
+                  <span class="status-dot" id="status-dot" data-state="loading"></span>
                   <span id="status" data-testid="status">Loading ruby.wasm</span>
+                  <div class="progress" id="progress" aria-hidden="true">
+                    <div class="progress-bar" id="progress-bar"></div>
+                  </div>
                 </div>
               </main>
             </body>

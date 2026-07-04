@@ -81,13 +81,30 @@
       }
 
       .status-dot[data-state="running"] {
-        background: #cf1748;
-        box-shadow: 0 0 14px rgba(207, 23, 72, 0.72);
+        background: #2fae66;
+        box-shadow: 0 0 14px rgba(47, 174, 102, 0.72);
       }
 
       .status-dot[data-state="error"] {
         background: #d64040;
         box-shadow: 0 0 14px rgba(214, 64, 64, 0.72);
+      }
+
+      .status-dot[data-state="loading"] {
+        animation: status-dot-pulse 1.2s ease-in-out infinite;
+      }
+
+      @keyframes status-dot-pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        50% {
+          opacity: 0.4;
+          transform: scale(0.75);
+        }
       }
 
       .progress {
@@ -103,7 +120,7 @@
         width: 4%;
         height: 100%;
         border-radius: inherit;
-        background: linear-gradient(90deg, #55ace0, #cf1748);
+        background: linear-gradient(90deg, #55ace0, #2fae66);
         transition: width 180ms ease;
       }
 
@@ -199,10 +216,10 @@
       });
 
       globalThis.setTimeout(() => {
-        if (status && status.textContent === "Loading ruby.wasm") {
-          status.textContent = "Still loading ruby.wasm. This first load can take a while.";
+        if (status && statusDot && statusDot.dataset.state === "loading") {
+          status.textContent = "Still loading after 30 seconds. Try reloading the page.";
         }
-      }, 15000);
+      }, 30000);
 
       globalThis.__threeRbSetStatus("Loading ruby.wasm", "loading", 4);
     </script>
@@ -212,7 +229,7 @@
     <main class="viewport" id="viewport">
       <canvas id="scene" data-testid="scene-canvas"></canvas>
       <div class="hud" aria-live="polite">
-        <span class="status-dot" id="status-dot"></span>
+        <span class="status-dot" id="status-dot" data-state="loading"></span>
         <span id="status" data-testid="status">Loading ruby.wasm</span>
         <div class="progress" id="progress" aria-hidden="true">
           <div class="progress-bar" id="progress-bar"></div>
