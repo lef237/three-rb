@@ -17,7 +17,7 @@ This project is in browser-first alpha. The current code covers the gem foundati
 Supported scope for the first public release:
 
 - Pure Ruby scene construction, math, cameras, lights, geometry, materials, textures, layers, raycasting helpers, and JSON export/load.
-- Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and pnpm-managed `three@0.184.0`.
+- Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and pnpm-managed `three@0.185.1`.
 - JavaScript-delegated browser features for texture loading, cube/RGBE textures, glTF/DRACO loading, OrbitControls, animation mixers, instancing, picking, shadows, and an initial postprocessing pipeline.
 
 Out of scope for the first public release:
@@ -132,7 +132,7 @@ http://localhost:8000/examples/browser/postprocessing/
 
 See [Browser Examples](examples/browser/README.md) for the feature coverage map and per-example smoke commands. See [Browser Runtime](docs/browser-runtime.md) for the current embedding and boot contract.
 
-The examples load pnpm-managed browser packages from `node_modules/`: `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`, `@ruby/wasm-wasi@2.9.4-2026-05-11-a`, and `three@0.184.0`.
+The examples load pnpm-managed browser packages from `node_modules/`: `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`, `@ruby/wasm-wasi@2.9.4-2026-05-11-a`, and `three@0.185.1`.
 
 To start a standalone browser app from the installed gem:
 

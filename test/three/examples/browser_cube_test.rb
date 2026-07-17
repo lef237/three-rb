@@ -369,7 +369,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "0.4.2", package.fetch("dependencies").fetch("@bjorn3/browser_wasi_shim")
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/3.4-wasm-wasi")
     assert_equal "2.9.4-2026-05-11-a", package.fetch("dependencies").fetch("@ruby/wasm-wasi")
-    assert_equal "0.184.0", package.fetch("dependencies").fetch("three")
+    assert_equal "0.185.1", package.fetch("dependencies").fetch("three")
     assert_equal "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:dango && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing", package.fetch("scripts").fetch("test:browser")
     assert_equal "node examples/browser/ruby/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:ruby")
     assert_equal "node examples/browser/cube/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cube")

@@ -29,7 +29,7 @@ The `0.1.0` target is complete when all of these are true:
 Included in the first public scope:
 
 - Ruby object model for scenes, groups, transforms, cameras, lights, geometries, non-mesh primitives including sprites, common materials including matcap, toon, sprite, and shadow materials, textures, and common math primitives.
-- Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and `three@0.184.0`.
+- Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and `three@0.185.1`.
 - `Three::Browser` helpers and the `three-rb browser` executable for generating standalone Ruby-only browser examples.
 - Dirty-tracked synchronization from Ruby objects into three.js handles.
 - JSON export/load for Ruby-authored scenes.

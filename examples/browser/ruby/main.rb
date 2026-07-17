@@ -198,7 +198,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
     [sparkle, phase, size]
   end
 
-  title_font = Three::Loaders::FontLoader.new.load("/node_modules/three/examples/fonts/helvetiker_regular.typeface.json")
+  title_font = Three::Loaders::FontLoader.new.load("/examples/browser/ruby/assets/helvetiker_regular.typeface.json")
   title_geometry = Three::TextGeometry.new(
     "three-rb",
     font: title_font,

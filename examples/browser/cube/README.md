@@ -19,7 +19,7 @@ The page uses these pnpm-managed browser dependencies:
 
 - `@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a`
 - `@ruby/wasm-wasi@2.9.4-2026-05-11-a`
-- `three@0.184.0`
+- `three@0.185.1`
 
 The repository root must be served, not only this directory, because `boot.mjs` loads browser packages from `node_modules/` and `main.rb` loads the library source from `lib/`.
 
