@@ -319,9 +319,9 @@ module Three
                 });
                 globalThis.setTimeout(() => {
                   if (status && statusDot && statusDot.dataset.state === "loading") {
-                    status.textContent = "Still loading after 30 seconds. Try reloading the page.";
+                    status.textContent = "Still loading after 15 seconds. Try reloading the page.";
                   }
-                }, 30000);
+                }, 15000);
                 globalThis.__threeRbSetStatus("Loading ruby.wasm", "loading", 4);
               </script>
               <script type="module" src="./boot.mjs"></script>
