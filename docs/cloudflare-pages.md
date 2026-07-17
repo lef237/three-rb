@@ -46,7 +46,7 @@ This script rebuilds `dist/` from scratch, copies the Ruby example, shared brows
 By default, the script writes a Pages-specific wasm URL into `dist/examples/browser/shared/config.mjs`:
 
 ```text
-https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@2.9.4-2026-05-11-a/dist/ruby+stdlib.wasm
+https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@2.9.4-2026-07-17-a/dist/ruby+stdlib.wasm
 ```
 
 To use an R2-hosted copy or another large-file host, set `RUBY_WASM_URL` before the build command.
