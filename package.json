@@ -28,7 +28,7 @@
     "three": "0.185.1"
   },
   "devDependencies": {
-    "playwright": "^1.61.1",
+    "playwright": "^1.62.1",
     "wrangler": "^4.111.0"
   }
 }
