@@ -13,6 +13,9 @@ import { DotScreenPass } from "three/addons/postprocessing/DotScreenPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { rubyWasmUrl } from "./config.mjs";
 
+const WASM_DOWNLOAD_ATTEMPTS = 3;
+const WASM_STALL_TIMEOUT_MS = 20000;
+
 export async function bootRubyExample({ main, clearColor }) {
   const setStatus = globalThis.__threeRbSetStatus || (() => {});
   const bootFailed = globalThis.__threeRbBootFailed || ((message) => console.error(message));
@@ -50,8 +53,10 @@ export async function bootRubyExample({ main, clearColor }) {
       composer.render();
     };
 
-    const rubyModule = await compileWasm(rubyWasmUrl, (percent) => {
-      setStatus(`Loading ruby.wasm ${percent}%`, "loading", percent);
+    const rubyModule = await compileWasm(rubyWasmUrl, {
+      onProgress: (percent) => setStatus(`Loading ruby.wasm ${percent}%`, "loading", percent),
+      onRetry: (attempt, attempts) =>
+        setStatus(`Retrying ruby.wasm download (${attempt}/${attempts})`, "loading", 4)
     });
     setStatus("Compiling ruby.wasm", "loading", 82);
     const { vm } = await DefaultRubyVM(rubyModule);
@@ -97,31 +102,87 @@ function shouldBypassCache(input) {
   return !pathname.includes("/assets/");
 }
 
-async function compileWasm(url, onProgress = () => {}) {
-  if (WebAssembly.compileStreaming) {
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Failed to load ruby.wasm: ${response.status} ${response.statusText}`);
-      }
+async function compileWasm(url, { onProgress = () => {}, onRetry = () => {} } = {}) {
+  let lastError;
 
-      return await WebAssembly.compileStreaming(trackDownload(response, onProgress));
-    } catch (_error) {
-      // Fall back when a static server does not provide application/wasm.
+  for (let attempt = 1; attempt <= WASM_DOWNLOAD_ATTEMPTS; attempt += 1) {
+    if (attempt > 1) onRetry(attempt, WASM_DOWNLOAD_ATTEMPTS);
+
+    try {
+      return await compileWasmOnce(url, onProgress);
+    } catch (error) {
+      lastError = error;
     }
   }
 
-  const fallbackResponse = await fetch(url);
-  if (!fallbackResponse.ok) {
-    throw new Error(`Failed to load ruby.wasm: ${fallbackResponse.status} ${fallbackResponse.statusText}`);
-  }
-  return WebAssembly.compile(await trackDownload(fallbackResponse, onProgress).arrayBuffer());
+  const reason = lastError && lastError.message ? lastError.message : "Failed to load ruby.wasm";
+
+  throw new Error(`${reason}. Try reloading the page.`, { cause: lastError });
 }
 
-function trackDownload(response, onProgress) {
-  const total = Number(response.headers.get("content-length"));
-  if (!response.body || !Number.isFinite(total) || total <= 0) return response;
+async function compileWasmOnce(url, onProgress) {
+  const controller = new AbortController();
+  const stall = watchForStall(controller, WASM_STALL_TIMEOUT_MS);
 
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) {
+      throw new Error(`Failed to load ruby.wasm: ${response.status} ${response.statusText}`);
+    }
+
+    // Decide before reading the body. Falling back after the download has
+    // started would fetch the whole file a second time.
+    const canStream =
+      typeof WebAssembly.compileStreaming === "function" &&
+      (response.headers.get("content-type") || "").includes("application/wasm");
+    const tracked = trackDownload(response, {
+      onProgress: (percent) => {
+        stall.reset();
+        if (percent !== null) onProgress(percent);
+      },
+      onSettled: () => stall.cancel()
+    });
+
+    if (canStream) return await WebAssembly.compileStreaming(tracked);
+
+    return await WebAssembly.compile(await tracked.arrayBuffer());
+  } finally {
+    stall.cancel();
+  }
+}
+
+// A download that stops mid-stream never rejects on its own, which left the
+// status line stuck on "Loading ruby.wasm" with nothing to retry it.
+function watchForStall(controller, timeout) {
+  let cancelled = false;
+  let timer = globalThis.setTimeout(abort, timeout);
+
+  function abort() {
+    controller.abort(new Error(`ruby.wasm stopped downloading for ${Math.round(timeout / 1000)} seconds`));
+  }
+
+  return {
+    reset() {
+      if (cancelled) return;
+
+      globalThis.clearTimeout(timer);
+      timer = globalThis.setTimeout(abort, timeout);
+    },
+    cancel() {
+      cancelled = true;
+      globalThis.clearTimeout(timer);
+    }
+  };
+}
+
+function trackDownload(response, { onProgress, onSettled }) {
+  if (!response.body) {
+    onSettled();
+    return response;
+  }
+
+  const total = Number(response.headers.get("content-length"));
+  const measurable = Number.isFinite(total) && total > 0;
   let loaded = 0;
   const stream = new ReadableStream({
     async start(controller) {
@@ -132,12 +193,14 @@ function trackDownload(response, onProgress) {
           if (done) break;
 
           loaded += value.byteLength;
-          onProgress(Math.min(80, Math.round((loaded / total) * 80)));
+          onProgress(measurable ? Math.min(80, Math.round((loaded / total) * 80)) : null);
           controller.enqueue(value);
         }
         controller.close();
       } catch (error) {
         controller.error(error);
+      } finally {
+        onSettled();
       }
     }
   });

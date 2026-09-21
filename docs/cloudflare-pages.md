@@ -10,15 +10,18 @@ The current browser examples use root-relative URLs. The deployed output must pr
 
 - `/examples/browser/ruby/` for the Ruby gemstone example page, boot file, Ruby entrypoint, and local assets.
 - `/examples/browser/shared/` for the shared JavaScript boot runtime.
-- `/lib/` for the three-rb Ruby source files loaded by `require_relative`.
 - `/vendor/@ruby/wasm-wasi/` for the browser Ruby VM JavaScript package.
 - `/vendor/@bjorn3/browser_wasi_shim/` for WASI browser support.
 - `/vendor/three/` for three.js and its addons.
 - `/` for the public demo entrypoint generated from the Ruby example page.
 
-Do not set `examples/browser/ruby` itself as the Cloudflare Pages output directory. That directory alone does not contain `/lib`, `/examples/browser/shared`, or the required browser packages.
+`/lib` is not deployed. The build script bundles the Ruby entrypoint and everything it reaches through `require_relative` into a single `dist/examples/browser/ruby/main.rb`, so the browser Ruby VM fetches one file instead of one per source file. See "Bundled Ruby Source" below.
+
+Do not set `examples/browser/ruby` itself as the Cloudflare Pages output directory. That directory alone does not contain `/examples/browser/shared` or the required browser packages.
 
 Cloudflare Pages has a 25 MiB maximum size for each static asset. The current `ruby+stdlib.wasm` file is larger than that limit, so the Pages build script does not upload it as a Pages asset. Instead, the generated `dist/examples/browser/shared/config.mjs` points at a CDN URL for the pinned `@ruby/3.4-wasm-wasi` package by default. If you prefer to own that asset, upload `node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm` to Cloudflare R2 or another static host that supports large files and set `RUBY_WASM_URL` to that public URL in the Pages environment.
+
+Do not point `RUBY_WASM_URL` at an R2 `pub-*.r2.dev` URL. That endpoint is rate limited, is documented as development-only, and is not served through the Cloudflare CDN cache, so every visitor downloads the full 30 MB from the bucket itself. Attach a custom domain to the bucket, or serve it from a Worker, so the file is cached at the edge.
 
 The Pages build script copies browser packages under `/vendor/` instead of `/node_modules/`. This avoids Pages deployments that omit or fail to serve `node_modules` paths, and keeps the deployed URLs separate from package-manager internals.
 
@@ -41,13 +44,15 @@ Create a deployment directory that contains only the static files required by th
 pnpm run build:pages:ruby
 ```
 
-This script rebuilds `dist/` from scratch, copies the Ruby example, shared browser boot runtime, local Ruby source, and required browser packages. It also generates `dist/index.html` and `dist/boot.mjs` so the public Pages root URL runs the Ruby example directly. It uses `cp -RL` for packages copied from local `node_modules` so pnpm symlinks are resolved into real files, then deploys those package files under `/vendor/`. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
+This script rebuilds `dist/` from scratch, copies the Ruby example, shared browser boot runtime, and required browser packages, and bundles the Ruby entrypoint. It also generates `dist/index.html` and `dist/boot.mjs` so the public Pages root URL runs the Ruby example directly. It uses `cp -RL` for packages copied from local `node_modules` so pnpm symlinks are resolved into real files, then deploys those package files under `/vendor/`. Cloudflare Pages uploads the output directory contents, and a copied symlink to `.pnpm/...` will not work unless the referenced package store is also present in the deployment.
 
-By default, the script writes a Pages-specific wasm URL into `dist/examples/browser/shared/config.mjs`:
+By default, the script writes a Pages-specific wasm URL into `dist/examples/browser/shared/config.mjs`, pinned to the `@ruby/3.4-wasm-wasi` version in `package.json`:
 
 ```text
-https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@2.9.4-2026-07-17-a/dist/ruby+stdlib.wasm
+https://cdn.jsdelivr.net/npm/@ruby/3.4-wasm-wasi@<version>/dist/ruby+stdlib.wasm
 ```
+
+The build fails if `@ruby/3.4-wasm-wasi` and `@ruby/wasm-wasi` are on different versions, because the wasm binary and the JavaScript glue that loads it must match.
 
 To use an R2-hosted copy or another large-file host, set `RUBY_WASM_URL` before the build command.
 
@@ -64,6 +69,20 @@ http://localhost:8000/
 ```
 
 If you rebuild `dist/` locally, start from an empty output directory so stale files do not hide missing copy steps.
+
+## Bundled Ruby Source
+
+The browser Ruby VM resolves `require_relative` over HTTP, one request per source file, and those requests are sequential. The gemstone example reaches 83 files, so an unbundled deployment pays 83 round trips before the scene can run. On a connection with 200 ms of latency that is roughly 17 seconds of waiting on its own.
+
+`scripts/bundle-ruby.mjs` inlines those files into a single entrypoint at build time:
+
+```sh
+node scripts/bundle-ruby.mjs examples/browser/ruby/main.rb dist/examples/browser/ruby/main.rb
+```
+
+Only literal top-level `require_relative "path"` lines are inlined, matching what `JS::RequireRemote` itself resolves. `require "json"` and other standard library requires are left alone, and each file is included once, in the order Ruby would have loaded it.
+
+Local development and the smoke tests still serve the repository root and still load the unbundled sources, so `require_relative` stays the way you edit the code.
 
 ## Optional Headers
 
@@ -134,7 +153,7 @@ Then open:
 https://<project>.pages.dev/examples/browser/cube/
 ```
 
-Keep `examples/browser/shared`, `lib`, and the same browser packages in the output directory. Examples with local files under `assets/` need those assets copied with the example directory.
+Keep `examples/browser/shared` and the same browser packages in the output directory, and bundle that example's entrypoint the same way. Examples with local files under `assets/` need those assets copied with the example directory.
 
 ## Troubleshooting
 
@@ -156,11 +175,20 @@ test -f dist/vendor/three/examples/jsm/postprocessing/UnrealBloomPass.js
 
 Ruby `require_relative` errors
 
-The output directory is missing `/lib`, or the example was moved without updating its relative Ruby paths.
+The deployed `main.rb` was copied instead of bundled, or the example was moved without updating its relative Ruby paths. Confirm the deployed entrypoint is the generated bundle:
+
+```sh
+head -2 dist/examples/browser/ruby/main.rb
+grep -c require_relative dist/examples/browser/ruby/main.rb
+```
+
+The second command should print `0`.
 
 The status stays at `Loading ruby.wasm`
 
-Check the browser network tab for failed `.wasm`, `.mjs`, `.rb`, `.hdr`, or three.js addon requests. A missing static asset is the most common cause.
+The boot runtime aborts and retries the wasm download up to three times if it stops making progress for 20 seconds, and the status line shows `Retrying ruby.wasm download (n/3)` while it does. If it still fails, check the browser network tab for failed `.wasm`, `.mjs`, `.rb`, `.hdr`, or three.js addon requests. A missing static asset is the most common cause.
+
+If the download completes but is simply slow for everyone, the wasm host is the problem rather than the page. Check whether the host returns a `cf-cache-status` header; an endpoint that never does is not being cached at the edge.
 
 The canvas is blank after the status says `Running`
 
