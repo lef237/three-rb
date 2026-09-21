@@ -1,4 +1,10 @@
 allowBuilds:
   esbuild: true
-  sharp: true
   workerd: true
+  # sharp's install script builds from source whenever a system libvips is
+  # present, then fails because sharp does not depend on node-addon-api, which
+  # aborts the whole install. Nothing here needs it: the prebuilt @img/sharp-*
+  # binaries load on their own, and sharp only arrives through miniflare.
+  # This must be `false`, not omitted: pnpm treats a missing entry as unreviewed
+  # and fails with ERR_PNPM_IGNORED_BUILDS.
+  sharp: false
