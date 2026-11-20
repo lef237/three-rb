@@ -2,11 +2,11 @@
 
 This document is the resume point for the next implementation session. It is intentionally narrower than `docs/implementation-plan.md`: use it to decide what to do next after conversation context is lost.
 
-Last updated: 2026-05-17.
+Last updated: 2026-11-20.
 
 ## Current Position
 
-The project is past the original MVP and is in Phase 8, renderer maturity. The `0.1.0` browser-first alpha target is implemented and release-gate ready; the remaining release work is manual metadata finalization and publishing after owner confirmation.
+The project is past the original MVP and is in Phase 8, renderer maturity. `0.1.0`, `0.2.0`, and `0.2.1` are published on RubyGems. Changes since `0.2.1` are collected under the `Unreleased` heading in `CHANGELOG.md` for the next release.
 
 Recent completed work:
 
@@ -29,28 +29,34 @@ Recent completed work:
 - Browser examples were moved to Ruby-only entrypoints that use `Three::Browser` helpers instead of application-level `require "js"` or `JS.global`.
 - Added the `three-rb browser` executable and generator for standalone Ruby-only browser examples.
 - Release install smoke now validates the installed executable and generated browser app shape outside the repository load path.
-- Local release gate and latest `main` CI are green for the `0.1.0` release candidate.
+- Local release gate and `main` CI were green for each published release.
+
+Since `0.2.1`:
+
+- Dango browser example with primitive meshes, lighting, shadows, and smoke coverage.
+- Cloudflare Pages deployment guide and the repository's `pnpm build:pages:ruby` build, which bundles the Ruby entrypoint and loads ruby.wasm from jsDelivr.
+- Shared `config.mjs` for the ruby.wasm URL, a loading progress bar, and stalled-download retries in the shared boot.
+- ruby.wasm 2.10.1 and three.js 0.187.0 (r187), including the r187 iridescence and shadow-map changes.
+- Generated apps get a runtime-only `package.json` and matching lockfile, and a smoke test generates, installs, and renders them.
+- Browser smoke tests fail on three.js console warnings.
 
 Do not start Phase 9 native renderer work yet. The implementation plan still recommends keeping browser rendering delegated to three.js through ruby.wasm until the browser-first API is more stable.
 
 ## Recommended Next Task
 
-Keep the `0.1.0` release candidate current while the release is deferred. Publish only after the release owner confirms the date and RubyGems credentials.
+Publish the changes under `Unreleased` as the next release once the release owner confirms the version and RubyGems credentials.
 
 This is the best next step because:
 
-- The representative JSON fixture covers the current primitive/material surface, including `Sprite` / `SpriteMaterial`.
-- The public docs now cover release readiness, publishing, browser example coverage, browser runtime boot contract, and the current implemented API scope.
-- `lib/three/version.rb` already contains `0.1.0`.
-- `CHANGELOG.md` currently records `## 0.1.0 - 2026-05-15`; if the release date changes before publishing, update that heading during release metadata finalization.
-- The release candidate now includes the Ruby-only browser generator and installed-generator smoke coverage.
-- Further feature scope should wait until after the `0.1.0` release unless an already-advertised example breaks.
+- `0.2.1` predates the r187 update, the ruby.wasm 2.10.1 release, and the generated-app fixes, so installed users still get the older runtime.
+- The `Unreleased` section in `CHANGELOG.md` already describes everything since `0.2.1`.
+- Further feature scope should wait until after that release unless an already-advertised example breaks.
 
 ## Scope
 
-For deferred-release maintenance, keep `CHANGELOG.md`, `docs/release-readiness.md`, and this resume point aligned with the implemented release-candidate surface. Do not tag, push, or publish until the release owner confirms the release window. If the confirmed release date differs from the current changelog heading, update it as release metadata work.
+Until the release, keep `CHANGELOG.md`, `docs/release-readiness.md`, and this resume point aligned with what is on `main`. Do not tag, push, or publish until the release owner confirms.
 
-When the owner is ready to publish, follow `docs/publishing.md`: confirm the release date, update `CHANGELOG.md`, run `bundle exec rake release:preflight`, commit the metadata update, publish the gem, tag `v0.1.0`, push `main` and the tag, then verify installation from RubyGems.
+When the owner is ready to publish, follow `docs/publishing.md`: bump `lib/three/version.rb`, replace the current changelog heading `## Unreleased` with the version and date, run `bundle exec rake release:preflight`, commit the metadata update, publish the gem, tag the release, push `main` and the tag, then verify installation from RubyGems.
 
 After the release is published, pick one feature target and keep the change small enough to verify through one browser example.
 
@@ -64,8 +70,8 @@ Candidate targets, in recommended order when there is no stronger product signal
 
 ## Suggested Implementation Plan
 
-1. While release is deferred, keep the current changelog heading, release-readiness docs, and publishing checklist aligned with the release candidate without changing the version, tag, or published artifact.
-2. When release is confirmed, adjust `CHANGELOG.md` only if the confirmed release date differs from the current heading.
+1. Until the release is confirmed, keep the current changelog heading, release-readiness docs, and publishing checklist aligned with `main` without changing the version, tag, or published artifact.
+2. When the release is confirmed, bump the version and date the `Unreleased` heading in `CHANGELOG.md`.
 3. Run `bundle exec rake release:preflight`.
 4. Commit the release metadata with a message that does not include co-author trailers.
 5. Publish and tag using `docs/publishing.md`.
@@ -100,7 +106,7 @@ Do not prioritize these without a clear product need:
 - Native renderer.
 - Broad public API documentation beyond the current README, release readiness, implementation plan, browser examples overview, and browser runtime guide.
 
-Those are valid later tasks, but they expand feature scope. The immediate gap is keeping the deferred release candidate accurate, then getting final release-owner confirmation and publishing before choosing future feature work by visible workflow and smoke-testability instead of API breadth.
+Those are valid later tasks, but they expand feature scope. The immediate gap is publishing the unreleased changes, then choosing future feature work by visible workflow and smoke-testability instead of API breadth.
 
 ## After This Task
 

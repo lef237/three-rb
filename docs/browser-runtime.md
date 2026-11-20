@@ -70,6 +70,8 @@ The boot module is responsible for:
   - `globalThis.THREE_GLTF_LOADER`
   - `globalThis.THREE_DRACO_LOADER`
   - `globalThis.THREE_RGBE_LOADER`
+  - `globalThis.THREE_FONT_LOADER`
+  - `globalThis.THREE_TEXT_GEOMETRY`
   - `globalThis.THREE_ORBIT_CONTROLS`
   - `globalThis.THREE_EFFECT_COMPOSER`
   - `globalThis.THREE_RENDER_PASS`
@@ -77,7 +79,7 @@ The boot module is responsible for:
   - `globalThis.THREE_DOT_SCREEN_PASS`
   - `globalThis.THREE_OUTPUT_PASS`
 - Setting `globalThis.__threeReady` to a promise Ruby can wait on.
-- Loading `/node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm`.
+- Loading ruby.wasm from the URL exported by `examples/browser/shared/config.mjs`. It defaults to `/node_modules/@ruby/3.4-wasm-wasi/dist/ruby+stdlib.wasm`; set `globalThis.__threeRbRubyWasmUrl` before the boot module loads, or edit `config.mjs`, to load it from another host.
 - Starting the Ruby VM and loading the Ruby entrypoint through `JS::RequireRemote`.
 
 The shared helper also installs optional render helpers used by smoke tests to draw immediately from Ruby renderer calls and expose render counters for deterministic assertions. Custom applications can keep that behavior or call directly into three.js through the renderer backend fallback.
@@ -206,7 +208,7 @@ The browser runtime intentionally does not promise full three.js compatibility y
 - Rendering is delegated to three.js through ruby.wasm.
 - Addon wrappers only work when their JavaScript constructors are registered on `globalThis`.
 - The JavaScript boot module is still required to import ES modules and start ruby.wasm, even though ordinary Ruby scene entrypoints can stay Ruby-only.
-- The first public scope does not include stable APIs for every loader, material, render target, postprocessing pass, WebGPU, or XR workflow.
+- The alpha scope does not include stable APIs for every loader, material, render target, postprocessing pass, WebGPU, or XR workflow.
 - `examples/browser/shared/boot.mjs` is a reference implementation for this repository's examples, not a separate stable package.
 - `preserveDrawingBuffer: true` is useful for deterministic canvas smoke tests, but applications do not need it by default.
 

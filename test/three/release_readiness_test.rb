@@ -17,6 +17,9 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes readme, "docs/browser-runtime.md"
     assert_includes readme, "docs/publishing.md"
     assert_includes readme, "examples/browser/README.md"
+    assert_includes readme, "docs/cloudflare-pages.md"
+    # The Plain Ruby Check sample prints this, so bump it with the version.
+    assert_includes readme, "three-rb #{Three::VERSION}\nThree::Scene"
   end
 
   def test_changelog_and_release_docs_are_packaged
@@ -44,7 +47,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes changelog, "glTF/DRACO"
     assert_includes changelog, "loaded-asset traversal/disposal helpers"
     assert_includes changelog, "three-rb browser"
-    assert_includes changelog, "avoid application-level"
+    assert_includes changelog, "without direct application-level"
     assert_includes changelog, "DotScreenPass"
     assert_includes changelog, "OutputPass"
     assert_includes changelog, "Deterministic JSON fixture regression coverage"
