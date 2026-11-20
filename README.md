@@ -98,7 +98,7 @@ ruby hello_three.rb
 You should see the library load and create Ruby scene objects:
 
 ```text
-three-rb 0.2.1
+three-rb 0.3.0
 Three::Scene
 Three::Mesh
 ```
