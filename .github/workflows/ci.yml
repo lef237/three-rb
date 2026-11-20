@@ -56,3 +56,31 @@ jobs:
 
       - name: Run browser smoke test
         run: pnpm test:browser
+
+  ruby-versions:
+    # The job above covers Ruby 3.4 along with the browser tests. The browser
+    # runs Ruby 3.4 through ruby.wasm whatever the host Ruby is, so the other
+    # supported versions only need the Ruby tests and the gem install check.
+    name: Ruby ${{ matrix.ruby }} tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.3", "4.0"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+
+      - name: Run Ruby tests
+        run: bundle exec rake test
+
+      - name: Run gem install smoke test
+        run: bundle exec rake release:gem_smoke
