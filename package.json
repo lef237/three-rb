@@ -23,12 +23,12 @@
   },
   "dependencies": {
     "@bjorn3/browser_wasi_shim": "0.4.2",
-    "@ruby/3.4-wasm-wasi": "2.9.4-2026-07-17-a",
-    "@ruby/wasm-wasi": "2.9.4-2026-07-17-a",
-    "three": "0.185.1"
+    "@ruby/3.4-wasm-wasi": "2.10.1",
+    "@ruby/wasm-wasi": "2.10.1",
+    "three": "0.186.1"
   },
   "devDependencies": {
-    "playwright": "^1.61.1",
-    "wrangler": "^4.111.0"
+    "playwright": "^1.65.1",
+    "wrangler": "^4.165.0"
   }
 }
