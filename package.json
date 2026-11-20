@@ -5,7 +5,7 @@
   "packageManager": "pnpm@11.1.1",
   "scripts": {
     "build:pages:ruby": "sh scripts/build-pages-ruby.sh",
-    "test:browser": "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:dango && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing",
+    "test:browser": "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:dango && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing && pnpm test:browser:generated",
     "test:browser:ruby": "node examples/browser/ruby/smoke_test.mjs",
     "test:browser:cube": "node examples/browser/cube/smoke_test.mjs",
     "test:browser:dango": "node examples/browser/dango/smoke_test.mjs",
@@ -17,6 +17,7 @@
     "test:browser:picking": "node examples/browser/picking/smoke_test.mjs",
     "test:browser:primitives": "node examples/browser/primitives/smoke_test.mjs",
     "test:browser:postprocessing": "node examples/browser/postprocessing/smoke_test.mjs",
+    "test:browser:generated": "node test/browser/generated_apps_smoke_test.mjs",
     "benchmark:browser": "pnpm benchmark:browser:mesh-sync && pnpm benchmark:browser:instanced-mesh-sync",
     "benchmark:browser:mesh-sync": "node benchmarks/browser/mesh_sync/run.mjs",
     "benchmark:browser:instanced-mesh-sync": "node benchmarks/browser/instanced_mesh_sync/run.mjs"

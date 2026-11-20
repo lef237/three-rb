@@ -368,7 +368,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "2.10.1", package.fetch("dependencies").fetch("@ruby/3.4-wasm-wasi")
     assert_equal "2.10.1", package.fetch("dependencies").fetch("@ruby/wasm-wasi")
     assert_equal "0.187.0", package.fetch("dependencies").fetch("three")
-    assert_equal "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:dango && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing", package.fetch("scripts").fetch("test:browser")
+    assert_equal "pnpm test:browser:ruby && pnpm test:browser:cube && pnpm test:browser:dango && pnpm test:browser:composition && pnpm test:browser:textures && pnpm test:browser:cubemap && pnpm test:browser:gltf && pnpm test:browser:serialization && pnpm test:browser:picking && pnpm test:browser:primitives && pnpm test:browser:postprocessing && pnpm test:browser:generated", package.fetch("scripts").fetch("test:browser")
     assert_equal "node examples/browser/ruby/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:ruby")
     assert_equal "node examples/browser/cube/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:cube")
     assert_equal "node examples/browser/dango/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:dango")
@@ -380,6 +380,7 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_equal "node examples/browser/picking/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:picking")
     assert_equal "node examples/browser/primitives/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:primitives")
     assert_equal "node examples/browser/postprocessing/smoke_test.mjs", package.fetch("scripts").fetch("test:browser:postprocessing")
+    assert_equal "node test/browser/generated_apps_smoke_test.mjs", package.fetch("scripts").fetch("test:browser:generated")
     assert_includes package.fetch("devDependencies"), "playwright"
   end
 end
