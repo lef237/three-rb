@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "json"
 require "stringio"
 require "tmpdir"
+require "yaml"
 require "three/generators/browser_example"
 
 class ThreeBrowserExampleGeneratorTest < Minitest::Test
+  ROOT = File.expand_path("../../..", __dir__)
+
   def test_generates_ruby_only_standalone_browser_example
     Dir.mktmpdir("three-rb-browser-generator") do |dir|
       stream = StringIO.new
@@ -24,8 +28,6 @@ class ThreeBrowserExampleGeneratorTest < Minitest::Test
       assert_path_exists File.join(dir, "lib/three.rb")
       assert_path_exists File.join(dir, "examples/browser/shared/boot.mjs")
       assert_path_exists File.join(dir, "examples/browser/shared/config.mjs")
-      assert_path_exists File.join(dir, "package.json")
-      assert_path_exists File.join(dir, "pnpm-lock.yaml")
       assert_includes main, "require_relative \"../../../lib/three\""
       assert_includes main, "Three::BoxGeometry"
       assert_includes main, "Three::Browser.run"
@@ -71,6 +73,50 @@ class ThreeBrowserExampleGeneratorTest < Minitest::Test
       assert_includes boot, "main: \"examples/browser/ruby/main\""
       assert_includes readme, "local `assets/` directory"
       assert_includes stream.string, "Created browser example at examples/browser/ruby"
+    end
+  end
+
+  def test_writes_app_package_with_only_the_browser_runtime
+    Dir.mktmpdir("three-rb-browser-generator") do |dir|
+      generator = Three::Generators::BrowserExample.new(
+        target: "examples/browser/quickstart",
+        root: dir,
+        stream: StringIO.new
+      ).call
+
+      gem_package = JSON.parse(File.read(File.join(ROOT, "package.json")))
+      package = JSON.parse(File.read(File.join(dir, "package.json")))
+      lockfile = YAML.safe_load(File.read(File.join(dir, "pnpm-lock.yaml")))
+      importer = lockfile.fetch("importers").fetch(".")
+      locked = lockfile.fetch("packages").keys
+
+      assert_includes generator.created, "package.json"
+      assert_includes generator.created, "pnpm-lock.yaml"
+      assert_equal %w[private packageManager dependencies], package.keys
+      assert_equal gem_package.fetch("dependencies"), package.fetch("dependencies")
+      assert_equal gem_package.fetch("packageManager"), package.fetch("packageManager")
+      assert_equal package.fetch("dependencies").keys, importer.fetch("dependencies").keys
+      refute importer.key?("devDependencies")
+      assert_includes locked, "three@#{package.fetch("dependencies").fetch("three")}"
+      assert_equal lockfile.fetch("snapshots").keys, locked
+      refute locked.any? { |key| key.start_with?("playwright@", "wrangler@", "esbuild@", "workerd@") }
+      refute File.read(File.join(dir, "pnpm-lock.yaml")).start_with?("---")
+    end
+  end
+
+  def test_keeps_existing_package_json_and_skips_the_lockfile
+    Dir.mktmpdir("three-rb-browser-generator") do |dir|
+      File.write(File.join(dir, "package.json"), "{\"private\": true}\n")
+
+      generator = Three::Generators::BrowserExample.new(
+        target: "examples/browser/quickstart",
+        root: dir,
+        stream: StringIO.new
+      ).call
+
+      assert_includes generator.skipped, "package.json"
+      assert_equal "{\"private\": true}\n", File.read(File.join(dir, "package.json"))
+      refute_path_exists File.join(dir, "pnpm-lock.yaml")
     end
   end
 

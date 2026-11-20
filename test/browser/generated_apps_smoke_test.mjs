@@ -1,9 +1,10 @@
-// Generates apps with `three-rb browser` into a temporary project and boots
-// them in Chromium. The file-level generator tests can't tell whether a
-// generated app actually loads, for example when the shared boot script
-// imports a file the generator doesn't copy.
+// Generates apps with `three-rb browser` into a temporary project, installs
+// their packages the way the generated README says, and boots them in
+// Chromium. The file-level generator tests can't tell whether a generated app
+// actually installs and loads, for example when pnpm rejects its package.json
+// or the shared boot script imports a file the generator doesn't copy.
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, rmSync, symlinkSync, unlinkSync } from "node:fs";
+import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -19,15 +20,15 @@ import {
 const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
 const examples = ["quickstart", "ruby"];
 
-function generate(appRoot, example) {
-  const result = spawnSync(
-    "ruby",
-    ["-I", join(repoRoot, "lib"), join(repoRoot, "exe/three-rb"), "browser", `examples/browser/${example}`],
-    { cwd: appRoot, encoding: "utf8" }
-  );
+function run(command, args, cwd) {
+  const result = spawnSync(command, args, { cwd, encoding: "utf8" });
   if (result.status !== 0) {
-    throw new Error(`three-rb browser examples/browser/${example} failed:\n${result.stdout}${result.stderr}`);
+    throw new Error(`${[command, ...args].join(" ")} failed:\n${result.stdout}${result.stderr}`);
   }
+}
+
+function generate(appRoot, example) {
+  run("ruby", ["-I", join(repoRoot, "lib"), join(repoRoot, "exe/three-rb"), "browser", `examples/browser/${example}`], appRoot);
 }
 
 // Generated apps don't set preserveDrawingBuffer, so gl.readPixels would see a
@@ -61,16 +62,16 @@ async function assertCanvasRendered(page, example) {
 
 async function main() {
   const appRoot = mkdtempSync(join(tmpdir(), "three-rb-generated-app-"));
-  const nodeModules = join(appRoot, "node_modules");
   const { chromium } = await loadPlaywright();
   let server;
   let browser;
 
   try {
     for (const example of examples) generate(appRoot, example);
-    // The generator copies this repository's package.json and lockfile, so
-    // the installed packages here are the ones the generated app would get.
-    symlinkSync(join(repoRoot, "node_modules"), nodeModules, "dir");
+    // --frozen-lockfile fails when the generated lockfile doesn't match the
+    // generated package.json. The packages are already in the store from
+    // this repository's install, so no download is needed.
+    run("pnpm", ["install", "--frozen-lockfile", "--prefer-offline"], appRoot);
 
     server = await startServer(appRoot);
     browser = await chromium.launch({ headless: process.env.HEADLESS !== "0" });
@@ -89,10 +90,6 @@ async function main() {
   } finally {
     await browser?.close();
     if (server) await new Promise((resolve) => server.instance.close(resolve));
-    // Remove the link first so cleanup can never reach the repository's packages.
-    try {
-      unlinkSync(nodeModules);
-    } catch {}
     rmSync(appRoot, { recursive: true, force: true });
   }
 }
