@@ -20,9 +20,9 @@ Do not use `file://` for browser runs. The examples assume an HTTP server becaus
 The runtime currently follows the pinned versions in `package.json`:
 
 - `@bjorn3/browser_wasi_shim@0.4.2`
-- `@ruby/3.4-wasm-wasi@2.9.4-2026-07-17-a`
-- `@ruby/wasm-wasi@2.9.4-2026-07-17-a`
-- `three@0.185.1`
+- `@ruby/3.4-wasm-wasi@2.10.1`
+- `@ruby/wasm-wasi@2.10.1`
+- `three@0.187.0`
 
 Install them from the repository root with:
 

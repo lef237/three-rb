@@ -81,7 +81,7 @@ The key architectural observation is that the renderer is much more complex than
 
 ### ruby.wasm
 
-ruby.wasm provides CRuby builds for WebAssembly/WASI. It includes npm packages such as `@ruby/wasm-wasi` and Ruby-version-specific packages. In the local repository, `@ruby/3.4-wasm-wasi` and `@ruby/wasm-wasi` are version `2.9.4`.
+ruby.wasm provides CRuby builds for WebAssembly/WASI. It includes npm packages such as `@ruby/wasm-wasi` and Ruby-version-specific packages. In the local repository, `@ruby/3.4-wasm-wasi` and `@ruby/wasm-wasi` are version `2.10.1`.
 
 Ruby can access JavaScript through `require "js"`. This enables Ruby code to use the DOM, call JavaScript constructors, pass callbacks, and await JavaScript promises.
 
