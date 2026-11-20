@@ -235,7 +235,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
     alpha: false,
     preserveDrawingBuffer: true,
     shadow_map_enabled: true,
-    shadow_map_type: Three::PCFSoftShadowMap
+    shadow_map_type: Three::PCFShadowMap
   )
   renderer.set_clear_color(0xffffff, 1)
   renderer.tone_mapping = Three::ACESFilmicToneMapping
