@@ -31,7 +31,10 @@ module Three
           parameters[:iridescence] = material.iridescence if material.respond_to?(:iridescence)
           parameters[:iridescenceIOR] = material.iridescence_ior if material.respond_to?(:iridescence_ior)
           if material.respond_to?(:iridescence_thickness_range) && material.iridescence_thickness_range
-            parameters[:iridescenceThicknessRange] = material.iridescence_thickness_range.dup
+            # three.js r187 replaced iridescenceThicknessRange with these two properties.
+            minimum, maximum = material.iridescence_thickness_range
+            parameters[:iridescenceThicknessMinimum] = minimum
+            parameters[:iridescenceThicknessMaximum] = maximum
           end
           parameters[:sheen] = material.sheen if material.respond_to?(:sheen)
           parameters[:sheenColor] = material.sheen_color.hex if material.respond_to?(:sheen_color)

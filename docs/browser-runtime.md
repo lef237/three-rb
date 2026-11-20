@@ -22,7 +22,7 @@ The runtime currently follows the pinned versions in `package.json`:
 - `@bjorn3/browser_wasi_shim@0.4.2`
 - `@ruby/3.4-wasm-wasi@2.10.1`
 - `@ruby/wasm-wasi@2.10.1`
-- `three@0.186.1`
+- `three@0.187.0`
 
 Install them from the repository root with:
 
@@ -183,7 +183,7 @@ For standalone projects, install the gem and generate a Ruby-only browser exampl
 three-rb browser examples/browser/quickstart
 ```
 
-`quickstart` generates an asset-free rotating cube. Use `three-rb browser examples/browser/ruby` to generate the richer Ruby gemstone sample; its HDR asset is copied under `examples/browser/ruby/assets/`.
+`quickstart` generates an asset-free rotating cube. Use `three-rb browser examples/browser/ruby` to generate the richer Ruby gemstone sample; its title font is copied under `examples/browser/ruby/assets/`.
 
 The generator copies the browser runtime files, `package.json`, `pnpm-lock.yaml`, and `lib/` into the served project root, then creates `index.html`, `boot.mjs`, `main.rb`, and `README.md` for the example. Templates that need local files keep them under the generated example's `assets/` directory.
 

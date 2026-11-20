@@ -445,7 +445,9 @@ class ThreeThreeJSBackendTest < Minitest::Test
     assert_equal 0.35, handle[:parameters][:reflectivity]
     assert_equal 0.2, handle[:parameters][:iridescence]
     assert_equal 1.15, handle[:parameters][:iridescenceIOR]
-    assert_equal [120, 360], handle[:parameters][:iridescenceThicknessRange]
+    assert_equal 120, handle[:parameters][:iridescenceThicknessMinimum]
+    assert_equal 360, handle[:parameters][:iridescenceThicknessMaximum]
+    refute handle[:parameters].key?(:iridescenceThicknessRange)
     assert_equal 0.3, handle[:parameters][:sheen]
     assert_equal 0x223344, handle[:parameters][:sheenColor]
     assert_equal 0.65, handle[:parameters][:sheenRoughness]

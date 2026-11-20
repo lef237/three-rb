@@ -106,9 +106,6 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
   camera = Three::PerspectiveCamera.new(42, aspect: 1.0, near: 0.1, far: 100)
   camera.position.set(0, 0.42, 6.9)
 
-  environment_texture = Three::Loaders::RGBELoader.new.load("/examples/browser/ruby/assets/studio.hdr")
-  scene.environment = environment_texture
-
   scene.add(Three::AmbientLight.new(0xffffff, 0.82))
   scene.add(Three::HemisphereLight.new(0xffffff, 0xffedf2, 1.0))
 
@@ -238,7 +235,7 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
     alpha: false,
     preserveDrawingBuffer: true,
     shadow_map_enabled: true,
-    shadow_map_type: Three::PCFSoftShadowMap
+    shadow_map_type: Three::PCFShadowMap
   )
   renderer.set_clear_color(0xffffff, 1)
   renderer.tone_mapping = Three::ACESFilmicToneMapping
@@ -273,7 +270,6 @@ Three::Browser.run(starting: "Starting Ruby scene") do |app|
       ruby_title_geometry: title_geometry,
       ruby_title_material: title_material,
       ruby_sparkles: sparkles.map(&:first),
-      ruby_environment: environment_texture,
       ruby_font_loaded: true,
       ruby_frame: 0
     },

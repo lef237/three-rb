@@ -82,7 +82,7 @@ module Three
           "index.html" => "index.html",
           "boot.mjs" => "boot.mjs",
           "main.rb" => "main.rb",
-          "assets/studio.hdr" => "assets/studio.hdr"
+          "assets/helvetiker_regular.typeface.json" => "assets/helvetiker_regular.typeface.json"
         }.each do |source_name, destination_name|
           copy_generated_file(
             runtime_path(File.join("examples/browser/ruby", source_name)),
@@ -167,7 +167,7 @@ module Three
 
       def example_files
         names = %w[index.html boot.mjs main.rb README.md]
-        names << "assets/studio.hdr" if ruby_example?
+        names << "assets/helvetiker_regular.typeface.json" if ruby_example?
         names.map { |name| example_path(name) }
       end
 

@@ -22,7 +22,7 @@ If you installed through Bundler, run:
 bundle exec three-rb browser examples/browser/quickstart
 ```
 
-Use `three-rb browser examples/browser/ruby` instead when you want the richer Ruby gemstone sample. It generates the same browser runtime shape and keeps its HDR file under `examples/browser/ruby/assets/`.
+Use `three-rb browser examples/browser/ruby` instead when you want the richer Ruby gemstone sample. It generates the same browser runtime shape and keeps its title font under `examples/browser/ruby/assets/`.
 
 The generator creates:
 
