@@ -9,6 +9,13 @@ updates:
     directory: "/"
     schedule:
       interval: weekly
+    groups:
+      # The ruby.wasm runtime and its JS glue must share one version: the Pages
+      # build refuses to run when they differ, so a PR that bumps only one of
+      # them can never pass.
+      ruby-wasm:
+        patterns:
+          - "@ruby/*"
 
   - package-ecosystem: github-actions
     directory: "/"
