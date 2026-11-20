@@ -23,6 +23,7 @@ class ThreeBrowserExampleGeneratorTest < Minitest::Test
       assert_includes generator.created, "examples/browser/quickstart/main.rb"
       assert_path_exists File.join(dir, "lib/three.rb")
       assert_path_exists File.join(dir, "examples/browser/shared/boot.mjs")
+      assert_path_exists File.join(dir, "examples/browser/shared/config.mjs")
       assert_path_exists File.join(dir, "package.json")
       assert_path_exists File.join(dir, "pnpm-lock.yaml")
       assert_includes main, "require_relative \"../../../lib/three\""
@@ -58,6 +59,7 @@ class ThreeBrowserExampleGeneratorTest < Minitest::Test
       assert_includes generator.created, "examples/browser/ruby/assets/helvetiker_regular.typeface.json"
       assert_path_exists File.join(dir, "examples/browser/ruby/assets/helvetiker_regular.typeface.json")
       assert_path_exists File.join(dir, "examples/browser/shared/boot.mjs")
+      assert_path_exists File.join(dir, "examples/browser/shared/config.mjs")
       assert_includes main, "faceted_ruby_geometry"
       assert_includes main, "/examples/browser/ruby/assets/helvetiker_regular.typeface.json"
       assert_includes main, "Three::TextGeometry"

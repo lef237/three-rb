@@ -117,11 +117,11 @@ export function diagnosticMessage(message, diagnostics) {
   return sections.join("\n\n");
 }
 
-export function startServer() {
+export function startServer(serverRoot = root) {
   const server = createServer(async (request, response) => {
     try {
       const pathname = decodeURIComponent(new URL(request.url, "http://127.0.0.1").pathname);
-      const filePath = await resolveFile(pathname);
+      const filePath = await resolveFile(pathname, serverRoot);
       response.setHeader("Content-Type", mimeTypes.get(extname(filePath)) || "application/octet-stream");
       response.end(await readFile(filePath));
     } catch (error) {
@@ -139,11 +139,11 @@ export function startServer() {
   });
 }
 
-async function resolveFile(pathname) {
+async function resolveFile(pathname, serverRoot) {
   const requested = pathname.endsWith("/") ? `${pathname}index.html` : pathname;
-  const filePath = normalize(join(root, requested));
-  const rel = relative(root, filePath);
-  if (rel.startsWith("..")) throw new Error("request escaped repository root");
+  const filePath = normalize(join(serverRoot, requested));
+  const rel = relative(serverRoot, filePath);
+  if (rel.startsWith("..")) throw new Error("request escaped server root");
 
   const info = await stat(filePath);
   if (info.isDirectory()) return join(filePath, "index.html");
