@@ -345,7 +345,10 @@ module Three
           texture[:matrixAutoUpdate] = parameters[:matrix_auto_update] unless parameters[:matrix_auto_update].nil?
           texture[:matrix].call(:fromArray, js_array(parameters[:matrix])) if parameters[:matrix]
           texture.call(:updateMatrix) if parameters[:matrix_auto_update]
-          texture[:needsUpdate] = true
+          # A loader texture has no image until its file arrives, and three.js
+          # warns on every frame it is flagged before then. The loader flags it
+          # once the image is in, and the upload reads the settings above.
+          texture[:needsUpdate] = true if js_present?(texture[:image])
           texture
         end
 
@@ -562,7 +565,10 @@ module Three
         end
 
         def new_mesh_toon_material(parameters)
-          material = @three[:MeshToonMaterial].new(stringify_keys(parameters))
+          # MeshToonMaterial doesn't declare flatShading, so its constructor
+          # warns and drops it. The renderer still reads flatShading on any
+          # material, so update_material assigns it directly instead.
+          material = @three[:MeshToonMaterial].new(stringify_keys(parameters.except(:flatShading)))
           update_material(material, parameters)
           material
         end
