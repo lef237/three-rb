@@ -4,6 +4,8 @@ This guide shows how to deploy a three-rb browser example to Cloudflare Pages.
 
 Cloudflare Pages does not run the example's Ruby code on the server. Pages serves static files, the browser downloads ruby.wasm, and ruby.wasm runs the Ruby entrypoint in the user's browser.
 
+The build scripts under `scripts/` belong to the three-rb repository and are not included in the gem, so run these steps from a clone of the repository.
+
 ## What Must Be Deployed
 
 The current browser examples use root-relative URLs. The deployed output must preserve these paths:
@@ -119,7 +121,7 @@ Optional, if you host `ruby+stdlib.wasm` yourself:
 RUBY_WASM_URL=https://<your-static-host>/ruby+stdlib.wasm
 ```
 
-Cloudflare Pages installs dependencies from `package.json` before the build command unless dependency installation is disabled. The build command creates `dist/` on Cloudflare during each deployment, so `dist/` should not be committed to the repository. Cloudflare's Ruby support is only needed for build-time commands; the deployed Pages runtime still serves static files.
+Cloudflare Pages installs dependencies from `package.json` before the build command unless dependency installation is disabled. The build command creates `dist/` on Cloudflare during each deployment, so `dist/` should not be committed to the repository. The build only runs `sh` and Node, so Pages needs no Ruby at build time either, and the deployed site is static files.
 
 After deployment, open:
 
@@ -153,7 +155,7 @@ Then open:
 https://<project>.pages.dev/examples/browser/cube/
 ```
 
-Keep `examples/browser/shared` and the same browser packages in the output directory, and bundle that example's entrypoint the same way. Examples with local files under `assets/` need those assets copied with the example directory.
+Keep `examples/browser/shared` and the same browser packages in the output directory, and bundle that example's entrypoint the same way. The build script also replaces `/node_modules/` with `/vendor/` in the Ruby example's `index.html` and bundled `main.rb`; do the same for the copied example, or its import map and asset URLs will point at paths that are not deployed. Examples with local files under `assets/` need those assets copied with the example directory.
 
 ## Troubleshooting
 
@@ -163,7 +165,7 @@ The configured wasm URL is not reachable. For Cloudflare Pages, do not rely on `
 
 `Failed to resolve module specifier`
 
-The import map in the example page points at `/node_modules/...`, but the matching package was not copied to the output directory.
+The import map in the example page points at a package path that is missing from the output directory. After the build script, the import map should point at `/vendor/...`; a page that still points at `/node_modules/...` was copied without that rewrite.
 
 `/node_modules/three/examples/jsm/... not found`
 
@@ -186,7 +188,7 @@ The second command should print `0`.
 
 The status stays at `Loading ruby.wasm`
 
-The boot runtime aborts and retries the wasm download up to three times if it stops making progress for 20 seconds, and the status line shows `Retrying ruby.wasm download (n/3)` while it does. If it still fails, check the browser network tab for failed `.wasm`, `.mjs`, `.rb`, `.hdr`, or three.js addon requests. A missing static asset is the most common cause.
+The boot runtime aborts and retries the wasm download up to three times if it stops making progress for 20 seconds, and the status line shows `Retrying ruby.wasm download (n/3)` while it does. If it still fails, check the browser network tab for failed `.wasm`, `.mjs`, `.rb`, font `.json`, or three.js addon requests. A missing static asset is the most common cause.
 
 If the download completes but is simply slow for everyone, the wasm host is the problem rather than the page. Check whether the host returns a `cf-cache-status` header; an endpoint that never does is not being cached at the edge.
 

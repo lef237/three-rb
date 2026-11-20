@@ -14,13 +14,13 @@ This project is in browser-first alpha. The current code covers the gem foundati
 
 ## Browser-first alpha scope
 
-Supported scope for the first public release:
+Supported scope for the alpha releases:
 
 - Pure Ruby scene construction, math, cameras, lights, geometry, materials, textures, layers, raycasting helpers, and JSON export/load.
 - Browser rendering through `Three::Renderers::ThreeJSRenderer`, ruby.wasm, and pnpm-managed `three@0.187.0`.
 - JavaScript-delegated browser features for texture loading, cube/RGBE textures, glTF/DRACO loading, OrbitControls, animation mixers, instancing, picking, shadows, and an initial postprocessing pipeline.
 
-Out of scope for the first public release:
+Out of scope for the alpha releases:
 
 - A Ruby-native OpenGL/Vulkan/software renderer.
 - Full three.js API compatibility.
@@ -98,7 +98,7 @@ ruby hello_three.rb
 You should see the library load and create Ruby scene objects:
 
 ```text
-three-rb 0.1.0
+three-rb 0.2.1
 Three::Scene
 Three::Mesh
 ```
@@ -216,6 +216,7 @@ bundle exec rake release:preflight
 - [Browser Runtime](docs/browser-runtime.md)
 - [Browser Examples](examples/browser/README.md)
 - [Standalone Browser App](docs/standalone-browser-app.md)
+- [Cloudflare Pages Deployment](docs/cloudflare-pages.md)
 - [Loaded Asset Traversal and Disposal Design](docs/loaded-assets-design.md)
 - [Release Readiness](docs/release-readiness.md)
 - [Publishing](docs/publishing.md)

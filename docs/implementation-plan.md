@@ -63,7 +63,7 @@ These can be future extensions. Adding them too early would expand the scope bef
 
 ### three.js
 
-The local three.js reference has package version `0.184.0`. Its public API is assembled through `src/Three.Core.js` and `src/Three.js`, which re-export many modules.
+When this plan was written, the local three.js reference had package version `0.184.0`; the browser runtime now pins `0.187.0` (see `docs/browser-runtime.md`). Its public API is assembled through `src/Three.Core.js` and `src/Three.js`, which re-export many modules.
 
 The main module boundaries are:
 
@@ -497,6 +497,8 @@ Current implementation status:
 - `Three::Renderers::ThreeJSRenderer` exists and delegates renderer creation, sizing, animation loops, scene syncing, and render calls to the backend.
 - The bridge can materialize `Scene`, `Group`, `Object3D`, external loaded `Object3D` handles, `PerspectiveCamera`, `OrthographicCamera`, `Mesh`, `Line`, `Points`, `Sprite`, `AmbientLight`, `DirectionalLight`, `PointLight`, `HemisphereLight`, `Texture`, `CubeTexture`, `RGBETexture`, `BoxGeometry`, `PlaneGeometry`, `SphereGeometry`, generic `BufferGeometry`, `BufferAttribute`, `MeshBasicMaterial`, `LineBasicMaterial`, `PointsMaterial`, `SpriteMaterial`, `MeshLambertMaterial`, `MeshMatcapMaterial`, `MeshToonMaterial`, `MeshStandardMaterial`, `MeshPhysicalMaterial`, `MeshNormalMaterial`, and `ShadowMaterial`.
 - Unit tests cover materialization, handle caching, transform syncing, rendering delegation, and disposal through a fake three.js adapter.
+- `examples/browser/ruby` renders a Ruby-authored faceted gemstone from a generic `BufferGeometry` with `MeshPhysicalMaterial`, a three-dimensional `TextGeometry` title loaded through `FontLoader`, shadows, and `OrbitControls`.
+- `examples/browser/dango` composes a three-color dango from `SphereGeometry` and `BoxGeometry` meshes in `Group`s, lit by directional, hemisphere, and point lights with shadows, under an `OrthographicCamera` with `OrbitControls`.
 - `examples/browser/cube` loads pnpm-managed ruby.wasm and three.js browser packages, loads this library from `lib/`, and renders a rotating cube through `Three::Renderers::ThreeJSRenderer`.
 - `examples/browser/cube/smoke_test.mjs` provides an opt-in Playwright smoke test that serves the repository root, waits for the example to reach `Running`, and samples the WebGL canvas for nonblank pixels.
 - `examples/browser/composition` renders an `OrthographicCamera` view with ambient/directional/point/hemisphere lights, directional shadow mapping, `PlaneGeometry`, `SphereGeometry`, grouped meshes, `TextureLoader` repeat/wrap/filter settings, `MeshLambertMaterial`, `MeshPhongMaterial`, `MeshStandardMaterial`, `MeshNormalMaterial`, `ShadowMaterial`, backend material/texture disposal, and a material color update through the same renderer path.
@@ -866,9 +868,9 @@ The MVP is complete when:
 The original MVP decisions are now resolved:
 
 - Use `minitest` for the first public release test suite.
-- Use pnpm-managed local browser dependencies for ruby.wasm and three.js, avoiding CDN runtime drift and browser ORB failures.
+- Use pnpm-managed local browser dependencies for ruby.wasm and three.js, avoiding CDN runtime drift and browser ORB failures. The Cloudflare Pages build is the one exception: ruby.wasm is over the Pages asset size limit, so it loads from jsDelivr, pinned to the version in `package.json`.
 - Defer broad camelCase three.js compatibility aliases until after the first public release; snake-case Ruby methods are the documented API style.
 - Start geometry and attribute data with standard Ruby `Array` values instead of requiring `numo-narray`.
 - Publish the gem as `three-rb`.
 
-The first public target is `0.1.0` browser-first alpha. Its completion definition and release gate are tracked in `docs/release-readiness.md`.
+`0.1.0` was the first public browser-first alpha release. The release gate for later releases is tracked in `docs/release-readiness.md`.
