@@ -11,6 +11,7 @@
 
 ### Changed
 
+- three-rb now requires Ruby 3.3 or later. Ruby 3.2 reached end of life on 2026-03-31. CI now also runs the Ruby tests on 3.3 and 4.0.
 - Updated the pinned ruby.wasm packages, `@ruby/3.4-wasm-wasi` and `@ruby/wasm-wasi`, from a 2.9.4 nightly build to the 2.10.1 release.
 - Updated the pinned three.js to 0.187.0 (r187). `MeshPhysicalMaterial#iridescence_thickness_range` is now sent to three.js as `iridescenceThicknessMinimum` and `iridescenceThicknessMaximum`, which require r187 or later.
 - The Ruby gemstone and dango examples now request `PCFShadowMap`. three.js had already been rendering them with it in place of the deprecated `PCFSoftShadowMap`, which r187 removes.
