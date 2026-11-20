@@ -75,9 +75,9 @@ Dir.mktmpdir("three-rb-installed-cli") do |dir|
   ruby_main = File.read(File.join(dir, "examples/browser/ruby/main.rb"))
   ruby_boot = File.read(File.join(dir, "examples/browser/ruby/boot.mjs"))
 
-  assert(File.file?(File.join(dir, "examples/browser/ruby/assets/studio.hdr")), "expected ruby asset to be generated")
+  assert(File.file?(File.join(dir, "examples/browser/ruby/assets/helvetiker_regular.typeface.json")), "expected ruby asset to be generated")
   assert(ruby_main.include?("faceted_ruby_geometry"), "expected generated ruby example to use gemstone scene")
-  assert(ruby_main.include?("/examples/browser/ruby/assets/studio.hdr"), "expected generated ruby example to use local assets")
+  assert(ruby_main.include?("/examples/browser/ruby/assets/helvetiker_regular.typeface.json"), "expected generated ruby example to use local assets")
   assert(!ruby_main.include?("/examples/browser/assets/"), "expected generated ruby example to avoid shared assets")
   assert(ruby_boot.include?("examples/browser/ruby/main"), "expected ruby boot file to load generated Ruby entrypoint")
 end

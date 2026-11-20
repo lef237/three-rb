@@ -138,7 +138,7 @@ test -f examples/browser/quickstart/main.rb
 ruby -e 'main = File.read("examples/browser/quickstart/main.rb"); abort "generated Ruby entrypoint used JS bridge" if main.include?("require \"js\"") || main.include?("JS.global"); puts "generated Ruby entrypoint is Ruby-only"'
 three-rb browser examples/browser/ruby
 test -f examples/browser/ruby/main.rb
-test -f examples/browser/ruby/assets/studio.hdr
+test -f examples/browser/ruby/assets/helvetiker_regular.typeface.json
 ```
 
 Both Ruby commands must print:

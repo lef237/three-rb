@@ -55,12 +55,11 @@ class ThreeBrowserExampleGeneratorTest < Minitest::Test
       readme = File.read(File.join(dir, "examples/browser/ruby/README.md"))
 
       assert_includes generator.created, "examples/browser/ruby/main.rb"
-      assert_includes generator.created, "examples/browser/ruby/assets/studio.hdr"
-      assert_path_exists File.join(dir, "examples/browser/ruby/assets/studio.hdr")
+      assert_includes generator.created, "examples/browser/ruby/assets/helvetiker_regular.typeface.json"
+      assert_path_exists File.join(dir, "examples/browser/ruby/assets/helvetiker_regular.typeface.json")
       assert_path_exists File.join(dir, "examples/browser/shared/boot.mjs")
       assert_includes main, "faceted_ruby_geometry"
-      assert_includes main, "/examples/browser/ruby/assets/studio.hdr"
-      assert_includes main, "Three::Loaders::RGBELoader"
+      assert_includes main, "/examples/browser/ruby/assets/helvetiker_regular.typeface.json"
       assert_includes main, "Three::TextGeometry"
       assert_includes main, "Three::Controls::OrbitControls"
       assert_includes main, "require_relative \"../../../lib/three\""

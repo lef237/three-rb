@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Removed the HDR environment from the Ruby gemstone example and its generated template. The bundled `studio.hdr` was a 2x2 uniform gray image that three.js r186 and earlier never applied, so the gem never showed it; from r187 on it only washed the gem out.
+
+### Fixed
+
+- The generated Ruby gemstone example now includes its title font, which `main.rb` loads from `examples/browser/ruby/assets/`.
+
 ## 0.2.1 - 2026-05-17
 
 ### Added

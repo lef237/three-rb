@@ -182,8 +182,6 @@ class ThreeBrowserCubeExampleTest < Minitest::Test
     assert_includes ruby, "Three::Renderers::ThreeJSRenderer"
     assert_includes ruby, "transmission:"
     assert_includes ruby, "attenuation_color:"
-    assert_includes ruby, "Three::Loaders::RGBELoader"
-    assert_includes ruby, "scene.environment = environment_texture"
     assert_includes ruby, "Three::Loaders::FontLoader"
     assert_includes ruby, "helvetiker_regular.typeface.json"
     assert_includes ruby, "Three::TextGeometry"

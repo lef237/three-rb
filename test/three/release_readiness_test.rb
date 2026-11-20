@@ -126,7 +126,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes publishing, "three-rb --help"
     assert_includes publishing, "three-rb browser examples/browser/quickstart"
     assert_includes publishing, "three-rb browser examples/browser/ruby"
-    assert_includes publishing, "examples/browser/ruby/assets/studio.hdr"
+    assert_includes publishing, "examples/browser/ruby/assets/helvetiker_regular.typeface.json"
     assert_includes publishing, "generated Ruby entrypoint is Ruby-only"
     assert_includes publishing, "generated Ruby entrypoint used JS bridge"
   end
