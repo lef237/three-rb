@@ -63,6 +63,7 @@ Dir.mktmpdir("three-rb-installed-cli") do |dir|
 
   assert(File.file?(File.join(dir, "package.json")), "expected package.json to be generated")
   assert(File.file?(File.join(dir, "examples/browser/shared/boot.mjs")), "expected shared browser boot to be generated")
+  assert(File.file?(File.join(dir, "examples/browser/shared/config.mjs")), "expected shared browser config to be generated")
   assert(main.include?("Three::Browser.run"), "expected generated Ruby to use Three::Browser.run")
   assert(!main.include?("require \"js\""), "expected generated Ruby to avoid require js")
   assert(!main.include?("JS.global"), "expected generated Ruby to avoid JS.global")

@@ -64,6 +64,13 @@ module Three
           File.join(File.dirname(@target), "shared", "boot.mjs"),
           overwrite: @force
         )
+        # boot.mjs imports the wasm URL from here. Apps may point it at their
+        # own host, so an existing copy is kept even with --force.
+        copy_file(
+          runtime_path("examples/browser/shared/config.mjs"),
+          File.join(File.dirname(@target), "shared", "config.mjs"),
+          overwrite: false
+        )
       end
 
       def write_example_files

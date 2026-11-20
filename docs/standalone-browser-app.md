@@ -28,7 +28,7 @@ The generator creates:
 
 - `package.json` and `pnpm-lock.yaml`
 - `lib/`, copied from the installed gem
-- `examples/browser/shared/boot.mjs`
+- `examples/browser/shared/boot.mjs` and `examples/browser/shared/config.mjs`
 - `examples/browser/quickstart/index.html`
 - `examples/browser/quickstart/boot.mjs`
 - `examples/browser/quickstart/main.rb`
