@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require "fileutils"
-require "cgi"
+# Ruby 4.0 keeps only the escape helpers of the cgi library.
+require "cgi/escape"
 require "json"
 require "pathname"
 

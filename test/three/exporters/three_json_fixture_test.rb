@@ -7,8 +7,10 @@ class ThreeJSONFixtureTest < Minitest::Test
   ROOT = File.expand_path("../../..", __dir__)
   FIXTURE_PATH = File.join(ROOT, "test/fixtures/scene_export_v1.json")
 
+  # Compares parsed data because JSON.pretty_generate lays out empty objects
+  # and arrays differently across json gem versions.
   def test_export_matches_saved_fixture
-    assert_equal File.read(FIXTURE_PATH), SceneFixtureBuilder.serialization_fixture_json
+    assert_equal JSON.parse(File.read(FIXTURE_PATH)), JSON.parse(SceneFixtureBuilder.serialization_fixture_json)
   end
 
   def test_saved_fixture_loads_expected_scene_graph
