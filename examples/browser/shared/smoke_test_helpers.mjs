@@ -17,7 +17,7 @@ const mimeTypes = new Map([
 ]);
 
 export function createDiagnostics() {
-  return { errors: [], requests: [] };
+  return { errors: [], warnings: [], requests: [] };
 }
 
 export async function loadPlaywright() {
@@ -35,6 +35,10 @@ export async function createSmokePage(browser, diagnostics, options = {}) {
   const page = await browser.newPage({ viewport: options.viewport || { width: 960, height: 540 } });
   page.on("console", (message) => {
     if (message.type() === "error") diagnostics.errors.push(message.text());
+    // three.js prefixes its warnings, which flag API misuse such as unknown
+    // material properties. Chromium's GPU driver messages are left out: they
+    // vary by machine and the canvas readback in these tests triggers them.
+    if (message.type() === "warning" && message.text().startsWith("THREE.")) diagnostics.warnings.push(message.text());
   });
   page.on("pageerror", (error) => diagnostics.errors.push(error.message));
   page.on("requestfailed", (request) => {
@@ -105,7 +109,7 @@ export function assertNonBlankCanvas(canvas) {
 }
 
 export function assertNoDiagnostics(diagnostics) {
-  if (diagnostics.errors.length > 0 || diagnostics.requests.length > 0) {
+  if (diagnostics.errors.length > 0 || diagnostics.warnings.length > 0 || diagnostics.requests.length > 0) {
     throw new Error(diagnosticMessage("browser diagnostics", diagnostics));
   }
 }
@@ -113,6 +117,7 @@ export function assertNoDiagnostics(diagnostics) {
 export function diagnosticMessage(message, diagnostics) {
   const sections = [message];
   if (diagnostics.errors.length > 0) sections.push(`console/page errors:\n${diagnostics.errors.join("\n")}`);
+  if (diagnostics.warnings.length > 0) sections.push(`three.js warnings:\n${diagnostics.warnings.join("\n")}`);
   if (diagnostics.requests.length > 0) sections.push(`network diagnostics:\n${diagnostics.requests.join("\n")}`);
   return sections.join("\n\n");
 }
