@@ -6,7 +6,7 @@ Last updated: 2026-11-20.
 
 ## Current Position
 
-The project is past the original MVP and is in Phase 8, renderer maturity. `0.1.0`, `0.2.0`, and `0.2.1` are published on RubyGems. Changes since `0.2.1` are collected under the `Unreleased` heading in `CHANGELOG.md` for the next release.
+The project is past the original MVP and is in Phase 8, renderer maturity. `0.1.0` through `0.3.0` are published on RubyGems. Record changes made after `0.3.0` under an `## Unreleased` heading at the top of `CHANGELOG.md`.
 
 Recent completed work:
 
@@ -31,7 +31,7 @@ Recent completed work:
 - Release install smoke now validates the installed executable and generated browser app shape outside the repository load path.
 - Local release gate and `main` CI were green for each published release.
 
-Since `0.2.1`:
+Released in `0.3.0`:
 
 - Dango browser example with primitive meshes, lighting, shadows, and smoke coverage.
 - Cloudflare Pages deployment guide and the repository's `pnpm build:pages:ruby` build, which bundles the Ruby entrypoint and loads ruby.wasm from jsDelivr.
@@ -44,21 +44,18 @@ Do not start Phase 9 native renderer work yet. The implementation plan still rec
 
 ## Recommended Next Task
 
-Publish the changes under `Unreleased` as the next release once the release owner confirms the version and RubyGems credentials.
+Pick one feature target and keep the change small enough to verify through one browser example.
 
 This is the best next step because:
 
-- `0.2.1` predates the r187 update, the ruby.wasm 2.10.1 release, and the generated-app fixes, so installed users still get the older runtime.
-- The `Unreleased` section in `CHANGELOG.md` already describes everything since `0.2.1`.
-- Further feature scope should wait until after that release unless an already-advertised example breaks.
+- `0.3.0` brought the pinned runtime up to three.js r187 and ruby.wasm 2.10.1 and fixed the generated-app install, so no release work is pending.
+- The release gate, CI on Ruby 3.3, 3.4, and 4.0, and the browser smoke tests all pass on `main`.
 
 ## Scope
 
-Until the release, keep `CHANGELOG.md`, `docs/release-readiness.md`, and this resume point aligned with what is on `main`. Do not tag, push, or publish until the release owner confirms.
+Between releases, keep `CHANGELOG.md`, `docs/release-readiness.md`, and this resume point aligned with what is on `main`. Do not tag, push, or publish until the release owner confirms.
 
 When the owner is ready to publish, follow `docs/publishing.md`: bump `lib/three/version.rb`, replace the current changelog heading `## Unreleased` with the version and date, run `bundle exec rake release:preflight`, commit the metadata update, publish the gem, tag the release, push `main` and the tag, then verify installation from RubyGems.
-
-After the release is published, pick one feature target and keep the change small enough to verify through one browser example.
 
 Candidate targets, in recommended order when there is no stronger product signal:
 
@@ -70,16 +67,14 @@ Candidate targets, in recommended order when there is no stronger product signal
 
 ## Suggested Implementation Plan
 
-1. Until the release is confirmed, keep the current changelog heading, release-readiness docs, and publishing checklist aligned with `main` without changing the version, tag, or published artifact.
-2. When the release is confirmed, bump the version and date the `Unreleased` heading in `CHANGELOG.md`.
-3. Run `bundle exec rake release:preflight`.
-4. Commit the release metadata with a message that does not include co-author trailers.
-5. Publish and tag using `docs/publishing.md`.
-6. After publishing, start the next feature from a user-visible workflow and choose exactly one feature target.
-7. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
-8. Add or extend one browser example and keep `examples/browser/README.md` in sync.
-9. Add or update a deterministic Playwright smoke command in `package.json`.
-10. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
+1. Start the next feature from a user-visible workflow and choose exactly one feature target.
+2. Add Ruby API coverage, fake adapter/backend tests, JSON export/load coverage when the object is serializable, and resource-disposal coverage when it owns GPU resources.
+3. Add or extend one browser example and keep `examples/browser/README.md` in sync.
+4. Add or update a deterministic Playwright smoke command in `package.json`.
+5. Record the change under an `## Unreleased` heading in `CHANGELOG.md`.
+6. Run Ruby tests, the affected browser smoke test, `bundle exec rake release:gem_smoke`, and `bundle exec rake release:preflight` before release work.
+7. Before the next release, keep the current changelog heading, release-readiness docs, and publishing checklist aligned with `main` without changing the version, tag, or published artifact until the release owner confirms.
+8. When the release is confirmed, publish and tag using `docs/publishing.md`, with a release commit message that does not include co-author trailers.
 
 ## Acceptance Criteria
 
