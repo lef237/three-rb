@@ -58,7 +58,7 @@ class ThreeReleaseReadinessTest < Minitest::Test
     assert_includes guide, "ruby.wasm"
     assert_includes guide, "Three::Renderers::ThreeJSRenderer"
     assert_includes guide, "@ruby/3.4-wasm-wasi@2.10.1"
-    assert_includes guide, "three@0.186.1"
+    assert_includes guide, "three@0.187.0"
     assert_includes guide, "globalThis.THREE"
     assert_includes guide, "globalThis.THREE_GLTF_LOADER"
     assert_includes guide, "globalThis.THREE_DOT_SCREEN_PASS"
