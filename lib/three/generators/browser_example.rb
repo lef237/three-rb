@@ -4,6 +4,8 @@ require "fileutils"
 require "cgi"
 require "json"
 require "pathname"
+require "set"
+require "yaml"
 
 module Three
   module Generators
@@ -56,8 +58,7 @@ module Three
       end
 
       def copy_runtime
-        copy_file(runtime_path("package.json"), File.join(@root, "package.json"), overwrite: false)
-        copy_file(runtime_path("pnpm-lock.yaml"), File.join(@root, "pnpm-lock.yaml"), overwrite: false)
+        write_app_package
         copy_tree(runtime_path("lib"), File.join(@root, "lib"), overwrite: false)
         copy_file(
           runtime_path("examples/browser/shared/boot.mjs"),
@@ -71,6 +72,81 @@ module Three
           File.join(File.dirname(@target), "shared", "config.mjs"),
           overwrite: false
         )
+      end
+
+      # The gem's own package.json also lists its test and deploy tooling, and
+      # pnpm refuses to install that tooling without the gem's
+      # pnpm-workspace.yaml. Apps only need the browser runtime packages.
+      def write_app_package
+        package_path = File.join(@root, "package.json")
+        package = app_package_json
+        write_runtime_file(package_path, package)
+
+        # A lockfile written next to someone else's package.json would not
+        # match it, and pnpm rejects a mismatched lockfile in CI.
+        return unless File.read(package_path) == package
+
+        lockfile = app_lockfile
+        write_runtime_file(File.join(@root, "pnpm-lock.yaml"), lockfile) if lockfile
+      end
+
+      def app_package_json
+        package = JSON.parse(File.read(runtime_path("package.json")))
+        app = {
+          "private" => true,
+          "packageManager" => package.fetch("packageManager"),
+          "dependencies" => package.fetch("dependencies")
+        }
+        "#{JSON.pretty_generate(app)}\n"
+      end
+
+      # Keeps the entries the runtime dependencies reach, so the app gets the
+      # versions and integrity hashes the gem was tested with.
+      def app_lockfile
+        source = File.read(runtime_path("pnpm-lock.yaml"))
+        return unless YAML.parse_stream(source).children.length == 1
+
+        lockfile = YAML.safe_load(source)
+        importer = lockfile.dig("importers", ".")
+        return unless importer
+
+        importer.delete("devDependencies")
+        snapshots = lockfile.fetch("snapshots", {})
+        reachable = reachable_snapshots(snapshots, importer.fetch("dependencies", {}))
+        # Snapshot keys may carry a peer suffix, as in "name@1.0.0(peer@2.0.0)".
+        packages = reachable.to_set { |key| key.sub(/\(.*\z/, "") }
+        lockfile["packages"] = lockfile.fetch("packages", {}).select { |key, _value| packages.include?(key) }
+        lockfile["snapshots"] = snapshots.select { |key, _value| reachable.include?(key) }
+
+        # pnpm reads a leading document marker as an empty first document and
+        # then reports the lockfile as missing.
+        YAML.dump(lockfile).delete_prefix("---\n")
+      end
+
+      def reachable_snapshots(snapshots, dependencies)
+        pending = dependencies.map { |name, dependency| "#{name}@#{dependency.fetch("version")}" }
+        reachable = Set.new
+        until pending.empty?
+          key = pending.shift
+          next unless reachable.add?(key)
+
+          snapshot = snapshots.fetch(key, nil) || {}
+          %w[dependencies optionalDependencies].each do |field|
+            snapshot.fetch(field, {}).each { |name, version| pending << "#{name}@#{version}" }
+          end
+        end
+        reachable
+      end
+
+      def write_runtime_file(path, content)
+        if File.exist?(path)
+          @skipped << relative_path(path)
+          return
+        end
+
+        FileUtils.mkdir_p(File.dirname(path))
+        File.write(path, content)
+        @created << relative_path(path)
       end
 
       def write_example_files

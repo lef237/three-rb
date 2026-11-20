@@ -26,7 +26,7 @@ Use `three-rb browser examples/browser/ruby` instead when you want the richer Ru
 
 The generator creates:
 
-- `package.json` and `pnpm-lock.yaml`
+- `package.json`, listing only the browser runtime packages (three.js and ruby.wasm), and a matching `pnpm-lock.yaml`
 - `lib/`, copied from the installed gem
 - `examples/browser/shared/boot.mjs` and `examples/browser/shared/config.mjs`
 - `examples/browser/quickstart/index.html`
@@ -35,6 +35,8 @@ The generator creates:
 - `examples/browser/quickstart/README.md`
 
 For templates that need assets, the generator also creates an `assets/` directory inside the example.
+
+If the project already has a `package.json`, the generator leaves it alone and doesn't write a lockfile. Add the `dependencies` from the gem's `package.json` to it yourself.
 
 Copying `lib/` puts the installed gem's Ruby source in the served app directory. The browser Ruby VM loads Ruby files over HTTP, so this is the current standalone workflow.
 

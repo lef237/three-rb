@@ -61,7 +61,10 @@ Dir.mktmpdir("three-rb-installed-cli") do |dir|
   main = File.read(File.join(dir, "examples/browser/quickstart/main.rb"))
   boot = File.read(File.join(dir, "examples/browser/quickstart/boot.mjs"))
 
-  assert(File.file?(File.join(dir, "package.json")), "expected package.json to be generated")
+  package = JSON.parse(File.read(File.join(dir, "package.json")))
+  assert(package.key?("dependencies") && package["dependencies"].key?("three"), "expected package.json to list the browser runtime")
+  assert(!package.key?("devDependencies") && !package.key?("scripts"), "expected package.json to leave out the gem's own tooling")
+  assert(File.file?(File.join(dir, "pnpm-lock.yaml")), "expected pnpm-lock.yaml to be generated")
   assert(File.file?(File.join(dir, "examples/browser/shared/boot.mjs")), "expected shared browser boot to be generated")
   assert(File.file?(File.join(dir, "examples/browser/shared/config.mjs")), "expected shared browser config to be generated")
   assert(main.include?("Three::Browser.run"), "expected generated Ruby to use Three::Browser.run")
